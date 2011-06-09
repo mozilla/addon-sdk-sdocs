@@ -1,0 +1,1 @@
+This repository contains snapshots of the Add-on SDK' static doc set: that is, the output of running "cfx sdocs" on an installation of the SDK.
