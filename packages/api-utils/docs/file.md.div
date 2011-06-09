@@ -1,0 +1,228 @@
+
+<div id="file_module_api_docs" class="module_api_docs">
+<h1>file</h1>
+<div class="module_description"><!-- contributed by Drew Willcoxon [adw@mozilla.com]  -->
+<!-- contributed by Atul Varma [atul@mozilla.com]  -->
+<!-- edited by Noelle Murata [fiveinchpixie@gmail.com]  -->
+
+<p>The <code>file</code> module provides access to the local filesystem.</p>
+<h2>Paths</h2>
+<p>Path specifications in this API are platform-specific.  This means that on
+Windows paths are specified using the backslash path separator (<code>\</code>), and on
+Unix-like systems like Linux and OS X paths are specified using the forward
+slash path separator (<code>/</code>).</p>
+<p>If your add-on uses literal Windows-style path specifications with this API,
+your add-on likely won't work when users run it on Unix-like systems.  Likewise,
+if your add-on uses literal Unix-style path specifications, it won't work for
+users on Windows.</p>
+<p>To ensure your add-on works for everyone, generate paths using the
+<a href="packages/api-utils/docs/file.html#join(...)"><code>join</code></a> function.  Unfortunately
+this API does not currently provide a way to obtain an absolute base path which
+you could then use with <code>join</code>.  For now, you need to
+<a href="dev-guide/module-development/chrome.html"><code>require("chrome")</code></a> and use the
+XPCOM directory service as described at
+<a href="https://developer.mozilla.org/en/Code_snippets/File_I%2F%2FO#Getting_special_files">MDN</a>.</p>
+<p>Note that if you do decide to hardcode Windows-style paths, be sure to escape
+backslashes in strings.  For example, to specify the file at <code>C:\Users\Myk</code>, you
+need to use the string <code>"C:\\Users\\Myk"</code>, not <code>"C:\Users\Myk"</code>.  You can read
+more about escaping characters in strings at
+<a href="https://developer.mozilla.org/en/JavaScript/Guide/Values,_Variables,_and_Literals#Escaping_Characters">MDN</a>.</p>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">basename(path)</h4>
+<p>Returns the last component of the given path.  For example,
+<code>basename("/foo/bar/baz")</code> returns <code>"baz"</code>.  If the path has no components,
+the empty string is returned.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">path : <span class="datatype">string</span></div>
+<p>The path of a file.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">string</span><p>The last component of the given path.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">dirname(path)</h4>
+<p>Returns the path of the directory containing the given file.  If the file is
+at the top of the volume, the empty string is returned.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">path : <span class="datatype">string</span></div>
+<p>The path of a file.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">string</span><p>The path of the directory containing the file.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">exists(path)</h4>
+<p>Returns true if a file exists at the given path and false otherwise.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">path : <span class="datatype">string</span></div>
+<p>The path of a file.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>True if the file exists and false otherwise.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">join(...)</h4>
+<p>Takes a variable number of strings, joins them on the file system's path
+separator, and returns the result.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">... : <span class="datatype">strings</span></div>
+<p>A variable number of strings to join.  The first string must be an absolute
+path.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">string</span><p>A single string formed by joining the strings on the file system's path
+separator.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">list(path)</h4>
+<p>Returns an array of file names in the given directory.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">path : <span class="datatype">string</span></div>
+<p>The path of the directory.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">array</span><p>An array of file names.  Each is a basename, not a full path.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">mkpath(path)</h4>
+<p>Makes a new directory named by the given path.  Any subdirectories that do not
+exist are also created.  <code>mkpath</code> can be called multiple times on the same
+path.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">path : <span class="datatype">string</span></div>
+<p>The path to create.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">open(path, mode)</h4>
+<p>Returns a stream providing access to the contents of a file.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">path : <span class="datatype">string</span></div>
+<p>The path of the file to open.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ mode : <span class="datatype">string</span> ]</div>
+<p>An optional string, each character of which describes a characteristic of the
+returned stream.  If the string contains <code>"r"</code>, the file is opened in
+read-only mode.  <code>"w"</code> opens the file in write-only mode.  <code>"b"</code> opens the
+file in binary mode.  If <code>"b"</code> is not present, the file is opened in text
+mode, and its contents are assumed to be UTF-8.  If <em><code>mode</code></em> is not given,
+<code>"r"</code> is assumed, and the file is opened in read-only text mode.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">stream</span><p>If the file is opened in text read-only <code>mode</code>, a <code>TextReader</code> is returned,
+and if text write-only mode, a <code>TextWriter</code> is returned.  See
+<a href="packages/api-utils/docs/text-streams.html"><code>text-streams</code></a> for information on
+these text stream objects.  If the file is opened in binary read-only <code>mode</code>,
+a <code>ByteReader</code> is returned, and if binary write-only mode, a <code>ByteWriter</code> is
+returned.  See
+<a href="packages/api-utils/docs/byte-streams.html"><code>byte-streams</code></a> for more
+information on these byte stream objects.  Opened files should always be
+closed after use by calling <code>close</code> on the returned stream.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">read(path, mode)</h4>
+<p>Opens a file and returns a string containing its entire contents.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">path : <span class="datatype">string</span></div>
+<p>The path of the file to read.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ mode : <span class="datatype">string</span> ]</div>
+<p>An optional string, each character of which describes a characteristic of the
+returned stream.  If the string contains <code>"b"</code>, the contents will be returned 
+in binary mode. If <code>"b"</code> is not present or <code>mode</code> is not given, the file
+contents will be returned in text mode. </p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">string</span><p>A string containing the file's entire contents.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">remove(path)</h4>
+<p>Removes a file from the file system.  To remove directories, use <code>rmdir</code>.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">path : <span class="datatype">string</span></div>
+<p>The path of the file to remove.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">rmdir(path)</h4>
+<p>Removes a directory from the file system.  If the directory is not empty, an
+exception is thrown.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">path : <span class="datatype">string</span></div>
+<p>The path of the directory to remove.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>

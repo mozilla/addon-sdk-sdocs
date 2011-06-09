@@ -1,0 +1,226 @@
+
+<div id="request_module_api_docs" class="module_api_docs">
+<h1>request</h1>
+<div class="module_description"><p>The <code>request</code> module lets you make simple yet powerful network requests.</p>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Classes</h3>
+
+<div class="api_component">
+<h4 class="api_name">Request</h4>
+<p>The <code>Request</code> object is used to make <code>GET</code> or <code>POST</code> network requests. It is
+constructed with a URL to which the request is sent. Optionally the user may
+specify a collection of headers and content to send alongside the request and
+a callback which will be executed once the request completes.</p>
+<p>Once a <code>Request</code> object has been created a <code>GET</code> request can be executed by
+calling its <code>get()</code> method, or a <code>POST</code> request by calling its <code>post()</code> method.</p>
+<p>When the server completes the request, the <code>Request</code> object emits a "complete"
+event.  Registered event listeners are passed a <code>Response</code> object.</p>
+<p>Each <code>Request</code> object is designed to be used once. Once <code>GET</code> or <code>POST</code> are
+called, attempting to call either will throw an error.</p>
+<p>Since the request is not being made by any particular website, requests made
+here are not subject to the same-domain restriction that requests made in web
+pages are subject to.</p>
+<p>With the exception of <code>response</code>, all of a <code>Request</code> object's properties
+correspond with the options in the constructor. Each can be set by simply
+performing an assignment. However, keep in mind that the same validation rules
+that apply to <code>options</code> in the constructor will apply during assignment. Thus,
+each can throw if given an invalid value.</p>
+<p>The example below shows how to use Request to get the most recent public tweet.</p>
+<pre><code>var Request = require('request').Request;
+var latestTweetRequest = Request({
+  url: "http://api.twitter.com/1/statuses/public_timeline.json",
+  onComplete: function (response) {
+    var tweet = response.json[0];
+    console.log("User: " + tweet.user.screen_name);
+    console.log("Tweet: " + tweet.text);
+  }
+});
+
+// Be a good consumer and check for rate limiting before doing more.
+Request({
+  url: "http://api.twitter.com/1/account/rate_limit_status.json",
+  onComplete: function (response) {
+    if (response.json.remaining_hits) {
+      latestTweetRequest.get();
+    } else {
+      console.log("You have been rate limited!");
+    }
+  }
+}).get();
+</code></pre>
+<div class="api_component_group">
+<h5 class="api_header">Constructors</h5>
+
+<div class="api_component">
+<h6 class="api_name">Request(options)</h6>
+<p>This constructor creates a request object that can be used to make network
+requests. The constructor takes a single parameter <code>options</code> which is used to
+set several properties on the resulting <code>Request</code>.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">options : <span class="datatype">object</span></div>
+
+<div class="api_component">
+<div class="api_name">url : <span class="datatype">string</span></div>
+<p>This is the url to which the request will be made.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ onComplete : <span class="datatype">function</span> ]</div>
+<p>This function will be called when the request has received a response (or in
+terms of XHR, when <code>readyState == 4</code>). The function is passed a <code>Response</code>
+object.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ headers : <span class="datatype">object</span> ]</div>
+<p>An unordered collection of name/value pairs representing headers to send
+with the request.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ content : <span class="datatype">string,object</span> ]</div>
+<p>The content to send to the server. If <code>content</code> is a string, it should be
+URL-encoded (use <code>encodeURIComponent</code>). If <code>content</code> is an object, it
+should be a collection of name/value pairs. Nested objects &amp; arrays should
+encode safely.</p>
+<p>For <code>GET</code> requests, the query string (<code>content</code>) will be appended to the
+URL. For <code>POST</code> requests, the query string will be sent as the body of the
+request.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ contentType : <span class="datatype">string</span> ]</div>
+<p>The type of content to send to the server. This explicitly sets the
+<code>Content-Type</code> header. The default value is <code>application/x-www-form-urlencoded</code>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Methods</h5>
+
+<div class="api_component">
+<h6 class="api_name">get()</h6>
+<p>Make a <code>GET</code> request.</p>
+<div class="returns">Returns: <span class="datatype">Request</span>
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">post()</h6>
+<p>Make a <code>POST</code> request.</p>
+<div class="returns">Returns: <span class="datatype">Request</span>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Properties</h5>
+
+<div class="api_component">
+<h6 class="api_name">url : <span class="datatype">string</span></h6>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">headers : <span class="datatype">object</span></h6>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">content : <span class="datatype">string,object</span></h6>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">contentType : <span class="datatype">string</span></h6>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">response : <span class="datatype">Response</span></h6>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Events</h5>
+
+<div class="api_component">
+<h6 class="api_name">complete</h6>
+<p>The <code>Request</code> object emits this event when the request has completed and a
+response has been received.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name"><span class="datatype">Response</span></div>
+<p>Listener functions are passed the response to the request as a <code>Response</code> object.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">Response</h4>
+<p>The Response object contains the response to a network request issued using a
+<code>Request</code> object. It is returned by the <code>get()</code> or <code>post()</code> method of a
+<code>Request</code> object.</p>
+<p>All members of a <code>Response</code> object are read-only.</p>
+<div class="api_component_group">
+<h5 class="api_header">Properties</h5>
+
+<div class="api_component">
+<h6 class="api_name">text : <span class="datatype">string</span></h6>
+<p>The content of the response as plain text.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">json : <span class="datatype">object</span></h6>
+<p>The content of the response as a JavaScript object. The value will be <code>null</code>
+if the document cannot be processed by <code>JSON.parse</code>.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">status : <span class="datatype">string</span></h6>
+<p>The HTTP response status code (e.g. <em>200</em>).</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">statusText : <span class="datatype">string</span></h6>
+<p>The HTTP response status line (e.g. <em>OK</em>).</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">headers : <span class="datatype">object</span></h6>
+<p>The HTTP response headers represented as key/value pairs.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>

@@ -1,0 +1,88 @@
+
+<div id="clipboard_module_api_docs" class="module_api_docs">
+<h1>clipboard</h1>
+<div class="module_description"><!-- contributed by Dietrich Ayala [dietrich@mozilla.com]  -->
+
+<p>The <code>clipboard</code> module allows callers to interact with the system clipboard,
+setting and retrieving its contents.</p>
+<p>You can optionally specify the type of the data to set and retrieve.
+The following types are supported:</p>
+<ul>
+<li><code>text</code> (plain text)</li>
+<li><code>html</code> (a string of HTML)</li>
+</ul>
+<p>If no data type is provided, then the module will detect it for you.</p>
+<h2>Examples</h2>
+<p>Set and get the contents of the clipboard.</p>
+<pre><code>let clipboard = require("clipboard");
+clipboard.set("Lorem ipsum dolor sit amet");
+let contents = clipboard.get();
+</code></pre>
+<p>Set the clipboard contents to some HTML.</p>
+<pre><code>let clipboard = require("clipboard");
+clipboard.set("&lt;blink&gt;Lorem ipsum dolor sit amet&lt;/blink&gt;", "html");
+</code></pre>
+<p>If the clipboard contains HTML content, open it in a new tab.</p>
+<pre><code>let clipboard = require("clipboard");
+if (clipboard.currentFlavors.indexOf("html") != -1)
+  require("tabs").open("data:text/html," + clipboard.get("html"));
+</code></pre>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">set(data, datatype)</h4>
+<p>Replace the contents of the user's clipboard with the provided data.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">data : <span class="datatype">string</span></div>
+<p>The data to put on the clipboard.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ datatype : <span class="datatype">string</span> ]</div>
+<p>The type of the data (optional).</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">get(datatype)</h4>
+<p>Get the contents of the user's clipboard.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">[ datatype : <span class="datatype">string</span> ]</div>
+<p>Retrieve the clipboard contents only if matching this type (optional).
+The function will return null if the contents of the clipboard do not match
+the supplied type.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h3 class="api_header">Properties</h3>
+
+<div class="api_component">
+<h4 class="api_name">currentFlavors : <span class="datatype">array</span></h4>
+<p>Data on the clipboard is sometimes available in multiple types. For example,
+HTML data might be available as both a string of HTML (the <code>html</code> type)
+and a string of plain text (the <code>text</code> type). This function returns an array
+of all types in which the data currently on the clipboard is available.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
