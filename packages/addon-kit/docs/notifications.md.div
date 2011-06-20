@@ -1,0 +1,91 @@
+
+<div id="notifications_module_api_docs" class="module_api_docs">
+<h1>notifications</h1>
+<div class="module_description"><!-- contributed by Drew Willcoxon [adw@mozilla.com]  -->
+
+<p>The <code>notifications</code> module allows you to display transient,
+<a href="http://en.wikipedia.org/wiki/Toast_%28computing%29">toaster</a>-style
+desktop messages to the user.</p>
+<p>This API supports desktop notifications on Windows, OS X using
+<a href="http://growl.info/">Growl</a>, and Linux using libnotify.  If the user's system
+does not support desktop notifications or if its notifications service is not
+running, then notifications made with this API are logged to Firefox's error
+console and, if the user launched Firefox from the command line, the terminal.</p>
+<h2>Examples</h2>
+<p>Here's a typical example.  When the message is clicked, a string is logged to
+the console.</p>
+<pre><code>var notifications = require("notifications");
+notifications.notify({
+  title: "Jabberwocky",
+  text: "'Twas brillig, and the slithy toves",
+  data: "did gyre and gimble in the wabe",
+  onClick: function (data) {
+    console.log(data);
+    // console.log(this.data) would produce the same result.
+  }
+});
+</code></pre>
+<p>This one displays an icon that's stored in the add-on's <code>data</code> directory.  (See
+the <a href="packages/addon-kit/docs/self.html"><code>self</code></a> module documentation for more information.)</p>
+<pre><code>var notifications = require("notifications");
+var self = require("self");
+var myIconURL = self.data.url("myIcon.png");
+notifications.notify({
+  text: "I have an icon!",
+  iconURL: myIconURL
+});
+</code></pre>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">notify(options)</h4>
+<p>Displays a transient notification to the user.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">options : <span class="datatype">object</span></div>
+<p>An object with the following keys.  Each is optional.</p>
+<div class="api_component">
+<div class="api_name">[ title : <span class="datatype">string</span> ]</div>
+<p>A string to display as the message's title.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ text : <span class="datatype">string</span> ]</div>
+<p>A string to display as the body of the message.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ iconURL : <span class="datatype">string</span> ]</div>
+<p>The URL of an icon to display inside the message.  It may be a remote URL,
+a data URI, or a URL returned by the <a href="packages/addon-kit/docs/self.html"><code>self</code></a>
+module.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ onClick : <span class="datatype">function</span> ]</div>
+<p>A function to be called when the user clicks the message.  It will be passed
+the value of <code>data</code>.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ data : <span class="datatype">string</span> ]</div>
+<p>A string that will be passed to <code>onClick</code>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>

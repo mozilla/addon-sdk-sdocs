@@ -1,0 +1,651 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.0/" >
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
+  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
+  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushXml.js"></script>
+  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushJScript.js"></script>
+  <link rel="stylesheet" type="text/css" media="all" href="css/base.css">
+  <link rel="stylesheet" type="text/css" media="all" href="css/header.css">
+  <link rel="stylesheet" type="text/css" media="all" href="css/footer.css">
+  <link rel="stylesheet" type="text/css" media="all" href="css/sdk-docs.css">
+  <link rel="stylesheet" type="text/css" media="all" href="css/api-reference.css">
+  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shCore.css">
+  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shThemeDefault.css">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link rel="shortcut icon" type="image/x-icon" href="media/favicon.png">
+  <title>Implementing Reusable Modules - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<header id="global-header">
+  <div class="funnel">
+    <a id="mozilla-tab" href="http://www.mozilla.org/?ref=logo">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Back to Developer Hub</a>
+      </p>
+  </div>
+</header>
+
+
+<header id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="dev-guide/welcome.html">Add-on SDK<span></span></a>
+    </h1>
+  </div>
+</header>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content"><h1>Implementing Reusable Modules</h1>
+<p>So far we've seen how you can use the SDK to build a simple add-on. But you
+can also use the SDK to create reusable CommonJS modules with clearly defined
+APIs. These modules are then usable by any other program which follows the
+CommonJS standard, including other add-ons built using the SDK.</p>
+<p>Even if you do not expect to provide reusable modules to other developers, it
+can often make sense to structure a larger or more complex add-on as a
+collection of modules. This makes the design of the add-on easier to understand
+and provides some encapsulation as each module will export only what it chooses
+to, so you can change the internals of the module without breaking its users.</p>
+<p>In this example we'll start with the <a href="dev-guide/addon-development/implementing-simple-addon.html">translator
+add-on</a>, and create
+a separate module containing the code that performs the translation.</p>
+<h2>Implementing "translate.js"</h2>
+<p>In the <code>lib</code> directory under your translator's root, create a new file called
+<code>translate.js</code> with the following contents:</p>
+<pre><code>// Import the APIs we need.
+var request = require("request");
+
+// Define the 'translate' function using Request
+function translate(text, callback) {
+  if (text.length === 0) {
+    throw ("Text to translate must not be empty");
+  }
+  var req = request.Request({
+    url: "http://ajax.googleapis.com/ajax/services/language/translate",
+    content: {
+      v: "1.0",
+      q: text,
+      langpair: "|en"
+    },
+    onComplete: function (response) {
+      callback(response.json.responseData.translatedText);
+    }
+  });
+  req.get();
+}
+
+// Export the 'translate' function
+exports.translate = translate;
+</code></pre>
+<p>The <code>translate</code> function here is essentially the same as the listener function
+assigned to <code>onMessage</code> in the original code, except that it calls a callback
+with the translation instead of assigning the result directly to the selection.</p>
+<p>We export the function by adding it to the global <code>exports</code> object.</p>
+<h2>Editing "main.js"</h2>
+<p>Next we edit <code>main.js</code> to make it use our new module rather than the <code>request</code>
+module:</p>
+<pre><code>// Import the APIs we need.
+var contextMenu = require("context-menu");
+var selection = require("selection");
+var translate = require("translate");
+
+exports.main = function(options, callbacks) {
+  console.log(options.loadReason);
+
+  // Create a new context menu item.
+  var menuItem = contextMenu.Item({
+    label: "Translate Selection",
+    // Show this item when a selection exists.
+    context: contextMenu.SelectionContext(),
+    // When this item is clicked, post a message to the item with the
+    // selected text and current URL.
+    contentScript: 'self.on("click", function () {' +
+                   '  var text = window.getSelection().toString();' +
+                   '  self.postMessage(text);' +
+                   '});',
+
+    // When we receive the message, call the translator with the
+    // selected text and replace it with the translation.
+    onMessage: function (text) {
+      translate.translate(text, function(translation) {
+                                    selection.text = translation; })
+    }
+  });
+};
+
+exports.onUnload = function (reason) {
+  console.log(reason);
+};
+</code></pre>
+<p>Next, execute <code>cfx run</code> again, and try out the add-on. It should work in
+exactly the same way as the previous version, except that now the core
+translate function has been made available to other parts of your add-on or
+to <em>any other program</em> that imports it.</p>
+<h2>Testing Your Module</h2>
+<p>The SDK provides a framework to help test any modules you develop. To
+demonstrate this we will add some slightly unlikely tests for the translator
+module.</p>
+<p>Navigate to the <code>test</code> directory and delete the <code>test-main.js</code> file. In its
+place create a file called <code>test-translate.js</code> with the following contents:</p>
+<pre><code>var translate = require("translator/translate")
+var testRunner;
+var remainingTests;
+
+function check_translation(translation) {
+  testRunner.assertEqual("Lizard", translation);
+  testRunner.done();
+}
+
+function test_languages(test, text) {
+  testRunner= test;
+  testRunner.waitUntilDone(2000);
+  translate.translate(text, check_translation);
+}
+
+exports.test_german = function(test) {
+  test_languages(test, "Eidechse");
+}
+
+exports.test_italian = function(test) {
+  test_languages(test, "Lucertola");
+}
+
+exports.test_finnish = function(test) {
+  test_languages(test, "Lisko");
+}
+
+exports.test_error = function(test) {
+  test.assertRaises(function() {
+    translate.translate("", check_translation);
+  },
+  "Text to translate must not be empty");
+};
+</code></pre>
+<p>This file exports four functions, each of which expects to receive a single
+argument which is a <code>test</code> object. <code>test</code> is supplied by the
+<a href="packages/api-utils/docs/unit-test.html"><code>unit-test</code></a> module and provides
+functions to simplify unit testing. The file imports one module, the
+<code>translate</code> module that lives in our <code>translator</code> package. The
+<code>PACKAGE/MODULE</code> syntax lets you identify a specific module in a specific
+package, rather than searching all available packages (using, for example,
+<code>require("request")</code>). The
+<a href="dev-guide/addon-development/module-search.html">module-search</a> documentation
+has more detail.</p>
+<p><span class="aside">
+<code>waitUntilDone()</code> and <code>done()</code> are needed here because the translator is
+asynchronous. To test an asynchronous function (a function that completes
+using a callback, rather than a return value), you call <code>test.waitUntilDone(),</code>
+supplying a delay time in milliseconds long enough for the function to
+complete. You put the test assertion in the callback, then call <code>test.done()</code>
+to signal that the test has finished.
+</span></p>
+<p>The first three functions call <code>translate</code> and in the callback use
+<code>test.assertEqual()</code> to check that the translation is as expected.</p>
+<p>The fourth function tests the translator's error-handling code by passing an
+empty string into <code>translate</code> and using <code>test.assertRaises()</code> to check that the
+expected exception is raised.</p>
+<p>At this point your package ought to look like this:</p>
+<pre>
+  /translator
+      package.json
+      README.md
+      /doc
+          main.md
+      /lib
+          main.js
+          translate.js
+      /test
+          test-translate.js
+</pre>
+
+<p>Now execute <code>cfx --verbose test</code> from under the package root directory.
+You should see something like this:</p>
+<pre>
+  Running tests on Firefox 4.0.1/Gecko 2.0.1 ...
+  info: executing 'test-translate.test_german'
+  info: pass: a == b == "Lizard"
+  info: executing 'test-translate.test_italian'
+  info: pass: a == b == "Lizard"
+  info: executing 'test-translate.test_finnish'
+  info: pass: a == b == "Lizard"
+  info: executing 'test-translate.test_error'
+  info: pass: a == b == "Text to translate must not be empty"
+  4 of 4 tests passed.
+  OK
+</pre>
+
+<p>What happens here is that <code>cfx test</code>:</p>
+<ul>
+<li>
+<p>looks in the <code>test</code> directory of your
+package</p>
+</li>
+<li>
+<p>loads any modules that start with the word <code>test</code></p>
+</li>
+<li>calls all their exported functions, passing them a <code>test</code> object
+implementation as their only argument.</li>
+</ul>
+<p>Obviously, you don't have to pass the <code>--verbose</code> option to <code>cfx</code> if you don't
+want to; doing so just makes the output easier to read.</p>
+<h2>Next: Introducing the SDK's APIs</h2>
+<p>Next we'll summarize the
+<a href="dev-guide/addon-development/api-intro.html">APIs provided by the SDK</a>.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <h2 class="sidebar-section-header"><a href="dev-guide/addon-development/about.html">Developer Guide</a></h2>
+      <div class="sidebar-section-contents" id="default-section-contents">
+
+        <div class="sidebar-subsection">
+          <h3><a href="dev-guide/addon-development/installation.html">Installation</a></h3>
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="dev-guide/addon-development/tutorials.html">Tutorials</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li><h4><a href="dev-guide/addon-development/getting-started.html">Getting Started</a></h4>
+            <ul>
+              <li><a href="dev-guide/addon-development/implementing-simple-addon.html">A Simple Add-on</a></li>
+              <li><a href="dev-guide/addon-development/commonjs.html">CommonJS</a></li>
+              <li><a href="dev-guide/addon-development/implementing-reusable-module.html">Reusable Modules</a></li>
+              <li><a href="dev-guide/addon-development/troubleshooting.html">Troubleshooting</a></li>
+            </ul></li>
+            <li><h4><a href="dev-guide/addon-development/api-intro.html" >Introducing the APIs</a></h4>
+            <ul>
+              <li><a href="dev-guide/addon-development/api-idioms.html">Common Idioms</a></li>
+              <li><a href="dev-guide/addon-development/api-modules.html">API Overview</a></li>
+            </ul></li>
+            <li><h4><a href="dev-guide/addon-development/annotator/annotator.html">Annotator: a More Complex Add-on</a></h4>
+            <ul>
+              <li><a href="dev-guide/addon-development/annotator/overview.html">Design Overview</a></li>
+              <li><a href="dev-guide/addon-development/annotator/widget.html">Implementing the Widget</a></li>
+              <li><a href="dev-guide/addon-development/annotator/creating.html">Creating Annotations</a></li>
+              <li><a href="dev-guide/addon-development/annotator/storing.html">Storing Annotations</a></li>
+              <li><a href="dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
+            </ul></li>
+          </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-subsection">
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="dev-guide/addon-development/guides.html">Programming Guides</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li><h4><a href="dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/events.html">Working with Events</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
+          </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-subsection">
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="dev-guide/addon-development/reference.html">Reference</a></h3>
+          <div class="sidebar-subsection-contents always-show">
+          <ul>
+            <li id="high-level-package-summaries">
+<div style="display: block;" class="package-summary">
+<h4>
+<a href="packages/addon-kit/addon-kit.html">addon-kit</a>
+</h4>
+
+<ul class="modules">
+<li class="module">
+<a href="packages/addon-kit/docs/clipboard.html">clipboard</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/context-menu.html">context-menu</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/hotkeys.html">hotkeys</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/notifications.html">notifications</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/page-mod.html">page-mod</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/page-worker.html">page-worker</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/panel.html">panel</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/passwords.html">passwords</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/private-browsing.html">private-browsing</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/request.html">request</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/selection.html">selection</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/self.html">self</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/simple-storage.html">simple-storage</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/tabs.html">tabs</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/timers.html">timers</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/widget.html">widget</a>
+</li>
+
+<li class="module">
+<a href="packages/addon-kit/docs/windows.html">windows</a>
+</li>
+</ul>
+</div>
+</li>
+            <li><h4><a href="dev-guide/addon-development/console.html">console</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/cfx-tool.html">cfx</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/package-spec.html">Package Specification</a></h4></li>
+          </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="sidebar-section" id="module-development">
+      <h2 class="sidebar-section-header"><a href="dev-guide/module-development/about.html">Internals Guide</a></h2>
+      <div class="sidebar-section-contents">
+
+        <div class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header"><a href="dev-guide/module-development/guides.html">Programming Guides</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li><h4><a href="dev-guide/module-development/best-practices.html">Low-Level Module Best Practices</a></h4>
+            <li><h4><a href="dev-guide/module-development/chrome.html">Chrome Authority</a></h4>
+            <li><h4><a href="dev-guide/module-development/xpi.html">XPI Generation</a></h4>
+            <li><h4><a href="dev-guide/module-development/e10s.html">Out-of-Process Add-ons</a></h4>
+          </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-subsection">
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="dev-guide/module-development/reference.html">Reference</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li id="low-level-package-summaries">
+<div style="display: block;" class="package-summary">
+<h4>
+<a href="packages/api-utils/api-utils.html">api-utils</a>
+</h4>
+
+<ul class="modules">
+<li class="module">
+<a href="packages/api-utils/docs/api-utils.html">api-utils</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/app-strings.html">app-strings</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/byte-streams.html">byte-streams</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/collection.html">collection</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/content.html">content</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/content/loader.html">content/loader</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/content/worker.html">content/worker</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/cortex.html">cortex</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/cuddlefish.html">cuddlefish</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/e10s.html">e10s</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/errors.html">errors</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/events.html">events</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/file.html">file</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/hidden-frame.html">hidden-frame</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/light-traits.html">light-traits</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/list.html">list</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/match-pattern.html">match-pattern</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/memory.html">memory</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/observer-service.html">observer-service</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/plain-text-console.html">plain-text-console</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/preferences-service.html">preferences-service</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/securable-module.html">securable-module</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/tab-browser.html">tab-browser</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/text-streams.html">text-streams</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/traceback.html">traceback</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/traits.html">traits</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/unit-test.html">unit-test</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/unload.html">unload</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/url.html">url</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/window-utils.html">window-utils</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/xhr.html">xhr</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/xpcom.html">xpcom</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/xul-app.html">xul-app</a>
+</li>
+</ul>
+</div>
+
+<div style="display: block;" class="package-summary">
+<h4>
+<a href="packages/test-harness/test-harness.html">test-harness</a>
+</h4>
+
+<ul class="modules">
+<li class="module">
+<a href="packages/test-harness/docs/harness.html">harness</a>
+</li>
+
+<li class="module">
+<a href="packages/test-harness/docs/run-tests.html">run-tests</a>
+</li>
+</ul>
+</div>
+
+<div style="display: block;" class="package-summary">
+<h4>
+<a href="packages/development-mode/development-mode.html">development-mode</a>
+</h4>
+
+<ul class="modules">
+<li class="module">
+<a href="packages/development-mode/docs/bootstrap.html">bootstrap</a>
+</li>
+
+<li class="module">
+<a href="packages/development-mode/docs/main.html">main</a>
+</li>
+</ul>
+</div>
+</li>
+            <li><h4><a href="dev-guide/module-development/globals.html">Globals</a></h4></li>
+          </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section" id="appendices">
+        <h3><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes">Release Notes</a></h3>
+          <div class="divider"></div>
+        <h3><a href="https://wiki.mozilla.org/Labs/Jetpack">Jetpack Wiki</a></h3>
+          <div class="divider"></div>
+        <h3><a href="dev-guide/appendices/glossary.html">Glossary</a></h3>
+          <div class="divider"></div>
+        <h3><a href="dev-guide/appendices/credits.html">Credits</a></h3>
+
+    </div>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div role="contentinfo" id="footer">
+  <div class="section">
+    <img alt="" src="media/footer-logo-med.png" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+
+</body>
+
+</html>

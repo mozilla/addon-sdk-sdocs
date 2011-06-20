@@ -1,0 +1,117 @@
+
+<div id="simple-storage_module_api_docs" class="module_api_docs">
+<h1>simple-storage</h1>
+<div class="module_description"><p>The <code>simple-storage</code> module lets you easily and persistently store data across
+application restarts.  If you're familiar with <a href="https://developer.mozilla.org/en/DOM/Storage">DOM storage</a> on the Web, it's
+kind of like that, but for add-ons.</p>
+<h2>Introduction</h2>
+<p>The simple storage module exports an object called <code>storage</code> that is persistent
+and private to your add-on.  It's a normal JavaScript object, and you can treat
+it as you would any other.</p>
+<p>To store a value, just assign it to a property on <code>storage</code>:</p>
+<pre><code>var ss = require("simple-storage");
+ss.storage.myArray = [1, 1, 2, 3, 5, 8, 13];
+ss.storage.myBoolean = true;
+ss.storage.myNull = null;
+ss.storage.myNumber = 3.1337;
+ss.storage.myObject = { a: "foo", b: { c: true }, d: null };
+ss.storage.myString = "O frabjous day!";
+</code></pre>
+<p>You can store array, boolean, number, object, null, and string values.  If you'd
+like to store other types of values, you'll first have to convert them to
+strings or another one of these types.</p>
+<p>Be careful to set properties on the <code>storage</code> object and not the module itself:</p>
+<pre><code>// This is no good!
+var ss = require("simple-storage");
+ss.foo = "I will not be saved! :(";
+</code></pre>
+<h2>Quotas</h2>
+<p>The simple storage available to your add-on is limited.  Currently this limit is
+about five megabytes (5,242,880 bytes).  You can choose to be notified when you
+go over quota, and you should respond by reducing the amount of data in storage.
+If the user quits the application while you are over quota, all data stored
+since the last time you were under quota will not be persisted.  You should not
+let that happen.</p>
+<p>To listen for quota notifications, register a listener for the <code>"OverQuota"</code>
+event.  It will be called when your storage goes over quota.</p>
+<pre><code>function myOnOverQuotaListener() {
+  console.log("Uh oh.");
+}
+ss.on("OverQuota", myOnOverQuotaListener);
+</code></pre>
+<p>Listeners can also be removed:</p>
+<pre><code>ss.removeListener("OverQuota", myOnOverQuotaListener);
+</code></pre>
+<p>To find out how much of your quota you're using, check the module's <code>quotaUsage</code>
+property.  It indicates the percentage of quota your storage occupies.  If
+you're within your quota, it's a number from 0 to 1, inclusive, and if you're
+over, it's a number greater than 1.</p>
+<p>Therefore, when you're notified that you're over quota, respond by removing
+storage until your <code>quotaUsage</code> is less than or equal to 1.  Which particular
+data you remove is up to you.  For example:</p>
+<pre><code>ss.storage.myList = [ /* some long array */ ];
+ss.on("OverQuota", function () {
+  while (ss.quotaUsage &gt; 1)
+    ss.storage.myList.pop();
+});
+</code></pre>
+<h2>Private Browsing</h2>
+<p><em>This section applies only to add-ons running on Firefox.</em></p>
+<p>If your storage is related to your users' Web history, personal information, or
+other sensitive data, your add-on should respect <a href="http://support.mozilla.com/en-US/kb/Private+Browsing">private browsing mode</a>.
+While private browsing mode is active, you should not store any sensitive data.</p>
+<p>Because any kind of data can be placed into simple storage, support for private
+browsing is not built into the module.  Instead, use the
+<a href="packages/addon-kit/docs/private-browsing.html"><code>private-browsing</code></a> module to
+check private browsing status and respond accordingly.</p>
+<p>For example, the URLs your users visit should not be stored during private
+browsing.  If your add-on records the URL of the selected tab, here's how you
+might handle that:</p>
+<pre><code>ss.storage.history = [];
+var privateBrowsing = require("private-browsing");
+if (!privateBrowsing.active) {
+  var url = getSelectedTabURL();
+  ss.storage.history.push(url);
+}
+</code></pre>
+<p>For more information on supporting private browsing, see its <a href="https://developer.mozilla.org/En/Supporting_private_browsing_mode">Mozilla Developer
+Network documentation</a>.  While that page does not apply specifically to
+SDK-based add-ons (and its code samples don't apply at all), you should follow
+its guidance on best practices and policies.</p>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Properties</h3>
+
+<div class="api_component">
+<h4 class="api_name">storage : <span class="datatype">object</span></h4>
+<p>A persistent object private to your add-on.  Properties with array, boolean,
+number, object, null, and string values will be persisted.</p>
+</div>
+
+<div class="api_component">
+<h4 class="api_name">quotaUsage : <span class="datatype">number</span></h4>
+<p>A number in the range [0, Infinity) that indicates the percentage of quota
+occupied by storage.  A value in the range [0, 1] indicates that the storage
+is within quota.  A value greater than 1 indicates that the storage exceeds
+quota.</p>
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h3 class="api_header">Events</h3>
+
+<div class="api_component">
+<h4 class="api_name">OverQuota</h4>
+<p>The module emits this event when your add-on's storage goes over its quota.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
