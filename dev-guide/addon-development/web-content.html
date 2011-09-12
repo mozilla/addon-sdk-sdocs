@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.0/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -218,6 +218,9 @@ alt="Content script events">
 <p>Events are asynchronous: that is, the sender does not wait for a reply from
 the recipient but just emits the event and continues processing.</p>
 <h3>Accessing <code>port</code> in the Content Script</h3>
+<p><span class="aside">Note that the global <code>self</code> object is completely different from the
+<a href="packages/addon-kit/docs/self.html"><code>self</code> module</a>, which provides an API for an add-on to
+access its data files and ID.</span></p>
 <p>In the content script the <code>port</code> object is available as a property of the
 global <code>self</code> object. Thus, to emit an event from a content script:</p>
 <pre><code>self.port.emit("myContentScriptEvent", myContentScriptEventPayload);

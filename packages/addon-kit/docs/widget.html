@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.0/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -103,6 +103,78 @@ grow it in order to show all the text.</p>
 handled by <a href="dev-guide/addon-development/web-content.html">content scripts</a>.
 So, for example, to be notified when your widget's content has loaded, you can
 make a small script that calls back to the widget when it finishes loading.</p>
+<h2>Attaching Panels to Widgets</h2>
+<p>You can supply a <a href="packages/addon-kit/docs/panel.html">panel</a> to the widget's
+constructor: if you do this, the panel is automatically displayed when the
+user clicks the widget.</p>
+<pre><code>data = require("self").data
+
+var clockPanel = require("panel").Panel({
+  width:215,
+  height:160,
+  contentURL: data.url("clock.html")
+});
+
+require("widget").Widget({
+  id: "open-clock-btn",
+  label: "Clock",
+  contentURL: data.url("History.png"),
+  panel: clockPanel
+});
+</code></pre>
+<!-- The icon the widget displays, shown in the screenshot, is taken from the
+Nuvola icon set, http://www.icon-king.com/projects/nuvola/ which is made
+available under the LGPL 2.1:
+http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html -->
+
+<p><img class="image-center" src="media/screenshots/widget-panel-clock.png"
+alt="Panel attached to a widget">
+<br></p>
+<p>Note that this is, at the moment, the only way you can attach a panel to a widget.</p>
+<p>You must supply the panel in the widget's constructor for it to work. If you
+assign the panel to the widget after construction, the panel can still be shown
+but will not be anchored to the widget:</p>
+<pre><code>data = require("self").data
+
+var clockPanel = require("panel").Panel({
+  width:215,
+  height:160,
+  contentURL: data.url("clock.html")
+});
+
+widget = require("widget").Widget({
+  id: "open-clock-btn",
+  label: "Clock",
+  contentURL: data.url("History.png")
+});
+
+widget.panel = clockPanel;
+
+// Will not be anchored
+widget.panel.show();
+</code></pre>
+<p>Also, if you try to call <code>panel.show()</code> inside your widget's <code>click</code> event
+listener, the panel will not be anchored:</p>
+<pre><code>data = require("self").data
+
+var clockPanel = require("panel").Panel({
+  width:215,
+  height:160,
+  contentURL: data.url("clock.html")
+});
+
+require("widget").Widget({
+  id: "open-clock-btn",
+  label: "Clock",
+  contentURL: data.url("History.png"),
+  panel: clockPanel,
+  onClick: function() {
+    // Will not be anchored
+    this.panel.show();
+  }
+});
+</code></pre>
+<p>See <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=638142">bug 638142</a>.</p>
 <h2>Examples</h2>
 <p>For conciseness, these examples create their content scripts as strings and use
 the <code>contentScript</code> property.  In your own add-ons, you will probably want to

@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.0/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -76,6 +76,18 @@ SDK modules it uses.</p>
 </li>
 </ul>
 <p><img alt="CommonJS modules" src="media/commonjs-modules.jpg" /></p>
+<p>The SDK
+<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/freeze">freezes</a>
+the <code>exports</code> object returned by <code>require</code>. So a if you import a module using
+<code>require</code>, you can't change the properties of the object returned:</p>
+<pre><code>self = require("self");
+// Attempting to define a new property
+// will fail, or throw an exception in strict mode
+self.foo = 1;
+// Attempting to modify an existing property
+// will fail, or throw an exception in strict mode
+self.data = "foo";
+</code></pre>
 <h2>CommonJS Packages</h2>
 <p>A CommonJS <strong>package</strong> is a structure which can wrap a collection of related
 modules: this makes it easier to distribute, install and manage modules.</p>
@@ -98,8 +110,7 @@ CommonJS modules, and a complete add-on is a CommonJS package.</p>
 <p>According to the CommonJS specification, if a module called <code>main</code> exists in a
 CommonJS package, that module will be evaluated as soon as your program is
 loaded. For an add-on, that means that the <code>main</code> module will be evaluated as
-soon as the host application (such as Firefox) has enabled your program as an
-extension.</p>
+soon as Firefox has enabled the add-on.</p>
 <p>So in terms of CommonJS objects the translator consists of a package that
 contains a single module called <code>main</code>, and which imports three SDK modules:</p>
 <p><img alt="CommonJS translator" src="media/commonjs-translator.jpg" /></p>

@@ -2,6 +2,7 @@
 <div id="window-utils_module_api_docs" class="module_api_docs">
 <h1>window-utils</h1>
 <div class="module_description"><!-- contributed by Drew Willcoxon [adw@mozilla.com] -->
+<!-- edited by Erik Vold [erikvvold@gmail.com] -->
 
 <p>The <code>window-utils</code> module provides helpers for accessing and tracking
 application windows.  These windows implement the <a href="http://mxr.mozilla.org/mozilla-central/source/dom/interfaces/base/nsIDOMWindow.idl"><code>nsIDOMWindow</code></a>
@@ -62,6 +63,18 @@ windows.</p>
 <div class="api_component">
 <div class="api_name">delegate : <span class="datatype">object</span></div>
 <p>An object that implements <code>onTrack()</code> and <code>onUntrack()</code> methods.</p>
+<div class="api_component">
+<div class="api_name">onTrack : <span class="datatype">function</span></div>
+<p>A function to be called when a window is open or loads, with the window as the
+first and only argument.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ onUntrack : <span class="datatype">function</span> ]</div>
+<p>A function to be called when a window unloads, with the window as the first
+and only argument.</p>
+</div>
+
 </div>
 
 </div>

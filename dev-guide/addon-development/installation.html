@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.0/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -56,6 +56,7 @@
   <div id="main-content-column" class="column">
     <div id="toc"></div>
     <div id="main-content"><h1>Installation</h1>
+<h2>Prerequisites</h2>
 <p>To develop with the Add-on SDK, you'll need:</p>
 <ul>
 <li>
@@ -63,51 +64,80 @@
   of Python are not supported. Make sure that Python is in your path.</p>
 </li>
 <li>
-<p>A version of Firefox that uses Gecko 2.0.0.7 or later
-  (for example, Firefox 4.0).</p>
+<p>Firefox version 4.0 or later.</p>
 </li>
 </ul>
-<p>At the moment, the latest stable version of the Add-on SDK is 1.0.
+<p>At the moment, the latest stable version of the Add-on SDK is 1.1.
 You can obtain it as a
 <a href="https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.tar.gz">tarball</a>
 or a <a href="https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.zip">zip file</a>.
 Alternatively, you can get the latest development version of the
 Add-on SDK from its <a href="https://github.com/mozilla/addon-sdk">GitHub repository</a>.</p>
+<h2>Installation on Mac OS X / Linux</h2>
 <p>Extract the file contents wherever you choose, and navigate to the root
 directory of the SDK with a shell/command prompt. For example:</p>
 <pre>
-  ~/mozilla > tar -xf addon-sdk-1.0.tar.gz
-  ~/mozilla > cd addon-sdk-1.0
-  ~/mozilla/addon-sdk-1.0 >
+  ~/mozilla > tar -xf addon-sdk-1.1.tar.gz
+  ~/mozilla > cd addon-sdk-1.1
+  ~/mozilla/addon-sdk-1.1 >
 </pre>
 
-<p>Then, if you're on Linux, OS X, or another Unix-based system, run:</p>
+<p>Then run:</p>
 <pre>
-  ~/mozilla/addon-sdk-1.0 > source bin/activate
+  ~/mozilla/addon-sdk-1.1 > source bin/activate
 </pre>
 
-<p>Otherwise, if you're on Windows, run:</p>
+<p>Your command prompt should now have a new prefix containing the name of the
+SDK's root directory:</p>
 <pre>
-  C:\Users\Mozilla\addon-sdk-1.0> bin\activate
+  (addon-sdk-1.1)~/mozilla/addon-sdk-1.1 >
 </pre>
 
-<p>Now the beginning of your command prompt should contain the text
-<code>(addon-sdk)</code>, which means that your shell has entered a special
-virtual environment that gives you access to the Add-on SDK's
-command-line tools.</p>
-<p>At any time, you can leave a virtual environment by running
-<code>deactivate</code>.</p>
+<h2>Installation on Windows</h2>
+<p>Extract the file contents wherever you choose, and navigate to the root
+directory of the SDK with a shell/command prompt. For example:</p>
+<pre>
+  C:\Users\mozilla\sdk>7z.exe x addon-sdk-1.1.zip
+  C:\Users\mozilla\sdk>cd addon-sdk-1.1
+  C:\Users\mozilla\sdk\addon-sdk-1.1>
+</pre>
+
+<p>Then run:</p>
+<pre>
+  C:\Users\mozilla\sdk\addon-sdk-1.1>bin\activate
+</pre>
+
+<p>You might see an error like this:</p>
+<pre>
+  ERROR: The system was unable to find the specified registry key or value.
+</pre>
+
+<p>This is a known issue, being tracked as
+<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=574563">bug 574563</a>, and should
+not affect the proper functioning of the SDK at all.</p>
+<p>Your command prompt should now have a new prefix containing the full path to
+the SDK's root directory:</p>
+<pre>
+  (C:\Users\mozilla\sdk\addon-sdk-1.1) C:\Users\Work\sdk\addon-sdk-1.1>
+</pre>
+
+<h2>SDK Virtual Environment</h2>
+<p>The new prefix to your command prompt indicates that your shell has entered
+a virtual environment that gives you access to the Add-on SDK's command-line
+tools.</p>
+<p>At any time, you can leave a virtual environment by running <code>deactivate</code>.</p>
 <p>The virtual environment is specific to this particular command prompt. If you
 close this command prompt, it is deactivated and you need to type
-<code>source bin/activate</code> in a new command prompt to reactivate it. If
-you open a new command prompt, the SDK will not be active in the new prompt.</p>
+<code>source bin/activate</code> or <code>bin\activate</code> in a new command prompt to reactivate
+it. If you open a new command prompt, the SDK will not be active in the new
+prompt.</p>
 <p>You can have multiple copies of the SDK in different locations on disk and
 switch between them, or even have them both activated in different command
 prompts at the same time.</p>
 <h2>Sanity Check</h2>
 <p>Run this at your shell prompt:</p>
 <pre>
-  ~/mozilla/addon-sdk-1.0 > cfx
+  ~/mozilla/addon-sdk-1.1 > cfx
 </pre>
 
 <p>It should produce output whose first line looks something like this, followed by

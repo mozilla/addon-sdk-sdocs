@@ -24,7 +24,7 @@ protocol scheme, which means that it can be used to read from (but not
 write to) the host system's entire filesystem. It also has unfettered
 access to any local area networks, VPNs, and the internet.</p>
 <h3>Threat Model</h3>
-<p>The <code>XMLHttpRequest</code> object can be used by an extension to "phone
+<p>The <code>XMLHttpRequest</code> object can be used by an add-on to "phone
 home" and transmit potentially sensitive user data to third
 parties.</p>
 <p>If access to the filesystem isn't prevented, it could easily be used

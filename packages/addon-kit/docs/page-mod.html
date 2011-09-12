@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.0/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -115,6 +115,26 @@ pageMod.PageMod({
                  ' "&lt;h1&gt;Page matches ruleset&lt;/h1&gt;";'
 });
 </code></pre>
+<h3>Using <code>contentScriptFile</code></h3>
+<p>Most of the examples in this page define content scripts as strings,
+and use the <code>contentScript</code> option to assign them to page mods.</p>
+<p>In your code you will more often create content scripts in separate files
+under your add-on's <code>data</code> directory. Then you can use the
+<a href="packages/addon-kit/docs/self.html"><code>self</code></a> module to retrieve a URL pointing
+to the file, and assign this to the page-mod's <code>contentScriptFile</code>
+property.</p>
+<p>For example, if you save the content script
+file in your <code>data</code> directory as "myScript.js", you would assign it using
+code like:</p>
+<pre><code>var data = require("self").data;
+
+var pageMod = require("page-mod");
+pageMod.PageMod({
+  include: "*.org",
+  contentScriptWhen: 'end',
+  contentScriptFile: data.url("myScript.js")
+});
+</code></pre>
 <h2>Communicating With Content Scripts</h2>
 <p>When a matching page is loaded the <code>PageMod</code> will call the function that the
 add-on code supplied to <code>onAttach</code>. The <code>PageMod</code> supplies one argument to
@@ -170,7 +190,7 @@ by sending it a message using the global <code>postMessage</code> function. In t
 <code>onAttach</code> function the add-on code logs the fact that a new page is
 attached and registers a listener function that simply logs the message:</p>
 <pre><code>var pageMod = require("page-mod");
-const data = require("self").data;
+var data = require("self").data;
 var tabs = require("tabs");
 
 pageMod.PageMod({
@@ -224,8 +244,8 @@ object, you can attach a set of content scripts to a particular tab. The
 scripts are executed immediately.</p>
 <p>The following add-on creates a widget which, when clicked, highlights all the
 <code>div</code> elements in the page loaded into the active tab:</p>
-<pre><code>const widgets = require("widget");
-const tabs = require("tabs");
+<pre><code>var widgets = require("widget");
+var tabs = require("tabs");
 
 var widget = widgets.Widget({
   label: "Show divs",

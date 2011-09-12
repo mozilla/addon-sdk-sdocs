@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.0/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -67,23 +67,23 @@ called <code>package.json</code>. This file is also referred to as the
   one package with a given name. This name cannot contain spaces or periods.
   The name defaults to the name of the parent directory. If the package is
   ever built as an XPI and the <code>fullName</code> key is not present, this is
-  used as the extension's <code>em:name</code> element in its <code>install.rdf</code>.</p>
+  used as the add-on's <code>em:name</code> element in its <code>install.rdf</code>.</p>
 </li>
 <li>
 <p><code>fullName</code> - the full name of the package. It can contain spaces. If
-  the package is ever built as an XPI, this is used as the extension's
+  the package is ever built as an XPI, this is used as the add-on's
   <code>em:name</code> element in its <code>install.rdf</code>.</p>
 </li>
 <li>
 <p><code>description</code> - a String describing the package. If the package is
-  ever built as an XPI, this is used as the extension's
+  ever built as an XPI, this is used as the add-on's
   <code>em:description</code> element in its <code>install.rdf</code>.</p>
 </li>
 <li>
 <p><code>author</code> - the original author of the package. The author may be a
   String including an optional URL in parentheses and optional email
   address in angle brackets. If the package is ever built as an XPI,
-  this is used as the extension's <code>em:creator</code> element in its
+  this is used as the add-on's <code>em:creator</code> element in its
   <code>install.rdf</code>.</p>
 </li>
 <li>
@@ -96,13 +96,13 @@ called <code>package.json</code>. This file is also referred to as the
 <p><code>icon</code> - the relative path from the root of the package to a
   PNG file containing the icon for the package. By default, this
   is <code>icon.png</code>. If the package is built as an XPI, this is used
-  as the extension's icon to display in the Add-on Manager's add-ons list.</p>
+  as the add-on's icon to display in the Add-on Manager's add-ons list.</p>
 </li>
 <li>
 <p><code>icon64</code> - the relative path from the root of the package to a
   PNG file containing the icon64 for the package. By default, this
   is <code>icon64.png</code>. If the package is built as an XPI, this is used
-  as the extension's icon to display in the Addon Manager's add-on details view.</p>
+  as the add-on's icon to display in the Addon Manager's add-on details view.</p>
 </li>
 <li>
 <p><code>license</code> - the name of the license as a String, with an optional
@@ -112,12 +112,12 @@ called <code>package.json</code>. This file is also referred to as the
 <p><code>id</code> - a globally unique identifier for the package, a String
   derived from the public half of a private/public keypair, generated
   the first time you run <code>cfx xpi</code>. When the package is built as an
-  XPI, this is used as the extension's <code>em:id</code> element in its
+  XPI, this is used as the add-on's <code>em:id</code> element in its
   <code>install.rdf</code>.</p>
 </li>
 <li>
 <p><code>version</code> - a String representing the version of the package. If the
-  package is ever built as an XPI, this is used as the extension's
+  package is ever built as an XPI, this is used as the add-on's
   <code>em:version</code> element in its <code>install.rdf</code>.</p>
 </li>
 <li>

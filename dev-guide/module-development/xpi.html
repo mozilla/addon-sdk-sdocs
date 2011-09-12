@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.0/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -83,7 +83,7 @@ a XPI file:</p>
 <p>A template different than the default can be specified via the
 <code>cfx</code> tool's <code>--templatedir</code> option.</p>
 <h2>The Generated XPI</h2>
-<p>When we run <code>cfx xpi</code> to build the <code>aardvark</code> package into an extension,
+<p>When we run <code>cfx xpi</code> to build the <code>aardvark</code> package into an add-on,
 <code>aardvark</code>'s dependencies are calculated, and a XPI file is generated that
 combines all required packages, the XPI template, and a few other
 auto-generated files:</p>
@@ -99,7 +99,7 @@ mapped to <code>resource://guid-api-utils-lib/</code> and
 <p>In an actual XPI built by the SDK, the string <code>"guid"</code> in these
 examples is a unique identifier that the SDK prepends to all
 <code>resource:</code> URIs to namespace the XPI's resources so they don't
-collide with anything else, including other extensions built by the
+collide with anything else, including other add-ons built by the
 SDK and containing the same packages. This GUID is built from the
 <a href="dev-guide/addon-development/program-id.html">Program ID</a>.</p>
 <p>By default, the generated XPI contains every module from each package that is

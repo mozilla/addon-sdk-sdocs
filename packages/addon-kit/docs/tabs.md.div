@@ -5,11 +5,19 @@
 <!-- edited by Noelle Murata [fiveinchpixie@gmail.com]  -->
 
 <p>The <code>tabs</code> module provides easy access to tabs and tab-related events.</p>
-<p>All tabs across all windows can be enumerated by using the <code>tabs</code> module itself
-like so:</p>
-<pre><code>var tabs = require("tabs");
+<p>The module itself can be used like a basic list of all opened
+tabs across all windows. In particular, you can enumerate it:</p>
+<pre><code>var tabs = require('tabs');
 for each (var tab in tabs)
   console.log(tab.title);
+</code></pre>
+<p>You can also access individual tabs by index:</p>
+<pre><code>var tabs = require('tabs');
+
+tabs.on('ready', function () {
+  console.log('first: ' + tabs[0].title);
+  console.log('last: ' + tabs[tabs.length-1].title);
+});
 </code></pre>
 <p>You can open a new tab, specifying various properties including location:</p>
 <pre><code>var tabs = require("tabs");
@@ -105,14 +113,11 @@ This is an optional argument.</p>
 <p><strong>Example</strong></p>
 <pre><code>var tabs = require("tabs");
 
-var worker = tabs.activeTab.attach({
-  contentScript: 
-    'document.body.style.border = "5px solid black";' +
-    'postMessage(document.getElementById("#my-watched-element").textContent);',
-  onMessage: function (data) {
-    // data is equal to the text of my DOM element with ID "#my-watched-element"
-
-  }
+tabs.on('ready', function(tab) {
+  tab.attach({
+      contentScript:
+        'document.body.style.border = "5px solid red";'
+  });
 });
 </code></pre>
 <div class="parameter_set">
@@ -135,8 +140,8 @@ Optional.</p>
 
 <div class="api_component">
 <div class="api_name">[ onMessage : <span class="datatype">function</span> ]</div>
-<p>A function called when the page mod receives a message from content scripts. 
-Listeners are passed a single argument, the message posted from the 
+<p>A function called when the page mod receives a message from content scripts.
+Listeners are passed a single argument, the message posted from the
 content script.</p>
 </div>
 

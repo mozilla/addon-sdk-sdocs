@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.0/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -62,10 +62,9 @@
 as a whole. It also provides access to the
 <a href="dev-guide/addon-development/program-id.html">Program ID</a>, a value which is
 unique for each add-on.</p>
-<p><span class="aside">
-The <a href="dev-guide/addon-development/package-spec.html">Package Specification</a>
-section explains the <code>package.json</code> file.
-</span></p>
+<p>Note that the <code>self</code> module is completely different from the global <code>self</code>
+object accessible to content scripts, which is used by a content script to
+<a href="dev-guide/addon-development/web-content#content_script_events">communicate with the add-on code</a>.</p>
 </div>
 
 <div class="api_reference">
@@ -91,6 +90,8 @@ Eventually, this ID will be unspoofable (see
 This data lives in the main package's <code>data/</code> directory, immediately below
 the <code>package.json</code> file. All files in this directory will be copied into the
 XPI and made available through the <code>data</code> object.</p>
+<p>The <a href="dev-guide/addon-development/package-spec.html">Package Specification</a>
+section explains the <code>package.json</code> file.</p>
 <div class="api_component_group">
 <div class="api_header">Methods</div>
 

@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.0/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -191,7 +191,10 @@ your add-on includes an icon or some HTML content to display in a
 <a href="packages/addon-kit/docs/panel.html"><code>panel</code></a> you can store the files in your
 <code>data</code> directory and retrieve them using <code>self</code>.</p>
 <p>This module also gives your add-on access to its <a href="dev-guide/addon-development/program-id.html">Program
-ID</a>.</p></div>
+ID</a>.</p>
+<p>Note that the <code>self</code> module is completely different from the global <code>self</code>
+object accessible to content scripts, which is used by a content script to
+<a href="dev-guide/addon-development/web-content#content_script_events">communicate with the add-on code</a>.</p></div>
   </div>
 
   <div id="sidebar" class="column">
