@@ -2,19 +2,19 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.2/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushXml.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushJScript.js"></script>
-  <link rel="stylesheet" type="text/css" media="all" href="css/base.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/header.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/footer.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/sdk-docs.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/api-reference.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shCore.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shThemeDefault.css">
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushXml.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushJScript.js"></script>
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/base.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/header.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/footer.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/sdk-docs.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/api-reference.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shCore.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shThemeDefault.css">
   <!--[if IE]>
     <style type="text/css">
       .package-summary .module,
@@ -25,7 +25,7 @@
     </style>
   <![endif]-->
 
-  <link rel="shortcut icon" type="image/x-icon" href="media/favicon.png">
+  <link rel="shortcut icon" type="image/x-icon" href="static-files/media/favicon.png">
   <title>Implementing the Widget - Add-on SDK Documentation</title>
 </head>
 <body>
@@ -92,8 +92,8 @@ posts the corresponding message to the add-on code:</p>
 <p>Save this in your <code>data/widget</code> directory as <code>widget.js</code>.</p>
 <h2>The Widget's Icons</h2>
 <p>You can copy the widget's icons from here:</p>
-<p><img style="margin-left:40px; margin-right:20px;" src="media/annotator/pencil-on.png" alt="Active Annotator">
-<img style="margin-left:20px; margin-right:20px;" src="media/annotator/pencil-off.png" alt="Inactive Annotator"></p>
+<p><img style="margin-left:40px; margin-right:20px;" src="static-files/media/annotator/pencil-on.png" alt="Active Annotator">
+<img style="margin-left:20px; margin-right:20px;" src="static-files/media/annotator/pencil-off.png" alt="Inactive Annotator"></p>
 <p>(Or make your own if you're feeling creative.) Save them in your <code>data/widget</code> directory.</p>
 <h2>main.js</h2>
 <p>Now in the <code>lib</code> directory open <code>main.js</code> and replace its contents with this:</p>
@@ -140,7 +140,7 @@ right-click events to the console.</p>
 <p>Now from the <code>annotator</code> directory type <code>cfx run</code>. You should see the widget
 in the add-on bar:</p>
 <div align="center">
-<img src="media/annotator/widget-icon.png" alt="Widget Icon">
+<img src="static-files/media/annotator/widget-icon.png" alt="Widget Icon">
 </div>
 
 <br>
@@ -193,7 +193,14 @@ left-click should also change the widget icon to signal that it is active.</p>
           <ul>
             <li><h4><a href="dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/events.html">Working with Events</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
+              <ul>
+                <li><a href="dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
+              </ul></li>
             <li><h4><a href="dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
           </ul>
@@ -516,7 +523,7 @@ left-click should also change the widget icon to signal that it is active.</p>
 
 <div role="contentinfo" id="footer">
   <div class="section">
-    <img alt="" src="media/footer-logo-med.png" class="footerlogo">
+    <img alt="" src="static-files/media/footer-logo-med.png" class="footerlogo">
     <div id="social-footer">
       <ul>
         <li>get to know <b>add-ons</b></li>
@@ -542,8 +549,8 @@ left-click should also change the widget icon to signal that it is active.</p>
   </div>
 </div>
 
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="static-files/js/jquery.js"></script>
+<script type="text/javascript" src="static-files/js/main.js"></script>
 
 </body>
 

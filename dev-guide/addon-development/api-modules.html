@@ -2,19 +2,19 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.2/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushXml.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushJScript.js"></script>
-  <link rel="stylesheet" type="text/css" media="all" href="css/base.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/header.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/footer.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/sdk-docs.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/api-reference.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shCore.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shThemeDefault.css">
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushXml.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushJScript.js"></script>
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/base.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/header.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/footer.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/sdk-docs.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/api-reference.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shCore.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shThemeDefault.css">
   <!--[if IE]>
     <style type="text/css">
       .package-summary .module,
@@ -25,7 +25,7 @@
     </style>
   <![endif]-->
 
-  <link rel="shortcut icon" type="image/x-icon" href="media/favicon.png">
+  <link rel="shortcut icon" type="image/x-icon" href="static-files/media/favicon.png">
   <title>API Overview - Add-on SDK Documentation</title>
 </head>
 <body>
@@ -73,7 +73,7 @@ by what you can do using HTML, CSS and JavaScript.</p>
 <p>You can build or load the content locally or load it from a remote server.
 The screenshot below shows a panel whose content is built from the list of
 currently open tabs:</p>
-<p><img class="image-center" src="media/screenshots/modules/panel-tabs-osx.png"
+<p><img class="image-center" src="static-files/media/screenshots/modules/panel-tabs-osx.png"
 alt="List open tabs panel">
 <br></p>
 <p>Scripts executing in the panel's context can exchange messages with the main
@@ -87,7 +87,7 @@ add-on code.</p>
 the time in a selected time zone or the weather. The screenshot below shows a
 widget that displays the time in the selected city:</li>
 </ul>
-<p><img class="image-center" src="media/screenshots/modules/widget-content-osx.png"
+<p><img class="image-center" src="static-files/media/screenshots/modules/widget-content-osx.png"
 alt="Mozilla widget content">
 <br></p>
 <ul>
@@ -96,13 +96,13 @@ interface. For example, a widget might display only an icon, but open a
 settings dialog when the user clicks it. The widget below displays only the
 Mozilla icon:</li>
 </ul>
-<p><img class="image-center" src="media/screenshots/modules/widget-icon-osx.png"
+<p><img class="image-center" src="static-files/media/screenshots/modules/widget-icon-osx.png"
 alt="Mozilla widget icon">
 <br></p>
 <p>To simplify your code in the latter case, you can assign a panel object to
 your widget. Then when the user clicks the widget, the widget will display
 the panel anchored to the widget:</p>
-<p><img class="image-center" src="media/screenshots/modules/widget-panel-osx.png"
+<p><img class="image-center" src="static-files/media/screenshots/modules/widget-panel-osx.png"
 alt="Panel anchored to widget">
 <br></p>
 <h3><a href="packages/addon-kit/docs/context-menu.html">context-menu</a></h3>
@@ -113,7 +113,7 @@ of a number of predefined contexts (for example, when some content on the page
 is selected) or define your own contexts using scripts.</p>
 <p>In the screenshot below an add-on has added a new submenu to the context menu
 associated with <code>img</code> elements:</p>
-<p><img class="image-center" src="media/screenshots/modules/context-menu-image-osx.png"
+<p><img class="image-center" src="static-files/media/screenshots/modules/context-menu-image-osx.png"
 alt="Context-menu">
 <br></p>
 <h3><a href="packages/addon-kit/docs/notifications.html">notifications</a></h3>
@@ -122,7 +122,7 @@ alt="Context-menu">
 OS X and Windows, libnotify on Linux), so the notification will look slightly
 different on different platforms. On Mac OS X a notification will look
 something like this:</p>
-<p><img class="image-center" src="media/screenshots/modules/notification-growl-osx.png"
+<p><img class="image-center" src="static-files/media/screenshots/modules/notification-growl-osx.png"
 alt="Growl notification">
 <br></p>
 <h2>Interacting with the Web</h2>
@@ -194,7 +194,7 @@ your add-on includes an icon or some HTML content to display in a
 ID</a>.</p>
 <p>Note that the <code>self</code> module is completely different from the global <code>self</code>
 object accessible to content scripts, which is used by a content script to
-<a href="dev-guide/addon-development/web-content#content_script_events">communicate with the add-on code</a>.</p></div>
+<a href="dev-guide/addon-development/content-scripts/using-port.html">communicate with the add-on code</a>.</p></div>
   </div>
 
   <div id="sidebar" class="column">
@@ -239,7 +239,14 @@ object accessible to content scripts, which is used by a content script to
           <ul>
             <li><h4><a href="dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/events.html">Working with Events</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
+              <ul>
+                <li><a href="dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
+              </ul></li>
             <li><h4><a href="dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
           </ul>
@@ -562,7 +569,7 @@ object accessible to content scripts, which is used by a content script to
 
 <div role="contentinfo" id="footer">
   <div class="section">
-    <img alt="" src="media/footer-logo-med.png" class="footerlogo">
+    <img alt="" src="static-files/media/footer-logo-med.png" class="footerlogo">
     <div id="social-footer">
       <ul>
         <li>get to know <b>add-ons</b></li>
@@ -588,8 +595,8 @@ object accessible to content scripts, which is used by a content script to
   </div>
 </div>
 
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="static-files/js/jquery.js"></script>
+<script type="text/javascript" src="static-files/js/main.js"></script>
 
 </body>
 

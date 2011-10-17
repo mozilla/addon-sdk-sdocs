@@ -2,19 +2,19 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.2/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushXml.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushJScript.js"></script>
-  <link rel="stylesheet" type="text/css" media="all" href="css/base.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/header.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/footer.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/sdk-docs.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/api-reference.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shCore.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shThemeDefault.css">
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushXml.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushJScript.js"></script>
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/base.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/header.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/footer.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/sdk-docs.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/api-reference.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shCore.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shThemeDefault.css">
   <!--[if IE]>
     <style type="text/css">
       .package-summary .module,
@@ -25,7 +25,7 @@
     </style>
   <![endif]-->
 
-  <link rel="shortcut icon" type="image/x-icon" href="media/favicon.png">
+  <link rel="shortcut icon" type="image/x-icon" href="static-files/media/favicon.png">
   <title>Installation - Add-on SDK Documentation</title>
 </head>
 <body>
@@ -67,7 +67,7 @@
 <p>Firefox version 4.0 or later.</p>
 </li>
 </ul>
-<p>At the moment, the latest stable version of the Add-on SDK is 1.1.
+<p>At the moment, the latest stable version of the Add-on SDK is 1.2.
 You can obtain it as a
 <a href="https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.tar.gz">tarball</a>
 or a <a href="https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.zip">zip file</a>.
@@ -77,34 +77,34 @@ Add-on SDK from its <a href="https://github.com/mozilla/addon-sdk">GitHub reposi
 <p>Extract the file contents wherever you choose, and navigate to the root
 directory of the SDK with a shell/command prompt. For example:</p>
 <pre>
-  ~/mozilla > tar -xf addon-sdk-1.1.tar.gz
-  ~/mozilla > cd addon-sdk-1.1
-  ~/mozilla/addon-sdk-1.1 >
+  ~/mozilla > tar -xf addon-sdk-1.2.tar.gz
+  ~/mozilla > cd addon-sdk-1.2
+  ~/mozilla/addon-sdk-1.2 >
 </pre>
 
 <p>Then run:</p>
 <pre>
-  ~/mozilla/addon-sdk-1.1 > source bin/activate
+  ~/mozilla/addon-sdk-1.2 > source bin/activate
 </pre>
 
 <p>Your command prompt should now have a new prefix containing the name of the
 SDK's root directory:</p>
 <pre>
-  (addon-sdk-1.1)~/mozilla/addon-sdk-1.1 >
+  (addon-sdk-1.2)~/mozilla/addon-sdk-1.2 >
 </pre>
 
 <h2>Installation on Windows</h2>
 <p>Extract the file contents wherever you choose, and navigate to the root
 directory of the SDK with a shell/command prompt. For example:</p>
 <pre>
-  C:\Users\mozilla\sdk>7z.exe x addon-sdk-1.1.zip
-  C:\Users\mozilla\sdk>cd addon-sdk-1.1
-  C:\Users\mozilla\sdk\addon-sdk-1.1>
+  C:\Users\mozilla\sdk>7z.exe x addon-sdk-1.2.zip
+  C:\Users\mozilla\sdk>cd addon-sdk-1.2
+  C:\Users\mozilla\sdk\addon-sdk-1.2>
 </pre>
 
 <p>Then run:</p>
 <pre>
-  C:\Users\mozilla\sdk\addon-sdk-1.1>bin\activate
+  C:\Users\mozilla\sdk\addon-sdk-1.2>bin\activate
 </pre>
 
 <p>You might see an error like this:</p>
@@ -118,7 +118,7 @@ not affect the proper functioning of the SDK at all.</p>
 <p>Your command prompt should now have a new prefix containing the full path to
 the SDK's root directory:</p>
 <pre>
-  (C:\Users\mozilla\sdk\addon-sdk-1.1) C:\Users\Work\sdk\addon-sdk-1.1>
+  (C:\Users\mozilla\sdk\addon-sdk-1.2) C:\Users\Work\sdk\addon-sdk-1.2>
 </pre>
 
 <h2>SDK Virtual Environment</h2>
@@ -137,7 +137,7 @@ prompts at the same time.</p>
 <h2>Sanity Check</h2>
 <p>Run this at your shell prompt:</p>
 <pre>
-  ~/mozilla/addon-sdk-1.1 > cfx
+  ~/mozilla/addon-sdk-1.2 > cfx
 </pre>
 
 <p>It should produce output whose first line looks something like this, followed by
@@ -151,7 +151,7 @@ Add-on SDK.  You use it to launch Firefox and test your add-on, package your
 add-on for distribution, view documentation, and run unit tests.</p>
 <h2>cfx docs</h2>
 <p>If you're reading these documents online, try running <code>cfx docs</code>. This will
-run a self-hosted documentation server and open it in your web browser.</p>
+build the documentation for the SDK and display it in a browser.</p>
 <h2>Problems?</h2>
 <p>Try the <a href="dev-guide/addon-development/troubleshooting.html">Troubleshooting</a>
 page.</p>
@@ -204,7 +204,14 @@ example.</p></div>
           <ul>
             <li><h4><a href="dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/events.html">Working with Events</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
+              <ul>
+                <li><a href="dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
+              </ul></li>
             <li><h4><a href="dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
           </ul>
@@ -527,7 +534,7 @@ example.</p></div>
 
 <div role="contentinfo" id="footer">
   <div class="section">
-    <img alt="" src="media/footer-logo-med.png" class="footerlogo">
+    <img alt="" src="static-files/media/footer-logo-med.png" class="footerlogo">
     <div id="social-footer">
       <ul>
         <li>get to know <b>add-ons</b></li>
@@ -553,8 +560,8 @@ example.</p></div>
   </div>
 </div>
 
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="static-files/js/jquery.js"></script>
+<script type="text/javascript" src="static-files/js/main.js"></script>
 
 </body>
 

@@ -2,19 +2,19 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.2/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushXml.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushJScript.js"></script>
-  <link rel="stylesheet" type="text/css" media="all" href="css/base.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/header.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/footer.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/sdk-docs.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/api-reference.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shCore.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shThemeDefault.css">
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushXml.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushJScript.js"></script>
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/base.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/header.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/footer.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/sdk-docs.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/api-reference.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shCore.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shThemeDefault.css">
   <!--[if IE]>
     <style type="text/css">
       .package-summary .module,
@@ -25,7 +25,7 @@
     </style>
   <![endif]-->
 
-  <link rel="shortcut icon" type="image/x-icon" href="media/favicon.png">
+  <link rel="shortcut icon" type="image/x-icon" href="static-files/media/favicon.png">
   <title>cfx - Add-on SDK Documentation</title>
 </head>
 <body>
@@ -74,8 +74,22 @@ commands (for example <code>--help</code>). <code>cfx</code> supports the follow
 applicable to a subset of the commands.</p>
 <h2>Supported Commands</h2>
 <h3>cfx docs</h3>
-<p>This command launches an HTTP server on the localhost to view web-based
-documentation in a new Firefox window.</p>
+<p>This command displays the documentation for the SDK. The documentation is
+shipped with the SDK in <a href="http://daringfireball.net/projects/markdown/">Markdown</a>
+format. The first time this command is executed, and any time after the
+Markdown files on disk have changed, <code>cfx docs</code> will generate a set of HTML
+pages from them and launch a web browser to display them. If the Markdown files
+haven't changed, <code>cfx docs</code> just launches a browser initialized to the set of
+generated pages.</p>
+<p>To regenerate the documentation associated with a single file, you can
+specify the file as an argument. For example:</p>
+<pre>
+  cfx docs doc/dev-guide-source/addon-development/cfx-tool.md 
+</pre>
+
+<p>This command will regenerate only the HTML page you're reading.
+This is useful if you're iteratively editing a single file, and don't want to wait for cfx to
+regenerate the complete documentation tree.</p>
 <h3>cfx init</h3>
 <p>Create a new directory, change into it, and run <code>cfx init</code>.</p>
 <p>This command will create an skeleton add-on, as a starting point for your
@@ -125,6 +139,25 @@ your add-on alongside debuggers like <a href="http://getfirebug.com/">Firebug</a
     Use the host application binary specified in BINARY. BINARY may be specified as
     a full path or as a path relative to the current directory.
   </td>
+</tr>
+
+<tr>
+  <td>
+    <code>--binary-args=CMDARGS</code>
+  </td>
+  <td>
+    <p>Pass <a href="http://kb.mozillazine.org/Command_line_arguments">extra
+    arguments</a> to the binary being executed (for example, Firefox).</p>
+    <p>For example, to pass the
+    <code>-jsconsole</code> argument to Firefox, which will launch the
+    <a href="https://developer.mozilla.org/en/Error_Console">JavaScript
+    Error Console</a>, try the following:</p<>
+    <pre>
+    cfx run --binary-args -jsconsole</pre>
+    <p>To pass multiple arguments, or arguments containing spaces, quote them:</p>
+    <pre>
+    cfx run --binary-args '-url "www.mozilla.org" -jsconsole'</pre>
+    </td>
 </tr>
 
 <tr>
@@ -258,25 +291,6 @@ To launch the application, enter the following command:
 
 <tr>
   <td>
-    <code>--binary-args=CMDARGS</code>
-  </td>
-  <td>
-    <p>Pass <a href="http://kb.mozillazine.org/Command_line_arguments">extra
-    arguments</a> to the binary being executed (for example, Firefox).</p>
-    <p>For example, to pass the
-    <code>-jsconsole</code> argument to Firefox, which will launch the
-    <a href="https://developer.mozilla.org/en/Error_Console">JavaScript
-    Error Console</a>, try the following:</p<>
-    <pre>
-    cfx run --binary-args -jsconsole</pre>
-    <p>To pass multiple arguments, or arguments containing spaces, quote them:</p>
-    <pre>
-    cfx run --binary-args '-url "www.mozilla.org" -jsconsole'</pre>
-    </td>
-</tr>
-
-<tr>
-  <td>
     <code>--e10s</code>
   </td>
   <td>
@@ -328,6 +342,25 @@ times.</p>
     Use the host application binary specified in BINARY. BINARY may be specified as
     a full path or as a path relative to the current directory.
   </td>
+</tr>
+
+<tr>
+  <td>
+    <code>--binary-args=CMDARGS</code>
+  </td>
+  <td>
+    <p>Pass <a href="http://kb.mozillazine.org/Command_line_arguments">extra
+    arguments</a> to the binary being executed (for example, Firefox).</p>
+    <p>For example, to pass the
+    <code>-jsconsole</code> argument to Firefox, which will launch the
+    <a href="https://developer.mozilla.org/en/Error_Console">JavaScript
+    Error Console</a>, try the following:</p<>
+    <pre>
+    cfx run --binary-args -jsconsole</pre>
+    <p>To pass multiple arguments, or arguments containing spaces, quote them:</p>
+    <pre>
+    cfx run --binary-args '-url "www.mozilla.org" -jsconsole'</pre>
+    </td>
 </tr>
 
 <tr>
@@ -460,25 +493,6 @@ To launch the application, enter the following command:
     ADDONS may be specified as full paths or relative to the
     current directory.
   </td>
-</tr>
-
-<tr>
-  <td>
-    <code>--binary-args=CMDARGS</code>
-  </td>
-  <td>
-    <p>Pass <a href="http://kb.mozillazine.org/Command_line_arguments">extra
-    arguments</a> to the binary being executed (for example, Firefox).</p>
-    <p>For example, to pass the
-    <code>-jsconsole</code> argument to Firefox, which will launch the
-    <a href="https://developer.mozilla.org/en/Error_Console">JavaScript
-    Error Console</a>, try the following:</p<>
-    <pre>
-    cfx run --binary-args -jsconsole</pre>
-    <p>To pass multiple arguments, or arguments containing spaces, quote them:</p>
-    <pre>
-    cfx run --binary-args '-url "www.mozilla.org" -jsconsole'</pre>
-    </td>
 </tr>
 
 <tr>
@@ -863,7 +877,14 @@ program in the XPI is run.</p></div>
           <ul>
             <li><h4><a href="dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/events.html">Working with Events</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
+              <ul>
+                <li><a href="dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
+              </ul></li>
             <li><h4><a href="dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
           </ul>
@@ -1186,7 +1207,7 @@ program in the XPI is run.</p></div>
 
 <div role="contentinfo" id="footer">
   <div class="section">
-    <img alt="" src="media/footer-logo-med.png" class="footerlogo">
+    <img alt="" src="static-files/media/footer-logo-med.png" class="footerlogo">
     <div id="social-footer">
       <ul>
         <li>get to know <b>add-ons</b></li>
@@ -1212,8 +1233,8 @@ program in the XPI is run.</p></div>
   </div>
 </div>
 
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="static-files/js/jquery.js"></script>
+<script type="text/javascript" src="static-files/js/main.js"></script>
 
 </body>
 

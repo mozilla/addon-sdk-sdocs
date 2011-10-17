@@ -2,19 +2,19 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.2/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushXml.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushJScript.js"></script>
-  <link rel="stylesheet" type="text/css" media="all" href="css/base.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/header.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/footer.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/sdk-docs.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/api-reference.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shCore.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shThemeDefault.css">
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushXml.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushJScript.js"></script>
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/base.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/header.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/footer.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/sdk-docs.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/api-reference.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shCore.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shThemeDefault.css">
   <!--[if IE]>
     <style type="text/css">
       .package-summary .module,
@@ -25,7 +25,7 @@
     </style>
   <![endif]-->
 
-  <link rel="shortcut icon" type="image/x-icon" href="media/favicon.png">
+  <link rel="shortcut icon" type="image/x-icon" href="static-files/media/favicon.png">
   <title>Two Types of Scripts - Add-on SDK Documentation</title>
 </head>
 <body>
@@ -150,7 +150,7 @@ such as <code>window</code>, <code>document</code>, and
 <tr>
     <td>The <code>self</code> global, used for communicating between content
 scripts and add-on code. See the guide to
-<a href="dev-guide/addon-development/web-content.html#content_script_events">communicating with content scripts</a>
+<a href="dev-guide/addon-development/content-scripts/using-port.html">communicating with content scripts</a>
 for more details.
     </td>
     <td class="cross">✘</td>
@@ -202,7 +202,14 @@ for more details.
           <ul>
             <li><h4><a href="dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/events.html">Working with Events</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
+              <ul>
+                <li><a href="dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
+              </ul></li>
             <li><h4><a href="dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
           </ul>
@@ -525,7 +532,7 @@ for more details.
 
 <div role="contentinfo" id="footer">
   <div class="section">
-    <img alt="" src="media/footer-logo-med.png" class="footerlogo">
+    <img alt="" src="static-files/media/footer-logo-med.png" class="footerlogo">
     <div id="social-footer">
       <ul>
         <li>get to know <b>add-ons</b></li>
@@ -551,8 +558,8 @@ for more details.
   </div>
 </div>
 
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="static-files/js/jquery.js"></script>
+<script type="text/javascript" src="static-files/js/main.js"></script>
 
 </body>
 

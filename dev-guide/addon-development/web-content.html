@@ -2,19 +2,19 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.1/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.2/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushCss.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushXml.js"></script>
-  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushJScript.js"></script>
-  <link rel="stylesheet" type="text/css" media="all" href="css/base.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/header.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/footer.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/sdk-docs.css">
-  <link rel="stylesheet" type="text/css" media="all" href="css/api-reference.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shCore.css">
-  <link rel="stylesheet" type="text/css" href="syntaxhighlighter/styles/shThemeDefault.css">
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushXml.js"></script>
+  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushJScript.js"></script>
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/base.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/header.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/footer.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/sdk-docs.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/api-reference.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shCore.css">
+  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shThemeDefault.css">
   <!--[if IE]>
     <style type="text/css">
       .package-summary .module,
@@ -25,8 +25,8 @@
     </style>
   <![endif]-->
 
-  <link rel="shortcut icon" type="image/x-icon" href="media/favicon.png">
-  <title>Working with Content Scripts - Add-on SDK Documentation</title>
+  <link rel="shortcut icon" type="image/x-icon" href="static-files/media/favicon.png">
+  <title>Content Scripts - Add-on SDK Documentation</title>
 </head>
 <body>
 
@@ -55,7 +55,7 @@
 
   <div id="main-content-column" class="column">
     <div id="toc"></div>
-    <div id="main-content"><h1>Working with Content Scripts</h1>
+    <div id="main-content"><h1>Content Scripts</h1>
 <p>Almost all interesting add-ons will need to interact with web content or the
 browser's user interface. For example, they may need to access and modify the
 content of web pages or be notified when the user clicks a link.</p>
@@ -70,7 +70,7 @@ Execute scripts in the context of selected web pages.</p>
 Host an add-on's user interface, including web content.</p>
 <p><strong><a href="packages/addon-kit/docs/context-menu.html">context-menu</a></strong><br>
 Add items to the browser's context menu.</p>
-<p>The Mozilla platform is moving towards a model in which it uses separate
+<p>Firefox is moving towards a model in which it uses separate
 processes to display the UI, handle web content, and execute add-ons. The main
 add-on code will run in the add-on process and will not have direct access to
 any web content.</p>
@@ -84,8 +84,8 @@ content process as a separate script. These separate scripts are called
 </ul>
 <p>A single add-on may use multiple content scripts, and content scripts loaded
 into the same context can interact directly with each other as well as with
-the web content itself. See the section below on
-<a href="dev-guide/addon-development/web-content.html#content_script_access">
+the web content itself. See the chapter on
+<a href="dev-guide/addon-development/content-scripts/access.html">
 content script access</a>.</p>
 <p>The add-on script and content script can't directly access each other's state.
 Instead, you can define your own events which each side can emit, and the
@@ -94,7 +94,7 @@ to the event-handling interfaces described in the
 <a href="dev-guide/addon-development/events.html">Working with Events</a> guide.</p>
 <p>The diagram below shows an overview of the main components and their
 relationships. The gray fill represents code written by the add-on developer.</p>
-<img class="image-center" src="media/content-scripting-overview.png"
+<img class="image-center" src="static-files/media/content-scripting-overview.png"
 alt="Content script events">
 
 <p>This might sound complicated but it doesn't need to be. The following add-on
@@ -112,409 +112,23 @@ pageMod.add(new pageMod.PageMod({
 <p>In this example the content script is supplied directly to the page mod via
 the <code>contentScript</code> option in its constructor, and does not need to be
 maintained as a separate file at all.</p>
-<h2>Loading Content Scripts</h2>
-<p>The constructors for content-script-using objects such as panel and page-mod
-define a group of options for loading content scripts:</p>
-<pre>
-  contentScript      string, array
-  contentScriptFile  string, array
-  contentScriptWhen  string
-</pre>
-
-<p>We have already seen the <code>contentScript</code> option, which enables you to pass
-in the text of the script itself as a string literal. This version of the API
-avoids the need to maintain a separate file for the content script.</p>
-<p>The <code>contentScriptFile</code> option enables you to pass in the local file URL from
-which the content script will be loaded. To supply the file
-"my-content-script.js", located in the /data subdirectory under your package's
-root directory, use a line like:</p>
-<pre><code>// "data" is supplied by the "self" module
-var data = require("self").data;
-...
-contentScriptFile: data.url("my-content-script.js")
-</code></pre>
-<p>Both <code>contentScript</code> and <code>contentScriptFile</code> accept an array of strings, so you
-can load multiple scripts, which can also interact directly with each other in
-the content process:</p>
-<pre><code>// "data" is supplied by the "self" module
-var data = require("self").data;
-...
-contentScriptFile:
-    [data.url("jquery-1.4.2.min.js"), data.url("my-content-script.js")]
-</code></pre>
-<p>Scripts specified using contentScriptFile are loaded before those specified
-using contentScript. This enables you to load a JavaScript library like jQuery
-by URL, then pass in a simple script inline that can use jQuery.</p>
-<p>The <code>contentScriptWhen</code> option specifies when the content script(s) should be
-loaded. It takes one of three possible values:</p>
+<p>The next few chapters explain content scripts in detail:</p>
 <ul>
-<li>
-<p>"start" loads the scripts immediately after the document element for the
-page is inserted into the DOM. At this point the DOM content hasn't been
-loaded yet, so the script won't be able to interact with it.</p>
-</li>
-<li>
-<p>"ready" loads the scripts after the DOM for the page has been loaded: that
-is, at the point the
-<a href="https://developer.mozilla.org/en/Gecko-Specific_DOM_Events">DOMContentLoaded</a>
-event fires. At this point, content scripts are able to interact with the DOM
-content, but externally-referenced stylesheets and images may not have finished
-loading.</p>
-</li>
-<li>
-<p>"end" loads the scripts after all content (DOM, JS, CSS, images) for the page
-has been loaded, at the time the
-<a href="https://developer.mozilla.org/en/DOM/window.onload">window.onload event</a>
-fires.</p>
-</li>
-</ul>
-<p>The default value is "end".</p>
-<h3><a name="content_script_access">Content Script Access</a></h3>
-<p>Content scripts loaded into the same global execution context can interact
-with each other directly as well as with the web content itself. However,
-content scripts which have been loaded into different execution contexts
-cannot interact with each other.</p>
-<p>For example:</p>
-<ul>
-<li>
-<p>if an add-on creates a single <code>panel</code> object and loads several content
-scripts into the panel, then they can interact with each other</p>
-</li>
-<li>
-<p>if an add-on creates two <code>panel</code> objects and loads a script into each
-one, they can't interact with each other.</p>
-</li>
-<li>
-<p>if an add-on creates a single <code>page-mod</code> object and loads several content
-scripts into the page mod, then only content scripts associated with the
-same page can interact with each other: if two different matching pages are
-loaded, content scripts attached to page A cannot interact with those attached
-to page B.</p>
-</li>
-</ul>
-<p>The web content has no access to objects created by the content script, unless
-the content script explicitly makes them available.</p>
-<h2><a name="content_script_events">Communicating with Content Scripts</a></h2>
-<p>To enable add-on scripts and content scripts to communicate with each other,
-each end of the conversation has access to a <code>port</code> object which defines two
-functions:</p>
-<p><strong><code>emit()</code></strong> is used to emit an event. It may be called with any number of
-parameters, but is most likely to be called with a name for the event and
-an optional payload. The payload can be any value that is
-<a href = "dev-guide/addon-development/web-content.html#json_serializable">serializable to JSON</a>.
-It is used to emit an event:</p>
-<pre><code>port.emit("myEvent", myEventPayload);
-</code></pre>
-<p><strong><code>on()</code></strong> takes two parameters: the name of the event and a function to handle it:</p>
-<pre><code>port.on("myEvent", function handleMyEvent(myEventPayload) {
-  // Handle the event
-});
-</code></pre>
-<p>We could depict the interface between add-on code and content script code like
-this:</p>
-<img class="image-center" src="media/content-scripting-events.png"
-alt="Content script events">
-
-<p>Events are asynchronous: that is, the sender does not wait for a reply from
-the recipient but just emits the event and continues processing.</p>
-<h3>Accessing <code>port</code> in the Content Script</h3>
-<p><span class="aside">Note that the global <code>self</code> object is completely different from the
-<a href="packages/addon-kit/docs/self.html"><code>self</code> module</a>, which provides an API for an add-on to
-access its data files and ID.</span></p>
-<p>In the content script the <code>port</code> object is available as a property of the
-global <code>self</code> object. Thus, to emit an event from a content script:</p>
-<pre><code>self.port.emit("myContentScriptEvent", myContentScriptEventPayload);
-</code></pre>
-<p>To receive an event from the add-on code:</p>
-<pre><code>self.port.on("myAddonEvent", function(myAddonEventPayload) {
-  // Handle the event
-});
-</code></pre>
-<p>Compare this to the technique used to receive <em>built-in</em> events in the
-content script. For example, to receive the <code>context</code> event in a content script
-associated with a <a href="packages/addon-kit/docs/context-menu.html">context menu</a>
-object, you would call the <code>on</code> function attached to the global <code>self</code> object:</p>
-<pre><code>self.on("context", function() {
-  // Handle the event
-});
-</code></pre>
-<p>So the <code>port</code> property is essentially used here as a namespace for
-user-defined events.</p>
-<h3>Accessing <code>port</code> in the Add-on Script</h3>
-<p>In the add-on code, the channel of communication between the add-on and a
-particular content script context is encapsulated by the <code>worker</code> object. Thus
-the <code>port</code> object for communicating with a content script is a property of the
-corresponding <code>worker</code> object.</p>
-<p>However, the worker is not exposed to add-on code in quite the same way
-in all modules. The <code>panel</code> and <code>page-worker</code> objects integrate the
-worker API directly. So to receive events from a content script associated
-with a panel you use <code>panel.port.on()</code>:</p>
-<pre><code>var panel = require("panel").Panel({
-  contentScript: "self.port.emit('showing', 'panel is showing');"
-});
-
-panel.port.on("showing", function(text) {
-  console.log(text);
-});
-
-panel.show();
-</code></pre>
-<p>Conversely, to emit user-defined events from your add-on you can just call
-<code>panel.port.emit()</code>:</p>
-<pre><code>var panel = require("panel").Panel({
-  contentScript: "self.port.on('alert', function(text) {" +
-                 "  console.log(text);" +
-                 "});"
-});
-
-panel.show();
-panel.port.emit("alert", "panel is showing");
-</code></pre>
-<p>The <code>panel</code> and <code>page-worker</code> objects only host a single page at a time,
-so each distinct page object only needs a single channel of communication
-to its content scripts. But some modules, such as <code>page-mod</code>, might need to
-handle multiple pages, each with its own context in which the content scripts
-are executing, so it needs a separate channel (worker) for each page.</p>
-<p>So <code>page-mod</code> does not integrate the worker API directly: instead, each time a
-content script is attached to a page, the worker associated with the page is
-supplied to the page-mod in its <code>onAttach</code> function. By supplying a target for
-this function in the page-mod's constructor you can register to receive
-events from the content script, and take a reference to the worker so as to
-emit events to it.</p>
-<pre><code>var pageModScript = "window.addEventListener('click', function(event) {" +
-                    "  self.port.emit('click', event.target.toString());" +
-                    "  event.stopPropagation();" +
-                    "  event.preventDefault();" +
-                    "}, false);" +
-                    "self.port.on('warning', function(message) {" +
-                    "window.alert(message);" +
-                    "});"
-
-var pageMod = require('page-mod').PageMod({
-  include: ['*'],
-  contentScript: pageModScript,
-  onAttach: function(worker) {
-    worker.port.on('click', function(html) {
-      worker.port.emit('warning', 'Do not click this again');
-    });
-  }
-});
-</code></pre>
-<p>In the add-on above there are two user-defined events:</p>
-<ul>
-<li><code>click</code> is sent from the page-mod to the add-on, when the user clicks an
-element in the page</li>
-<li><code>warning</code> sends a silly string back to the page-mod</li>
-</ul>
-<h3><a name="json_serializable">JSON-Serializable Values</a></h3>
-<p>The payload for an event can be any JSON-serializable value. When events are
-sent their payloads are automatically serialized, and when events are received
-their payloads are automatically deserialized, so you don't need to worry
-about serialization.</p>
-<p>However, you <em>do</em> have to ensure that the payload can be serialized to JSON.
-This means that it needs to be a string, number, boolean, null, array of
-JSON-serializable values, or an object whose property values are themselves
-JSON-serializable. This means you can't send functions, and if the object
-contains methods they won't be encoded.</p>
-<p>For example, to include an array of strings in the payload:</p>
-<pre><code>var pageModScript = "self.port.emit('loaded'," +
-                    "  [" +
-                    "  document.location.toString()," +
-                    "  document.title" +
-                    "  ]" +
-                    ");"
-
-var pageMod = require('page-mod').PageMod({
-  include: ['*'],
-  contentScript: pageModScript,
-  onAttach: function(worker) {
-    worker.port.on('loaded', function(pageInfo) {
-      console.log(pageInfo[0]);
-      console.log(pageInfo[1]);
-    });
-  }
-});
-</code></pre>
-<h3>Examples</h3>
-<h4>Reddit Example</h4>
-<p>This example add-on creates a panel containing the mobile version of Reddit.
-When the user clicks on the title of a story in the panel, the add-on opens
-the linked story in a new tab in the main browser window.</p>
-<p>To accomplish this the add-on needs to run a content script in the context of
-the Reddit page which intercepts mouse clicks on each title link and fetches the
-link's target URL. The content script then needs to send the URL to the add-on
-script.</p>
-<p>This is the complete add-on script:</p>
-<pre><code>var data = require("self").data;
-
-var reddit_panel = require("panel").Panel({
-  width: 240,
-  height: 320,
-  contentURL: "http://www.reddit.com/.mobile?keep_extension=True",
-  contentScriptFile: [data.url("jquery-1.4.4.min.js"),
-                      data.url("panel.js")]
-});
-
-reddit_panel.port.on("click", function(url) {
-  require("tabs").open(url);
-});
-
-require("widget").Widget({
-  id: "open-reddit-btn",
-  label: "Reddit",
-  contentURL: "http://www.reddit.com/static/favicon.ico",
-  panel: reddit_panel
-});
-</code></pre>
-<p>This code supplies two content scripts to the panel's constructor in the
-<code>contentScriptFile</code> option: the jQuery library and the script that intercepts
-link clicks.</p>
-<p>Finally, it registers a listener to the user-defined <code>click</code> event which in
-turn passes the URL into the <code>open</code> function of the
-<a href="packages/addon-kit/docs/tabs.html">tabs</a> module.</p>
-<p>This is the <code>panel.js</code> content script that intercepts link clicks:</p>
-<pre><code>$(window).click(function (event) {
-  var t = event.target;
-
-  // Don't intercept the click if it isn't on a link.
-  if (t.nodeName != "A")
-    return;
-
-  // Don't intercept the click if it was on one of the links in the header
-  // or next/previous footer, since those links should load in the panel itself.
-  if ($(t).parents('#header').length || $(t).parents('.nextprev').length)
-    return;
-
-  // Intercept the click, passing it to the addon, which will load it in a tab.
-  event.stopPropagation();
-  event.preventDefault();
-  self.port.emit('click', t.toString());
-});
-</code></pre>
-<p>This script uses jQuery to interact with the DOM of the page and the
-<code>self.port.emit</code> function to pass URLs back to the add-on script.</p>
-<p>See the <code>examples/reddit-panel</code> directory for the complete example (including
-the content script containing jQuery).</p>
-<h3>Message Events</h3>
-<p>As an alternative to user-defined events content modules support the built-in
-<code>message</code> event. For most cases user-defined events are preferable to message
-events. However, the <code>context-menu</code> module does not support user-defined
-events, so to send messages from a content script to the add-on via a context
-menu object, you must use message events.</p>
-<h4>Handling Message Events in the Content Script</h4>
-<p>To send a message from a content script, you use the <code>postMessage</code> function of
-the global <code>self</code> object:</p>
-<pre><code>self.postMessage(contentScriptMessage);
-</code></pre>
-<p>This takes a single parameter, the message payload, which may be any
-<a href = "dev-guide/addon-development/web-content.html#json_serializable">JSON-serializable value</a>.</p>
-<p>To receive a message from the add-on script, use <code>self</code>'s <code>on</code> function:</p>
-<pre><code>self.on("message", function(addonMessage) {
-  // Handle the message
-});
-</code></pre>
-<p>Like all event-registration functions, this takes two parameters: the name
-of the event, and the handler function. The handler function is passed the
-message payload.</p>
-<h4>Handling Message Events in the Add-on Script</h4>
-<p>To send a message to a content script, use the worker's <code>postMessage</code>
-function. Again, <code>panel</code> and <code>page</code> integrate <code>worker</code> directly:</p>
-<pre><code>// Post a message to the panel's content scripts
-panel.postMessage(addonMessage);
-</code></pre>
-<p>However, for <code>page-mod</code> objects you need to listen to the <code>onAttach</code> event
-and use the worker supplied to that:</p>
-<pre><code>var pageMod = require('page-mod').PageMod({
-  include: ['*'],
-  contentScript: pageModScript,
-  onAttach: function(worker) {
-    worker.postMessage(addonMessage);
-  }
-});
-</code></pre>
-<p>To receive messages from a content script, use the worker's <code>on</code> function.
-To simplify this most content modules provide an <code>onMessage</code> property as an
-argument to the constructor:</p>
-<pre><code>panel = require("panel").Panel({
-  onMessage: function(contentScriptMessage) {
-    // Handle message from the content script
-  }
-});
-</code></pre>
-<h4>Message Events Versus User-Defined Events</h4>
-<p>You can use message events as an alternative to user-defined events:</p>
-<pre><code>var pageModScript = "window.addEventListener('mouseover', function(event) {" +
-                    "  self.postMessage(event.target.toString());" +
-                    "}, false);";
-
-var pageMod = require('page-mod').PageMod({
-  include: ['*'],
-  contentScript: pageModScript,
-  onAttach: function(worker) {
-    worker.on('message', function(message) {
-      console.log('mouseover: ' + message);
-    });
-  }
-});
-</code></pre>
-<p>The reason to prefer user-defined events is that as soon as you need to send
-more than one type of message, then both sending and receiving messages gets
-more complex.</p>
-<p>Suppose the content script wants to send <code>mouseout</code> events as well as
-<code>mouseover</code>. Now we have to embed the event type in the message payload, and
-implement a switch function in the receiver to dispatch the message:</p>
-<pre><code>var pageModScript = "window.addEventListener('mouseover', function(event) {" +
-                    "  self.postMessage({" +
-                    "    kind: 'mouseover'," +
-                    "    element: event.target.toString()" +
-                    "  });" +
-                    "}, false);" +
-                    "window.addEventListener('mouseout', function(event) {" +
-                    "  self.postMessage({" +
-                    "    kind: 'mouseout'," +
-                    "    element: event.target.toString()" +
-                    "  });" +
-                    " }, false);"
-
-var pageMod = require('page-mod').PageMod({
-  include: ['*'],
-  contentScript: pageModScript,
-  onAttach: function(worker) {
-    worker.on('message', function(message) {
-    switch(message.kind) {
-      case 'mouseover':
-        console.log('mouseover: ' + message.element);
-        break;
-      case 'mouseout':
-        console.log('mouseout: ' + message.element);
-        break;
-      }
-    });
-  }
-});
-</code></pre>
-<p>Implementing the same add-on with user-defined events is shorter and more
-readable:</p>
-<pre><code>var pageModScript = "window.addEventListener('mouseover', function(event) {" +
-                    "  self.port.emit('mouseover', event.target.toString());" +
-                    "}, false);" +
-                    "window.addEventListener('mouseout', function(event) {" +
-                    "  self.port.emit('mouseout', event.target.toString());" +
-                    "}, false);";
-
-var pageMod = require('page-mod').PageMod({
-  include: ['*'],
-  contentScript: pageModScript,
-  onAttach: function(worker) {
-    worker.port.on('mouseover', function(message) {
-      console.log('mouseover :' + message);
-    });
-    worker.port.on('mouseout', function(message) {
-      console.log('mouseout :' + message);
-    });
-  }
-});
-</code></pre></div>
+<li><a href="dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a>:
+how to attach content scripts to web pages, and how to control the point at
+which they are executed</li>
+<li><a href="dev-guide/addon-development/content-scripts/access.html">Content Script Access</a>:
+detail about the access content scripts get to the DOM, to other content scripts,
+and to scripts loaded by the page itself</li>
+<li><a href="dev-guide/addon-development/content-scripts/using-port.html">Communicating Using <code>port</code></a>:
+how to communicate between your add-on and its content scripts using the
+<code>port</code> object</li>
+<li><a href="dev-guide/addon-development/content-scripts/using-postmessage.html">Communicating using <code>postMessage()</code></a>:
+how to communicate between your add-on and its content scripts using the
+<code>postMessage()</code> API</li>
+<li><a href="dev-guide/addon-development/content-scripts/reddit-example.html">Example</a>:
+a simple example add-on using content scripts</li>
+</ul></div>
   </div>
 
   <div id="sidebar" class="column">
@@ -559,7 +173,14 @@ var pageMod = require('page-mod').PageMod({
           <ul>
             <li><h4><a href="dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/events.html">Working with Events</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
+              <ul>
+                <li><a href="dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
+                <li><a href="dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
+              </ul></li>
             <li><h4><a href="dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
           </ul>
@@ -882,7 +503,7 @@ var pageMod = require('page-mod').PageMod({
 
 <div role="contentinfo" id="footer">
   <div class="section">
-    <img alt="" src="media/footer-logo-med.png" class="footerlogo">
+    <img alt="" src="static-files/media/footer-logo-med.png" class="footerlogo">
     <div id="social-footer">
       <ul>
         <li>get to know <b>add-ons</b></li>
@@ -908,8 +529,8 @@ var pageMod = require('page-mod').PageMod({
   </div>
 </div>
 
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="static-files/js/jquery.js"></script>
+<script type="text/javascript" src="static-files/js/main.js"></script>
 
 </body>
 
