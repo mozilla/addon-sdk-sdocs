@@ -27,7 +27,7 @@ of Worker and their descendants expose all the public properties
 exposed by <a href="packages/api-utils/docs/events.html">EventEmitter</a> along with additional public properties that
 are listed below.</p>
 <p><strong>Example</strong></p>
-<pre><code>const workers = require("content/worker");
+<pre><code>var workers = require("content/worker");
 let worker =  workers.Worker({
   window: require("window-utils").activeWindow,
   contentScript:

@@ -53,7 +53,7 @@ when applying your own styles. For example, if you set the panel's
 then the panel's text will be invisible on OS X although it looks fine on Ubuntu.</p>
 <h2>Examples</h2>
 <p>Create and show a simple panel with content from the <code>data/</code> directory:</p>
-<pre><code>const data = require("self").data;
+<pre><code>var data = require("self").data;
 var panel = require("panel").Panel({
   contentURL: data.url("foo.html")
 });
@@ -196,19 +196,8 @@ the panel and might show it later, use <code>hide</code> instead.</p>
 </div>
 
 <div class="api_component">
-<h6 class="api_name">show(anchor)</h6>
+<h6 class="api_name">show()</h6>
 <p>Displays the panel.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">[ anchor : <span class="datatype">handle</span> ]</div>
-<p>A handle to a DOM node in a page to which the panel should appear to be
-anchored.  If not given, the panel is centered inside the most recent browser
-window. Note that it is not currently possible to anchor panels in this way
-using only the high level APIs.</p>
-</div>
-
-</div>
-
 </div>
 
 <div class="api_component">

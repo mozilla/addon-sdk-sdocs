@@ -3,6 +3,7 @@
 <h1>unit-test</h1>
 <div class="module_description"><!-- contributed by Atul Varma [atul@mozilla.com]  -->
 <!-- edited by Noelle Murata [fiveinchpixie@gmail.com]  -->
+<!-- edited by Shane Tomlinson[stomlinson@mozilla.com] -->
 
 <p>The <code>unit-test</code> module makes it easy to find and run unit tests.</p>
 </div>
@@ -40,6 +41,19 @@
 <div class="api_component">
 <div class="api_name">[ message : <span class="datatype">string</span> ]</div>
 <p>Optional failure message.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">expectFail(func)</h6>
+<p><em>experimental</em> Expect the test enclosed within <code>func</code> to fail. </p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">func : <span class="datatype">function</span></div>
+<p>A function that should contain a test that is expected to fail.</p>
 </div>
 
 </div>
@@ -225,6 +239,177 @@ against it.</p>
 <div class="api_name">[ message : <span class="datatype">string</span> ]</div>
 <p>Depending on the outcome, a test is marked as passing or failing, and
 <em>message</em> is logged.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">assertFunction(a, message)</h6>
+<p>Ensures that <code>a</code> is a function.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">a : <span class="datatype">value</span></div>
+<p>A value.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>The test is marked as passing or failing depending on the result, logging
+<em>message</em> with it.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">assertUndefined(a, message)</h6>
+<p>Ensures that <code>a</code> is <code>undefined</code>.  <code>null</code>, <code>0</code>, and <code>false</code> will all fail.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">a : <span class="datatype">value</span></div>
+<p>A value.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>The test is marked as passing or failing depending on the result, logging
+<em>message</em> with it.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">assertNotUndefined(a, message)</h6>
+<p>Ensures that <code>a</code> is not <code>undefined</code>.  <code>null</code>, <code>0</code>, and <code>false</code> will all pass.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">a : <span class="datatype">value</span></div>
+<p>A value.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>The test is marked as passing or failing depending on the result, logging
+<em>message</em> with it.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">assertNull(a, message)</h6>
+<p>Ensures that <code>a</code> is <code>null</code>.  <code>undefined</code>, <code>0</code>, and <code>false</code> will all fail.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">a : <span class="datatype">value</span></div>
+<p>A value.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>The test is marked as passing or failing depending on the result, logging
+<em>message</em> with it.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">assertNotNull(a, message)</h6>
+<p>Ensures that <code>a</code> is not <code>null</code>.  <code>undefined</code>, <code>0</code>, and <code>false</code> will all pass.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">a : <span class="datatype">value</span></div>
+<p>A value.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>The test is marked as passing or failing depending on the result, logging
+<em>message</em> with it.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">assertObject(a, message)</h6>
+<p>Ensures that <code>a</code> is an object.  A function, string, or number will fail.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">a : <span class="datatype">value</span></div>
+<p>A value.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>The test is marked as passing or failing depending on the result, logging
+<em>message</em> with it.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">assertString(a, message)</h6>
+<p>Ensures that <code>a</code> is a string.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">a : <span class="datatype">value</span></div>
+<p>A value.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>The test is marked as passing or failing depending on the result, logging
+<em>message</em> with it.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">assertArray(a, message)</h6>
+<p>Ensures that <code>a</code> is an array.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">a : <span class="datatype">value</span></div>
+<p>A value.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>The test is marked as passing or failing depending on the result, logging
+<em>message</em> with it.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">assertNumber(a, message)</h6>
+<p>Ensures that <code>a</code> is a number.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">a : <span class="datatype">value</span></div>
+<p>A value.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>The test is marked as passing or failing depending on the result, logging
+<em>message</em> with it.</p>
 </div>
 
 </div>

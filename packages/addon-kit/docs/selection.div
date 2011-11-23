@@ -6,8 +6,6 @@
 
 <p>The <code>selection</code> module provides a means to get and set text and HTML selections
 in the current Firefox page.  It can also observe new selections.</p>
-<p>It does not currently support selections inside <code>textarea</code> and <code>input</code> elements,
-however.</p>
 <h2>Registering for Selection Notifications</h2>
 <p>To be notified when the user makes a selection, register a listener for the
 "select" event. Each listener will be called after a selection is made.</p>
@@ -76,8 +74,7 @@ current selection throws an exception. Getting the selection when
 <h4 class="api_name">isContiguous : <span class="datatype">boolean</span></h4>
 <p><code>true</code> if the current selection is a single, contiguous selection, and <code>false</code>
 if there are two or more discrete selections, each of which may or may not be
-spatially adjacent. If there is no current selection, this property is <code>null</code>.
-(Discontiguous selections can be created by the user with
+spatially adjacent. (Discontiguous selections can be created by the user with
 Ctrl+click-and-drag.)</p>
 </div>
 

@@ -362,7 +362,7 @@ attached to a page whose URL matches the page-mod's <code>include</code> filter.
 <div class="parameter_set">
 <div class="api_component">
 <div class="api_name"><span class="datatype">Worker</span></div>
-<p>The listener function is passed a <code>Worker</code> object that can be used to communicate
+<p>The listener function is passed a <a href="packages/api-utils/docs/content/worker.html"><code>Worker</code></a> object that can be used to communicate
 with any content scripts attached to this page.</p>
 </div>
 

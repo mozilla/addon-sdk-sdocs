@@ -53,7 +53,7 @@ elements of the list).</p>
 <p>List is a base trait and is meant to be part of a
 composition, since all of its API is private except for the <code>length</code> property.</p>
 <p><strong>Examples:</strong></p>
-<pre><code>const MyList = List.compose({
+<pre><code>var MyList = List.compose({
   add: function add(item1, item2, /*item3...*/) {
     Array.slice(arguments).forEach(this._add.bind(this));
   },

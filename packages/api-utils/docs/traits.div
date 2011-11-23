@@ -71,8 +71,8 @@ This is a commutative and associative operation, and the order of its
 arguments is not significant.</p>
 <p><strong>Examples:</strong></p>
 <p>Let's say we want to define a reusable piece of code for a lists of elements.</p>
-<pre><code>const { Trait } = require('traits');
-const List = Trait.compose({
+<pre><code>var { Trait } = require('traits');
+var List = Trait.compose({
   // private API:
   _list: null,
   // public API
@@ -138,7 +138,7 @@ in the <code>resolutions</code> argument will be renamed from the name
 of the  property in the <code>resolutions</code> argument to its value.
 And if its value is <code>null</code>, the property will become required.</p>
 <p><strong>Example:</strong></p>
-<pre><code>const Range = List.resolve({
+<pre><code>var Range = List.resolve({
   constructor: null,
   add: '_add',
 }).compose({
@@ -227,7 +227,7 @@ ConstructableList(1, 2, 3).length       // 3
 <code>'[object Trait]'</code> string, unless they have <code>constructor</code> property, in that
 case string <code>'Trait'</code> is replaced with the name of <code>constructor</code> property.</p>
 <p><strong>Example:</strong></p>
-<pre><code>const MyTrait = Trait.compose({
+<pre><code>var MyTrait = Trait.compose({
   constructor: function MyTrait() {
     // do your initialization here
   }
@@ -245,7 +245,7 @@ MyTrait().toString();     // [object MyTrait]
 <h6 class="api_name">required : <span class="datatype">Object</span></h6>
 <p>Singleton, used during trait composition to define "required" properties.</p>
 <p><strong>Example:</strong></p>
-<pre><code>const Enumerable = Trait.compose({
+<pre><code>var Enumerable = Trait.compose({
   list: Trait.required,
   forEach: function forEach(consumer) {
     return this.list.forEach(consumer);
@@ -254,7 +254,7 @@ MyTrait().toString();     // [object MyTrait]
 
 let c1 = Enumerable();      // Error: Missing required property: list
 
-const EnumerableList = List.compose({
+var EnumerableList = List.compose({
   get list() this._list.slice(0)
 }, Enumerable);
 

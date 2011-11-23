@@ -7,16 +7,16 @@
 module exposes an API to create those.</p>
 <h2>Example</h2>
 <pre><code>// Define keyboard shortcuts for showing and hiding a custom panel.
-const { Hotkey } = require("hotkeys");
+var { Hotkey } = require("hotkeys");
 
 var showHotKey = Hotkey({
-  combo: "accel-shift-p",
+  combo: "accel-shift-o",
   onPress: function() {
     showMyPanel();
   }
 });
 var hideHotKey = Hotkey({
-  combo: "accel-alt-shift-p",
+  combo: "accel-alt-shift-o",
   onPress: function() {
     hideMyPanel();
   }
@@ -49,7 +49,8 @@ combination, the listener is executed only on the last one created</p>
 <p>Options for the hotkey, with the following keys:</p>
 <div class="api_component">
 <div class="api_name">combo : <span class="datatype">String</span></div>
-<p>Key combination in the format of <code>'modifier-key'</code>:</p>
+<p>Any function key: <code>"f1, f2, ..., f24"</code> or key combination in the format
+of <code>'modifier-key'</code>:</p>
 <pre><code>  "accel-s"
   "meta-shift-i"
   "control-alt-d"

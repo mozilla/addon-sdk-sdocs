@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.2.1/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.3/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -35,7 +35,10 @@
     <a id="mozilla-tab" href="http://www.mozilla.org/?ref=logo">Mozilla</a>
     <div class="menu">
       <p>
-        <a href="https://addons.mozilla.org/en-US/developers/">Back to Developer Hub</a>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
       </p>
   </div>
 </header>
@@ -110,7 +113,7 @@ when applying your own styles. For example, if you set the panel's
 then the panel's text will be invisible on OS X although it looks fine on Ubuntu.</p>
 <h2>Examples</h2>
 <p>Create and show a simple panel with content from the <code>data/</code> directory:</p>
-<pre><code>const data = require("self").data;
+<pre><code>var data = require("self").data;
 var panel = require("panel").Panel({
   contentURL: data.url("foo.html")
 });
@@ -253,19 +256,8 @@ the panel and might show it later, use <code>hide</code> instead.</p>
 </div>
 
 <div class="api_component">
-<h6 class="api_name">show(anchor)</h6>
+<h6 class="api_name">show()</h6>
 <p>Displays the panel.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">[ anchor : <span class="datatype">handle</span> ]</div>
-<p>A handle to a DOM node in a page to which the panel should appear to be
-anchored.  If not given, the panel is centered inside the most recent browser
-window. Note that it is not currently possible to anchor panels in this way
-using only the high level APIs.</p>
-</div>
-
-</div>
-
 </div>
 
 <div class="api_component">
@@ -488,7 +480,7 @@ object.</p>
               <li><a href="dev-guide/addon-development/api-idioms.html">Common Idioms</a></li>
               <li><a href="dev-guide/addon-development/api-modules.html">API Overview</a></li>
             </ul></li>
-            <li><h4><a href="dev-guide/addon-development/annotator/annotator.html">Annotator: a More Complex Add-on</a></h4>
+            <li><h4><a href="dev-guide/addon-development/annotator/annotator.html">Example: Annotator</a></h4>
             <ul>
               <li><a href="dev-guide/addon-development/annotator/overview.html">Design Overview</a></li>
               <li><a href="dev-guide/addon-development/annotator/widget.html">Implementing the Widget</a></li>
@@ -496,7 +488,14 @@ object.</p>
               <li><a href="dev-guide/addon-development/annotator/storing.html">Storing Annotations</a></li>
               <li><a href="dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
             </ul></li>
-          </ul>
+            <li><h4><a href="dev-guide/addon-development/third-party-packages.html">Using Third Party Packages</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/xul-migration.html">XUL Migration Guide</a></h4>
+            <ul>
+              <li><a href="dev-guide/addon-development/sdk-vs-xul.html">XUL Versus the SDK</a></li>
+            </ul>
+            <ul>
+              <li><a href="dev-guide/addon-development/library-detector.html">Porting Example</a></li>
+            </ul></li>
           </div>
         </div>
 
@@ -727,6 +726,10 @@ object.</p>
 
 <li class="module">
 <a href="packages/api-utils/docs/preferences-service.html">preferences-service</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/runtime.html">runtime</a>
 </li>
 
 <li class="module">

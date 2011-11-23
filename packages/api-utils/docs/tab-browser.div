@@ -24,15 +24,15 @@ add-on, use the Tabs module (JEP 110).</p>
 <h4 class="api_name">addTab(URL, options)</h4>
 <p>Adds a new tab.</p>
 <p><strong>Example</strong></p>
-<pre><code>const tabBrowser = require("tab-browser");
+<pre><code>var tabBrowser = require("tab-browser");
 tabBrowser.addTab("http://google.com");
 
-const tabBrowser = require("tab-browser");
+var tabBrowser = require("tab-browser");
 tabBrowser.addTab("http://google.com", {
   inBackground: true
 });
 
-const tabBrowser = require("tab-browser");
+var tabBrowser = require("tab-browser");
 tabBrowser.addTab("http://google.com", {
   inNewWindow: true,
   onLoad: function(tab) {
@@ -86,7 +86,7 @@ and destroyed.</p>
 <p>The onTrack method will be called once per pre-existing tabbrowser, upon
 tracker registration.</p>
 <p><strong>Example</strong></p>
-<pre><code>const tabBrowser = require("tab-browser");
+<pre><code>var tabBrowser = require("tab-browser");
 let tracker = {
   onTrack: function(tabbrowser) {
     console.log("A new tabbrowser is being tracked.");
@@ -126,7 +126,7 @@ The tabbrowser element is passed as a parameter to this method.</p>
 <p>The onTrack method will be called once per pre-existing tab, upon
 tracker registration.</p>
 <p><strong>Example</strong></p>
-<pre><code>const tabBrowser = require("tab-browser");
+<pre><code>var tabBrowser = require("tab-browser");
 let tracker = {
   onTrack: function(tab) {
     console.log("A new tab is being tracked.");

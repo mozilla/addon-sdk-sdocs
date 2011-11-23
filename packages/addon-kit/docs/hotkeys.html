@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.2.1/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.3/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -35,7 +35,10 @@
     <a id="mozilla-tab" href="http://www.mozilla.org/?ref=logo">Mozilla</a>
     <div class="menu">
       <p>
-        <a href="https://addons.mozilla.org/en-US/developers/">Back to Developer Hub</a>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
       </p>
   </div>
 </header>
@@ -64,16 +67,16 @@
 module exposes an API to create those.</p>
 <h2>Example</h2>
 <pre><code>// Define keyboard shortcuts for showing and hiding a custom panel.
-const { Hotkey } = require("hotkeys");
+var { Hotkey } = require("hotkeys");
 
 var showHotKey = Hotkey({
-  combo: "accel-shift-p",
+  combo: "accel-shift-o",
   onPress: function() {
     showMyPanel();
   }
 });
 var hideHotKey = Hotkey({
-  combo: "accel-alt-shift-p",
+  combo: "accel-alt-shift-o",
   onPress: function() {
     hideMyPanel();
   }
@@ -106,7 +109,8 @@ combination, the listener is executed only on the last one created</p>
 <p>Options for the hotkey, with the following keys:</p>
 <div class="api_component">
 <div class="api_name">combo : <span class="datatype">String</span></div>
-<p>Key combination in the format of <code>'modifier-key'</code>:</p>
+<p>Any function key: <code>"f1, f2, ..., f24"</code> or key combination in the format
+of <code>'modifier-key'</code>:</p>
 <pre><code>  "accel-s"
   "meta-shift-i"
   "control-alt-d"
@@ -183,7 +187,7 @@ destroyed it can no longer be used.</p>
               <li><a href="dev-guide/addon-development/api-idioms.html">Common Idioms</a></li>
               <li><a href="dev-guide/addon-development/api-modules.html">API Overview</a></li>
             </ul></li>
-            <li><h4><a href="dev-guide/addon-development/annotator/annotator.html">Annotator: a More Complex Add-on</a></h4>
+            <li><h4><a href="dev-guide/addon-development/annotator/annotator.html">Example: Annotator</a></h4>
             <ul>
               <li><a href="dev-guide/addon-development/annotator/overview.html">Design Overview</a></li>
               <li><a href="dev-guide/addon-development/annotator/widget.html">Implementing the Widget</a></li>
@@ -191,7 +195,14 @@ destroyed it can no longer be used.</p>
               <li><a href="dev-guide/addon-development/annotator/storing.html">Storing Annotations</a></li>
               <li><a href="dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
             </ul></li>
-          </ul>
+            <li><h4><a href="dev-guide/addon-development/third-party-packages.html">Using Third Party Packages</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/xul-migration.html">XUL Migration Guide</a></h4>
+            <ul>
+              <li><a href="dev-guide/addon-development/sdk-vs-xul.html">XUL Versus the SDK</a></li>
+            </ul>
+            <ul>
+              <li><a href="dev-guide/addon-development/library-detector.html">Porting Example</a></li>
+            </ul></li>
           </div>
         </div>
 
@@ -422,6 +433,10 @@ destroyed it can no longer be used.</p>
 
 <li class="module">
 <a href="packages/api-utils/docs/preferences-service.html">preferences-service</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/runtime.html">runtime</a>
 </li>
 
 <li class="module">

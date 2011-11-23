@@ -1,0 +1,78 @@
+
+<div id="runtime_module_api_docs" class="module_api_docs">
+<h1>runtime</h1>
+<div class="module_description"><!-- contributed by Wes Kocher [kwierso@gmail.com]  -->
+
+<p>The <code>runtime</code> module provides access to information about Firefox's
+runtime environment. All properties exposed are read-only.</p>
+<p>For more information, see <a href="https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIXULRuntime">nsIXULRuntime</a>.</p>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Properties</h3>
+
+<div class="api_component">
+<h4 class="api_name">inSafeMode : <span class="datatype">boolean</span></h4>
+<p>This value is <code>true</code> if Firefox was started in safe mode,
+otherwise <code>false</code>.</p>
+</div>
+
+<div class="api_component">
+<h4 class="api_name">OS : <span class="datatype">string</span></h4>
+<p>A string identifying the current operating system. For example, .
+  <code>"WINNT"</code>, <code>"Darwin"</code>, or <code>"Linux"</code>. See <a href="https://developer.mozilla.org/en/OS_TARGET">OS_TARGET</a>
+  for a more complete list of possible values.</p>
+</div>
+
+<div class="api_component">
+<h4 class="api_name">processType : <span class="datatype">long</span></h4>
+<p>The type of the caller's process, which will be one of these constants:
+<table>
+  <tr>
+    <th>Constant</th>
+    <th>Value</th>
+    <th>Description</th>
+  </tr></p>
+<p><tr>
+    <td>PROCESS_TYPE_DEFAULT</td>
+    <td>0</td>
+    <td>The default (chrome) process.</td>
+  </tr></p>
+<p><tr>
+    <td>PROCESS_TYPE_PLUGIN</td>
+    <td>1</td>
+    <td>A plugin subprocess.</td>
+  </tr></p>
+<p><tr>
+    <td>PROCESS_TYPE_CONTENT</td>
+    <td>2</td>
+    <td>A content subprocess.</td>
+  </tr></p>
+<p><tr>
+    <td>PROCESS_TYPE_IPDLUNITTEST</td>
+    <td>3</td>
+    <td>An IPDL unit testing subprocess.</td>
+  </tr>
+</table></p>
+</div>
+
+<div class="api_component">
+<h4 class="api_name">widgetToolkit : <span class="datatype">string</span></h4>
+<p>A string identifying the target widget toolkit in use.</p>
+</div>
+
+<div class="api_component">
+<h4 class="api_name">XPCOMABI : <span class="datatype">string</span></h4>
+<p>A string identifying the <a href="https://developer.mozilla.org/en/XPCOM_ABI">ABI</a> of the current processor and compiler vtable.
+  This string takes the form &lt;<code>processor</code>&gt;-&lt;<code>compilerABI</code>&gt;,
+  for example: "<code>x86-msvc</code>" or "<code>ppc-gcc3</code>".</p>
+</div>
+
+</div>
+
+</div>
+
+</div>

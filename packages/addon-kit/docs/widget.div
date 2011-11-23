@@ -31,7 +31,10 @@ using a URL with the <code>contentURL</code> property.</p>
   contentURL: "http://www.mozilla.org/favicon.ico"
 });
 </code></pre>
-<p>Upon creation, the widget is automatically added to the add-on bar.</p>
+<p>Upon creation, the widget is automatically added to the add-on bar.
+You can set the width of a widget, but the height is fixed so as to fit in the
+add-on bar. If the content is an image, it is automatically scaled to be 16x16
+pixels.</p>
 <p>This widget contains an entire web page:</p>
 <pre><code>require("widget").Widget({
   id: "hello-display",
@@ -125,7 +128,7 @@ create your content scripts in separate files and pass their URLs using the
 <code>contentScriptFile</code> property.  See
 <a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a> for more
 information.</p>
-<pre><code>const widgets = require("widget");
+<pre><code>var widgets = require("widget");
 
 // A basic click-able image widget.
 widgets.Widget({
@@ -255,6 +258,7 @@ This string has to be unique and must not be changed over time.</p>
 <p>An optional string value containing the displayed content of the widget.
 It may contain HTML. Widgets must have either the <code>content</code> property or the
 <code>contentURL</code> property set.</p>
+<p>If the content is an image, it is automatically scaled to be 16x16 pixels.</p>
 </div>
 
 <div class="api_component">
@@ -263,6 +267,7 @@ It may contain HTML. Widgets must have either the <code>content</code> property 
 <a href="dev-guide/addon-development/web-content.html">local content</a> or remote
 content, an image or web content. Widgets must have either the <code>content</code>
 property or the <code>contentURL</code> property set.</p>
+<p>If the content is an image, it is automatically scaled to be 16x16 pixels.</p>
 </div>
 
 <div class="api_component">

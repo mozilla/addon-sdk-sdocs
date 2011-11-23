@@ -96,14 +96,29 @@ tabs in this window, not all tabs in all windows. This property is read-only.</p
 <pre><code>var windows = require("windows").browserWindows;
 
 // Open a new window.
-windows.open("http://www.mysite.com");
+windows.open("http://www.example.com");
 
 // Open a new window and set a listener for "open" event.
 windows.open({
-  url: "http://www.mysite.com",
+  url: "http://www.example.com",
   onOpen: function(window) {
     // do stuff like listen for content
     // loading.
+  }
+});
+</code></pre>
+<p>Returns the window that was opened:</p>
+<pre><code>var widgets = require("widget");
+var windows = require("windows").browserWindows;
+
+var example = windows.open("http://www.example.com");
+
+var widget = widgets.Widget({
+  id: "close-window",
+  label: "Close window",
+  contentURL: "http://www.mozilla.org/favicon.ico",
+  onClick: function() {
+    example.close();
   }
 });
 </code></pre>
@@ -135,6 +150,9 @@ This is an optional property.</p>
 
 </div>
 
+</div>
+
+<div class="returns">Returns: <span class="datatype">BrowserWindow</span>
 </div>
 
 </div>

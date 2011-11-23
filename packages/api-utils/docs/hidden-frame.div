@@ -19,7 +19,7 @@ content that was loaded in it.</p>
 <h2>Examples</h2>
 <p>The following code creates a hidden frame, loads a web page into it, and then
 logs its title:</p>
-<pre><code>const hiddenFrames = require("hidden-frame");
+<pre><code>var hiddenFrames = require("hidden-frame");
 let hiddenFrame = hiddenFrames.add(hiddenFrames.HiddenFrame({
   onReady: function() {
     this.element.contentWindow.location = "http://www.mozilla.org/";

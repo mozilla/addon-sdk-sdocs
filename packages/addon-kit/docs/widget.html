@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.2.1/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.3/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -35,7 +35,10 @@
     <a id="mozilla-tab" href="http://www.mozilla.org/?ref=logo">Mozilla</a>
     <div class="menu">
       <p>
-        <a href="https://addons.mozilla.org/en-US/developers/">Back to Developer Hub</a>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
       </p>
   </div>
 </header>
@@ -88,7 +91,10 @@ using a URL with the <code>contentURL</code> property.</p>
   contentURL: "http://www.mozilla.org/favicon.ico"
 });
 </code></pre>
-<p>Upon creation, the widget is automatically added to the add-on bar.</p>
+<p>Upon creation, the widget is automatically added to the add-on bar.
+You can set the width of a widget, but the height is fixed so as to fit in the
+add-on bar. If the content is an image, it is automatically scaled to be 16x16
+pixels.</p>
 <p>This widget contains an entire web page:</p>
 <pre><code>require("widget").Widget({
   id: "hello-display",
@@ -182,7 +188,7 @@ create your content scripts in separate files and pass their URLs using the
 <code>contentScriptFile</code> property.  See
 <a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a> for more
 information.</p>
-<pre><code>const widgets = require("widget");
+<pre><code>var widgets = require("widget");
 
 // A basic click-able image widget.
 widgets.Widget({
@@ -312,6 +318,7 @@ This string has to be unique and must not be changed over time.</p>
 <p>An optional string value containing the displayed content of the widget.
 It may contain HTML. Widgets must have either the <code>content</code> property or the
 <code>contentURL</code> property set.</p>
+<p>If the content is an image, it is automatically scaled to be 16x16 pixels.</p>
 </div>
 
 <div class="api_component">
@@ -320,6 +327,7 @@ It may contain HTML. Widgets must have either the <code>content</code> property 
 <a href="dev-guide/addon-development/web-content.html">local content</a> or remote
 content, an image or web content. Widgets must have either the <code>content</code>
 property or the <code>contentURL</code> property set.</p>
+<p>If the content is an image, it is automatically scaled to be 16x16 pixels.</p>
 </div>
 
 <div class="api_component">
@@ -898,7 +906,7 @@ from the content script. The message can be any
               <li><a href="dev-guide/addon-development/api-idioms.html">Common Idioms</a></li>
               <li><a href="dev-guide/addon-development/api-modules.html">API Overview</a></li>
             </ul></li>
-            <li><h4><a href="dev-guide/addon-development/annotator/annotator.html">Annotator: a More Complex Add-on</a></h4>
+            <li><h4><a href="dev-guide/addon-development/annotator/annotator.html">Example: Annotator</a></h4>
             <ul>
               <li><a href="dev-guide/addon-development/annotator/overview.html">Design Overview</a></li>
               <li><a href="dev-guide/addon-development/annotator/widget.html">Implementing the Widget</a></li>
@@ -906,7 +914,14 @@ from the content script. The message can be any
               <li><a href="dev-guide/addon-development/annotator/storing.html">Storing Annotations</a></li>
               <li><a href="dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
             </ul></li>
-          </ul>
+            <li><h4><a href="dev-guide/addon-development/third-party-packages.html">Using Third Party Packages</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/xul-migration.html">XUL Migration Guide</a></h4>
+            <ul>
+              <li><a href="dev-guide/addon-development/sdk-vs-xul.html">XUL Versus the SDK</a></li>
+            </ul>
+            <ul>
+              <li><a href="dev-guide/addon-development/library-detector.html">Porting Example</a></li>
+            </ul></li>
           </div>
         </div>
 
@@ -1137,6 +1152,10 @@ from the content script. The message can be any
 
 <li class="module">
 <a href="packages/api-utils/docs/preferences-service.html">preferences-service</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/runtime.html">runtime</a>
 </li>
 
 <li class="module">

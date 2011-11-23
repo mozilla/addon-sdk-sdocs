@@ -18,8 +18,8 @@ specified contentURL and scripts into it, and plumbs an asynchronous
 JSON pipe between the content symbiont object and the content symbiont
 context. If frame is not provided hidden frame will be created.</p>
 <h2>Examples</h2>
-<pre><code>const { Symbiont } = require('content');
-const Thing = Symbiont.resolve({ constructor: '_init' }).compose({
+<pre><code>var { Symbiont } = require('content');
+var Thing = Symbiont.resolve({ constructor: '_init' }).compose({
   constructor: function Thing(options) {
     // `getMyFrame` returns the host application frame in which
     // the page is loaded.
