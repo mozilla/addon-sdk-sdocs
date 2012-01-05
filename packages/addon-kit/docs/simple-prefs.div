@@ -1,0 +1,94 @@
+
+<div id="simple-prefs_module_api_docs" class="module_api_docs">
+<h1>simple-prefs</h1>
+<div class="module_description"><!-- contributed by Erik Vold [erikvvold@gmail.com]  -->
+
+<h4><em>Experimental</em></h4>
+<p>The <code>simple-prefs</code> module lets you easily and persistently store preferences
+across application restarts, which can be configured by users in the
+Add-ons Manager.</p>
+<h2>Introduction</h2>
+<p>With the simple preferences module you can store booleans, integers, and string
+values.</p>
+<h2>Inline Options &amp; Default Values</h2>
+<p>In order to have a <code>options.xul</code> (for inline options) generated, or a
+<code>defaults/preferences/prefs.js</code> for default preferences, you will need to
+define the preferences in your <code>package.json</code>, like so:</p>
+<pre><code>{
+    "fullName": "Example Add-on",
+    ...
+    "preferences": [{
+        "name": "somePreference",
+        "title": "Some preference title",
+        "type": "string",
+        "value": "this is the default string value"
+    }]
+}
+</code></pre>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">on(prefName, listener)</h4>
+<p><em>experimental</em> Registers an event <code>listener</code> that will be called when a preference is changed.</p>
+<p><strong>Example:</strong></p>
+<pre><code>function onPrefChange(prefName) {
+    console.log("The " + prefName + " preference changed.");
+}
+require("simple-prefs").on("somePreference", onPrefChange);
+require("simple-prefs").on("someOtherPreference", onPrefChange);
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">prefName : <span class="datatype">String</span></div>
+<p>The name of the preference to watch for changes.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">listener : <span class="datatype">Function</span></div>
+<p>The listener function that processes the event.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">removeListener(prefName, listener)</h4>
+<p><em>experimental</em> Unregisters an event <code>listener</code> for the specified preference.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">prefName : <span class="datatype">String</span></div>
+<p>The name of the preference to watch for changes.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">listener : <span class="datatype">Function</span></div>
+<p>The listener function that processes the event.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h3 class="api_header">Properties</h3>
+
+<div class="api_component">
+<h4 class="api_name">prefs : <span class="datatype">object</span></h4>
+<p><em>experimental</em> A persistent object private to your add-on.  Properties with boolean,
+number, and string values will be persisted in the Mozilla preferences system.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>

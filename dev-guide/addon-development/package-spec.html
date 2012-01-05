@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.3/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.4/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -49,6 +49,7 @@
     <h1>
       <a href="dev-guide/welcome.html">Add-on SDK<span></span></a>
     </h1>
+    <div id="version">Version 1.4</div>
   </div>
 </header>
 
@@ -112,6 +113,13 @@ called <code>package.json</code>. This file is also referred to as the
   This key maps on to the
   <a href="https://developer.mozilla.org/en/install_manifests#icon64URL"><code>icon64URL</code> entry in the Install Manifest</a>,
   so the icon should be 64x64 pixels in size.</p>
+</li>
+<li>
+<p><code>preferences</code> - <em>experimental</em>
+  An array of JSON objects that use the following keys <code>name</code>, <code>type</code>, <code>value</code>,
+  <code>title</code>, and <code>description</code>.  These JSON objects will be used to automatically
+  create a preferences interface for the addon in the Add-ons Manager.
+  For more information see the documentation of <a href="packages/addon-kit/docs/simple-prefs.html">simple-prefs</a>.</p>
 </li>
 <li>
 <p><code>license</code> - the name of the license as a String, with an optional
@@ -300,6 +308,10 @@ URL for these resources may be reached using the
 </li>
 
 <li class="module">
+<a href="packages/addon-kit/docs/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li class="module">
 <a href="packages/addon-kit/docs/simple-storage.html">simple-storage</a>
 </li>
 
@@ -342,7 +354,6 @@ URL for these resources may be reached using the
             <li><h4><a href="dev-guide/module-development/best-practices.html">Low-Level Module Best Practices</a></h4>
             <li><h4><a href="dev-guide/module-development/chrome.html">Chrome Authority</a></h4>
             <li><h4><a href="dev-guide/module-development/xpi.html">XPI Generation</a></h4>
-            <li><h4><a href="dev-guide/module-development/e10s.html">Out-of-Process Add-ons</a></h4>
           </ul>
           </div>
         </div>
@@ -400,7 +411,7 @@ URL for these resources may be reached using the
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/e10s.html">e10s</a>
+<a href="packages/api-utils/docs/environment.html">environment</a>
 </li>
 
 <li class="module">
@@ -420,6 +431,10 @@ URL for these resources may be reached using the
 </li>
 
 <li class="module">
+<a href="packages/api-utils/docs/httpd.html">httpd</a>
+</li>
+
+<li class="module">
 <a href="packages/api-utils/docs/light-traits.html">light-traits</a>
 </li>
 
@@ -436,6 +451,10 @@ URL for these resources may be reached using the
 </li>
 
 <li class="module">
+<a href="packages/api-utils/docs/namespace.html">namespace</a>
+</li>
+
+<li class="module">
 <a href="packages/api-utils/docs/observer-service.html">observer-service</a>
 </li>
 
@@ -449,10 +468,6 @@ URL for these resources may be reached using the
 
 <li class="module">
 <a href="packages/api-utils/docs/runtime.html">runtime</a>
-</li>
-
-<li class="module">
-<a href="packages/api-utils/docs/securable-module.html">securable-module</a>
 </li>
 
 <li class="module">

@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.3/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.4/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -26,7 +26,7 @@
   <![endif]-->
 
   <link rel="shortcut icon" type="image/x-icon" href="static-files/media/favicon.png">
-  <title>e10s - Add-on SDK Documentation</title>
+  <title>namespace - Add-on SDK Documentation</title>
 </head>
 <body>
 
@@ -49,6 +49,7 @@
     <h1>
       <a href="dev-guide/welcome.html">Add-on SDK<span></span></a>
     </h1>
+    <div id="version">Version 1.4</div>
   </div>
 </header>
 
@@ -59,287 +60,71 @@
   <div id="main-content-column" class="column">
     <div id="toc"></div>
     <div id="main-content">
-<div id="e10s_module_api_docs" class="module_api_docs">
-<h1>e10s</h1>
-<div class="module_description"><p><span class="aside">
-For a high-level overview of out-of-process add-ons, see the
-<a href="dev-guide/module-development/e10s.html">Out-of-Process Add-ons</a> internals guide.
-</span></p>
-<p>The <code>e10s</code> module allows add-ons to execute in a separate process from Firefox
-itself.</p>
-<h2>Adapters</h2>
-<p>As explained in the <a href="dev-guide/module-development/e10s.html">Out-of-Process Add-ons</a> internals guide, an <em>e10s
-adapter</em> is the primary mechanism through which chrome functionality is exposed
-to add-on processes. It is a single piece of code evaluated <em>twice</em>&mdash;once
-in each process&mdash;and typically has the following form:</p>
-<pre><code>if (this.chrome) {
-  /* We're being evaluated in the add-on process. Export the
-   * module's API, proxying all calls to the chrome process
-   * as necessary. */
-} else exports.register = function register(addon) {
-  /* We're being evaluated in the chrome process.
-   * Set up chrome process listeners to communicate with
-   * the given add-on process. */
-};
+<div id="namespace_module_api_docs" class="module_api_docs">
+<h1>namespace</h1>
+<div class="module_description"><p>Provides an API for creating namespaces for any given objects, which
+effectively may be used for creating fields that are not part of objects
+public API.</p>
+<pre><code>  let { Namespace } = require('api-utils/namespace');
+  let ns = Namespace();
+
+  ns(publicAPI).secret = secret;
 </code></pre>
-<p>In the above code, the <code>chrome</code> global is only visible to this code when it is
-executed in the add-on process. It is an instance of <code>ChromeProcess</code>.</p>
-<p>The <code>register()</code> function, on the other hand, is only defined and called in the
-chrome process, and the <code>addon</code> argument passed to it is an instance of
-<code>AddonProcess</code>.</p>
-<p><code>ChromeProcess</code> and <code>AddonProcess</code> instances come in pairs, and represent
-opposite sides of an inter-process communication mechanism.</p>
-<h2>Events</h2>
-<p>Chrome and add-on processes can asynchronously send arbitrary events to each
-other. The <code><a href="packages/api-utils/docs/events.html">EventEmitter</a></code> interface has been overloaded to make
-handling these events simple and intuitive. For instance, here's a trivial e10s
-adapter that uses events:</p>
-<pre><code>if (this.chrome) {
-  exports.sendFoo = function(x) {
-    chrome.send('foo', x);
+<p>One namespace may be used with multiple objects:</p>
+<pre><code>  let { Namespace } = require('api-utils/namespace');
+  let dom = Namespace();
+
+  function View(element) {
+    let view = Object.create(View.prototype);
+    dom(view).element = element;
+    // ....
+  }
+  View.prototype.destroy = function destroy() {
+    let { element } = dom(this);
+    element.parentNode.removeChild(element);
+    // ...
   };
-} else exports.register = function register(addon) {
-  addon.on('foo', function(type, x) {
-    console.log("foo called with argument", x);
-  });
-};
+  // ...
+  exports.View = View;
+  // ...
 </code></pre>
-<h2>Remote Function Calls</h2>
-<p>The add-on process can synchronously call a function on the chrome process, but
-not vice versa. Here's a trivial example of an e10s adapter using this
-mechanism:</p>
-<pre><code>if (this.chrome) {
-  exports.bar = function(x) {
-    return chrome.call('bar', x);
+<p>Also, multiple namespaces can be used with one object:</p>
+<pre><code>  // ./widget.js
+
+  let { Cu } = require('chrome');
+  let { Namespace } = require('api-utils/namespace');
+  let { View } = require('./view');
+
+  // Note this is completely independent from View's internal Namespace object.
+  let ns = Namespace();
+
+  function Widget(options) {
+    let { element, contentScript } = options;
+    let widget = Object.create(Widget.prototype);
+    View.call(widget, options.element);
+    ns(widget).sandbox = Cu.Sandbox(element.ownerDocument.defaultView);
+    // ...
+  }
+  Widget.prototype = Object.create(View.prototype);
+  Widget.prototype.postMessage = function postMessage(message) {
+    let { sandbox } = ns(this);
+    sandbox.postMessage(JSON.stringify(JSON.parse(message)));
+    ...
   };
-} else exports.register = function register(addon) {
-  addon.registerCall('bar', function(name, x) {
-    return x * 3;
-  });
-};
-</code></pre>
-<h2>Arguments</h2>
-<p>When sending events or calling functions in another process, the chrome and
-add-on processes are allowed to send JSON-serializable arguments. Additionally,
-they can send a special type of object called a <em>handle</em>. See the
-<a href="https://developer.mozilla.org/en/Jetpack_Processes#Handles">MDN Handle Documentation</a> for more information on these.</p>
-<p>Here's a simple example of a handle being used to remember a callback function
-on the add-on side:</p>
-<pre><code>if (this.chrome) {
-  exports.baz = function(callback) {
-    var handle = chrome.createHandle();
-    handle.callback = callback;
-    chrome.send('baz', handle);
+  Widget.prototype.destroy = function destroy() {
+    View.prototype.destroy.call(this);
+    // ...
+    delete ns(this).sandbox;
   };
-  chrome.on('bazCallback', function(name, handle) {
-    try { handle.callback(); } except (e) { console.exception(e); }
-    handle.invalidate();
-  });
-} else exports.register = function register(addon) {
-  addon.on('baz', function(name, handle) {
-    require('timer').setTimeout(function() {
-      addon.send('bazCallback', handle);
-    }, 1000);
-  });
-};
+  exports.Widget = Widget;
 </code></pre>
-</div>
-
-<div class="api_reference">
-<h2 class="api_header">API Reference</h2>
-
-<div class="api_component_group">
-<h3 class="api_header">Classes</h3>
-
-<div class="api_component">
-<h4 class="api_name">ChromeProcess</h4>
-<p>In an add-on process, this represents the parent chrome process. This class is
-a singleton and has no constructor. It is automatically injected into the
-global scope of all <code>-e10s-adapter</code> modules as the <code>chrome</code> object.</p>
-<div class="api_component_group">
-<h5 class="api_header">Methods</h5>
-
-<div class="api_component">
-<h6 class="api_name">on(type, listener)</h6>
-<p>Registers an event listener with the chrome process.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">type : <span class="datatype">string</span></div>
-<p>The type of event to listen for.</p>
-</div>
-
-<div class="api_component">
-<div class="api_name">listener : <span class="datatype">function</span></div>
-<p>The listener function that handles the event. Its first argument is always
-<code>type</code>, and additional arguments vary depending on the event's originating
-<code>addon.send()</code> call in the chrome process.</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component">
-<h6 class="api_name">removeListener(type, listener)</h6>
-<p>Removes an event listener from the chrome process.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">type : <span class="datatype">string</span></div>
-<p>The type of event for which <code>listener</code> was registered.</p>
-</div>
-
-<div class="api_component">
-<div class="api_name">listener : <span class="datatype">function</span></div>
-<p>The listener function that was registered.</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component">
-<h6 class="api_name">send(type)</h6>
-<p>Sends an event asynchronously to the chrome process. Any additional arguments
-after <code>type</code> are passed as arguments to event listeners in the chrome process.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">type : <span class="datatype">string</span></div>
-<p>The type of event to send.</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component">
-<h6 class="api_name">call(name)</h6>
-<p>Synchronously calls a remote function in the chrome process and returns its
-result. Any additional arguments after <code>name</code> are passed as arguments to the
-function in the chrome process.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">name : <span class="datatype">string</span></div>
-<p>The name of the function to call.</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component">
-<h6 class="api_name">createHandle()</h6>
-<p>Creates a <a href="https://developer.mozilla.org/en/Jetpack_Processes#Handles">handle</a> object, which can be passed to the chrome process via
-<code>send()</code> or <code>call()</code>.</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component">
-<h4 class="api_name">AddonProcess</h4>
-<p>In the chrome process, this represents a child add-on process.</p>
-<div class="api_component_group">
-<h5 class="api_header">Constructors</h5>
-
-<div class="api_component">
-<h6 class="api_name">AddonProcess(options)</h6>
-<p>Creates a new add-on process.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">options : <span class="datatype">object</span></div>
-<p>An optional object with the following keys, all of which are optional:</p>
-<div class="api_component">
-<div class="api_name">[ console : <span class="datatype">object</span> ]</div>
-<p>An object whose interface corresponds to that of the <code>console</code> global. All
-logging messages to the <code>console</code> object of the addon will be redirected to
-this object. If this object isn't provided, then the global <code>console</code> object
-of the chrome process will be used.</p>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component_group">
-<h5 class="api_header">Methods</h5>
-
-<div class="api_component">
-<h6 class="api_name">destroy()</h6>
-<p>Terminates the add-on process.</p>
-</div>
-
-<div class="api_component">
-<h6 class="api_name">on(type, listener)</h6>
-<p>Registers an event listener with the add-on process.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">type : <span class="datatype">string</span></div>
-<p>The type of event to listen for.</p>
-</div>
-
-<div class="api_component">
-<div class="api_name">listener : <span class="datatype">function</span></div>
-<p>The listener function that handles the event. Its first argument is always
-<code>type</code>, and additional arguments vary depending on the event's originating
-<code>chrome.send()</code> call in the add-on process.</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component">
-<h6 class="api_name">registerCall(name, handler)</h6>
-<p>Registers a synchronous call handler with the add-on process.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">name : <span class="datatype">string</span></div>
-<p>The name of the function.</p>
-</div>
-
-<div class="api_component">
-<div class="api_name">handler : <span class="datatype">function</span></div>
-<p>The call handler. Its first argument is always <code>name</code>, and additional
-arguments vary depending on the call's originating <code>chrome.call()</code> invocation
-in the add-on process. The handler's return value is also passed back to the
-original caller in the add-on process.</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component">
-<h6 class="api_name">send(type)</h6>
-<p>Sends an event asynchronously to the add-on process. Any additional arguments
-after <code>type</code> are passed as arguments to event listeners in the add-on process.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">type : <span class="datatype">string</span></div>
-<p>The type of event to send.</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component">
-<h6 class="api_name">createHandle()</h6>
-<p>Creates a <a href="https://developer.mozilla.org/en/Jetpack_Processes#Handles">handle</a> object, which can be passed to the add-on process via
-<code>send()</code>.</p>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
+<p>In addition access to the namespace can be shared with other code by just
+handing them a namespace accessor function.</p>
+<pre><code>  let { dom } = require('./view');
+  Widget.prototype.setInnerHTML = function setInnerHTML(html) {
+    dom(this).element.innerHTML = String(html);
+  };
+</code></pre>
 </div>
 
 </div>
@@ -470,6 +255,10 @@ after <code>type</code> are passed as arguments to event listeners in the add-on
 </li>
 
 <li class="module">
+<a href="packages/addon-kit/docs/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li class="module">
 <a href="packages/addon-kit/docs/simple-storage.html">simple-storage</a>
 </li>
 
@@ -512,7 +301,6 @@ after <code>type</code> are passed as arguments to event listeners in the add-on
             <li><h4><a href="dev-guide/module-development/best-practices.html">Low-Level Module Best Practices</a></h4>
             <li><h4><a href="dev-guide/module-development/chrome.html">Chrome Authority</a></h4>
             <li><h4><a href="dev-guide/module-development/xpi.html">XPI Generation</a></h4>
-            <li><h4><a href="dev-guide/module-development/e10s.html">Out-of-Process Add-ons</a></h4>
           </ul>
           </div>
         </div>
@@ -570,7 +358,7 @@ after <code>type</code> are passed as arguments to event listeners in the add-on
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/e10s.html">e10s</a>
+<a href="packages/api-utils/docs/environment.html">environment</a>
 </li>
 
 <li class="module">
@@ -590,6 +378,10 @@ after <code>type</code> are passed as arguments to event listeners in the add-on
 </li>
 
 <li class="module">
+<a href="packages/api-utils/docs/httpd.html">httpd</a>
+</li>
+
+<li class="module">
 <a href="packages/api-utils/docs/light-traits.html">light-traits</a>
 </li>
 
@@ -606,6 +398,10 @@ after <code>type</code> are passed as arguments to event listeners in the add-on
 </li>
 
 <li class="module">
+<a href="packages/api-utils/docs/namespace.html">namespace</a>
+</li>
+
+<li class="module">
 <a href="packages/api-utils/docs/observer-service.html">observer-service</a>
 </li>
 
@@ -619,10 +415,6 @@ after <code>type</code> are passed as arguments to event listeners in the add-on
 
 <li class="module">
 <a href="packages/api-utils/docs/runtime.html">runtime</a>
-</li>
-
-<li class="module">
-<a href="packages/api-utils/docs/securable-module.html">securable-module</a>
 </li>
 
 <li class="module">

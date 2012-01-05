@@ -28,6 +28,10 @@ application-wide preferences service singleton.</p>
 <div class="api_component">
 <div class="api_name">value : <span class="datatype">string,number,bool</span></div>
 <p>Preference value.</p>
+<p><strong>Example:</strong></p>
+<pre><code>var name = "extensions.checkCompatibility.nightly";
+require("preferences-service").set(name, false);
+</code></pre>
 </div>
 
 </div>
@@ -52,6 +56,10 @@ application-wide preferences service singleton.</p>
 
 <div class="returns">Returns: <span class="datatype">string,number,bool</span><p>Preference value, returns a default value if no
 preference is set.</p>
+<p><strong>Example:</strong></p>
+<pre><code>var name = "extensions.checkCompatibility.nightly";
+var nightlyCompatChk = require("preferences-service").get(name);
+</code></pre>
 </div>
 
 </div>
@@ -68,6 +76,12 @@ preference is set.</p>
 </div>
 
 <div class="returns">Returns: <span class="datatype">bool</span><p>Returns whether or not the application preference <code>name</code> exists.</p>
+<p><strong>Example:</strong></p>
+<pre><code>var name = "extensions.checkCompatibility.nightly";
+if (require("preferences-service").has(name)) {
+  // ...
+}
+</code></pre>
 </div>
 
 </div>
@@ -86,6 +100,12 @@ preference is set.</p>
 <div class="returns">Returns: <span class="datatype">bool</span><p>Returns whether or not the application preference <code>name</code> both exists
 and has been set to a non-default value by the user (or a program
 acting on the user's behalf).</p>
+<p><strong>Example:</strong></p>
+<pre><code>var name = "extensions.checkCompatibility.nightly";
+if (require("preferences-service").isSet(name)) {
+  // ...
+}
+</code></pre>
 </div>
 
 </div>
@@ -99,6 +119,10 @@ does nothing.</p>
 <div class="api_component">
 <div class="api_name">name : <span class="datatype">string</span></div>
 <p>Preference name.</p>
+<p><strong>Example:</strong></p>
+<pre><code>var name = "extensions.checkCompatibility.nightly";
+require("preferences-service").reset(name);
+</code></pre>
 </div>
 
 </div>

@@ -1,0 +1,29 @@
+
+<div id="httpd_module_api_docs" class="module_api_docs">
+<h1>httpd</h1>
+<div class="module_description"><p>Provides an HTTP server written in JavaScript for the Mozilla platform, which 
+can be used in unit tests.</p>
+<p>The most basic usage is:</p>
+<pre><code>var {startServerAsync} = require("httpd");
+var srv = startServerAsync(port, basePath);
+require("unload").when(function cleanup() {
+  srv.stop(function() { // you should continue execution from this point.
+  })
+});
+</code></pre>
+<p>This starts a server in background (assuming you're running this code in an 
+application that has an event loop, such as Firefox). The server listens at 
+http://localhost:port/ and serves files from the specified directory. You 
+can serve static content or use SJS scripts, as described in documentation 
+on developer.mozilla.org.</p>
+<p>You can also use <code>nsHttpServer</code> to start the server manually:</p>
+<pre><code>var {nsHttpServer} = require("httpd");
+var srv = new nsHttpServer();
+// further documentation on developer.mozilla.org
+</code></pre>
+<p>See 
+<a href="https://developer.mozilla.org/En/HTTP_server_for_unit_tests">HTTP server for unit tests</a>
+for general information.</p>
+</div>
+
+</div>

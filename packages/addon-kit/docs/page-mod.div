@@ -49,6 +49,7 @@ pageMod.PageMod({
 });
 </code></pre>
 <p>If you specify a value of "ready" or "end" for <code>contentScriptWhen</code>,
+as opposed to "start",
 then the content script can interact with the DOM itself:</p>
 <pre><code>var pageMod = require("page-mod");
 pageMod.PageMod({

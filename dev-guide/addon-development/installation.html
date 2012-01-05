@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.3/" >
+  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.4/" >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -49,6 +49,7 @@
     <h1>
       <a href="dev-guide/welcome.html">Add-on SDK<span></span></a>
     </h1>
+    <div id="version">Version 1.4</div>
   </div>
 </header>
 
@@ -70,8 +71,7 @@
 <p>Firefox version 4.0 or later.</p>
 </li>
 </ul>
-<p>At the moment, the latest stable version of the Add-on SDK is 1.3.
-You can obtain it as a
+<p>You can obtain the latest stable version of the SDK as a
 <a href="https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.tar.gz">tarball</a>
 or a <a href="https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.zip">zip file</a>.
 Alternatively, you can get the latest development version of the
@@ -80,27 +80,27 @@ Add-on SDK from its <a href="https://github.com/mozilla/addon-sdk">GitHub reposi
 <p>Extract the file contents wherever you choose, and navigate to the root
 directory of the SDK with a shell/command prompt. For example:</p>
 <pre>
-  tar -xf addon-sdk-1.3.tar.gz
-  cd addon-sdk-1.3
+tar -xf addon-sdk.tar.gz
+cd addon-sdk
 </pre>
 
 <p>Then run:</p>
 <pre>
-  source bin/activate
+source bin/activate
 </pre>
 
 <p>Your command prompt should now have a new prefix containing the name of the
 SDK's root directory:</p>
 <pre>
-  (addon-sdk-1.3)~/mozilla/addon-sdk-1.3 >
+(addon-sdk)~/mozilla/addon-sdk >
 </pre>
 
 <h2>Installation on Windows</h2>
 <p>Extract the file contents wherever you choose, and navigate to the root
 directory of the SDK with a shell/command prompt. For example:</p>
 <pre>
-  7z.exe x addon-sdk-1.3.zip
-  cd addon-sdk-1.3
+7z.exe x addon-sdk.zip
+cd addon-sdk
 </pre>
 
 <p>Then run:</p>
@@ -119,7 +119,7 @@ not affect the proper functioning of the SDK at all.</p>
 <p>Your command prompt should now have a new prefix containing the full path to
 the SDK's root directory:</p>
 <pre>
-  (C:\Users\mozilla\sdk\addon-sdk-1.3) C:\Users\Work\sdk\addon-sdk-1.3>
+(C:\Users\mozilla\sdk\addon-sdk) C:\Users\Work\sdk\addon-sdk>
 </pre>
 
 <h2>SDK Virtual Environment</h2>
@@ -161,7 +161,7 @@ program in your <code>~/bin</code> directory:</p>
 <h2>Sanity Check</h2>
 <p>Run this at your shell prompt:</p>
 <pre>
-  ~/mozilla/addon-sdk-1.3 > cfx
+~/mozilla/addon-sdk > cfx
 </pre>
 
 <p>It should produce output whose first line looks something like this, followed by
@@ -310,6 +310,10 @@ example.</p></div>
 </li>
 
 <li class="module">
+<a href="packages/addon-kit/docs/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li class="module">
 <a href="packages/addon-kit/docs/simple-storage.html">simple-storage</a>
 </li>
 
@@ -352,7 +356,6 @@ example.</p></div>
             <li><h4><a href="dev-guide/module-development/best-practices.html">Low-Level Module Best Practices</a></h4>
             <li><h4><a href="dev-guide/module-development/chrome.html">Chrome Authority</a></h4>
             <li><h4><a href="dev-guide/module-development/xpi.html">XPI Generation</a></h4>
-            <li><h4><a href="dev-guide/module-development/e10s.html">Out-of-Process Add-ons</a></h4>
           </ul>
           </div>
         </div>
@@ -410,7 +413,7 @@ example.</p></div>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/e10s.html">e10s</a>
+<a href="packages/api-utils/docs/environment.html">environment</a>
 </li>
 
 <li class="module">
@@ -430,6 +433,10 @@ example.</p></div>
 </li>
 
 <li class="module">
+<a href="packages/api-utils/docs/httpd.html">httpd</a>
+</li>
+
+<li class="module">
 <a href="packages/api-utils/docs/light-traits.html">light-traits</a>
 </li>
 
@@ -446,6 +453,10 @@ example.</p></div>
 </li>
 
 <li class="module">
+<a href="packages/api-utils/docs/namespace.html">namespace</a>
+</li>
+
+<li class="module">
 <a href="packages/api-utils/docs/observer-service.html">observer-service</a>
 </li>
 
@@ -459,10 +470,6 @@ example.</p></div>
 
 <li class="module">
 <a href="packages/api-utils/docs/runtime.html">runtime</a>
-</li>
-
-<li class="module">
-<a href="packages/api-utils/docs/securable-module.html">securable-module</a>
 </li>
 
 <li class="module">

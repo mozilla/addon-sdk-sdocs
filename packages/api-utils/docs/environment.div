@@ -1,0 +1,38 @@
+
+<div id="environment_module_api_docs" class="module_api_docs">
+<h1>environment</h1>
+<div class="module_description"><p>Module provides API to access, set and unset environment variables via exported
+<code>env</code> object.</p>
+<pre><code>var { env } = require('api-utils/environment');
+</code></pre>
+<p>You can get the value of an environment variable, by accessing property that
+has name of desired variable:</p>
+<pre><code>var PATH = env.PATH;
+</code></pre>
+<p>You can check existence of an environment variable by checking if property with
+such variable name exists:</p>
+<pre><code>console.log('PATH' in env); // true
+console.log('FOO' in env);  // false
+</code></pre>
+<p>You can set value of an environment variable by setting a property:</p>
+<pre><code>env.FOO = 'foo';
+env.PATH += ':/my/path/'
+</code></pre>
+<p>You can unset environment variable by deleting a property:</p>
+<pre><code>delete env.FOO;
+</code></pre>
+<h2>Limitations</h2>
+<p>There is no way to enumerate existing environment variables, also <code>env</code>
+won't have any enumerable properties:</p>
+<pre><code>console.log(Object.keys(env)); // []
+</code></pre>
+<p>Environment variable will be unset, show up as non-existing if it's set
+to <code>null</code>, <code>undefined</code> or <code>''</code>.</p>
+<pre><code>env.FOO = null;
+console.log('FOO' in env);  // false
+env.BAR = '';
+console.log(env.BAR);       // undefined
+</code></pre>
+</div>
+
+</div>
