@@ -230,12 +230,12 @@ page containing some text that is not in English, for example:
 Select some text on that page and right-click to activate the context menu.
 You should see a new item labeled "What's this?":
 
-![wikipanel context-menu](static-files/media/screenshots/wikipanel/wikipanel-context-menu.png)
+<img src="static-files/media/screenshots/wikipanel/wikipanel-context-menu.png" alt="wikipanel context-menu"></img>
 
 Select that item and you'll see a popup panel showing the Wikipedia entry for
 the selection:
 
-![wikipanel panel](static-files/media/screenshots/wikipanel/wikipanel-panel.png)
+<img src="static-files/media/screenshots/wikipanel/wikipanel-panel.png" alt="wikipanel panel"></img>
 
 You will also see output like this appear in your command shell:
 

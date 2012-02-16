@@ -1,3 +1,7 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
 
 # SDK and XUL Comparison #
 
@@ -55,6 +59,13 @@ anyway.</p></td>
 guidelines for Firefox, giving your users a better, more consistent experience.</p></td>
 </tr>
 
+<tr>
+<td> <strong><a name="mobile_support">Mobile Support</a></strong></td>
+<td><p>Starting in SDK 1.5, we've added experimental support for developing
+add-ons on the new native version of Firefox Mobile. See the
+<a href="dev-guide/addon-development/mobile.html">tutorial on mobile development<a>.</p></td>
+</tr>
+
 </table>
 
 ## Advantages of XUL-based Add-ons ##
@@ -80,8 +91,7 @@ small set of this functionality.</p></td>
 
 <tr>
 <td><strong><a name="localization">Localization Support</a></strong></td>
-<td><p>The SDK doesn't yet support localization, although this is
-<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=691782">coming soon</a>.
+<td><p>The SDK currently only has fairly basic <a href="dev-guide/addon-development/l10n.html">localization support</a>.
 </p></td>
 </tr>
 

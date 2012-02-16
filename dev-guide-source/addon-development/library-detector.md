@@ -1,10 +1,14 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
 # Porting the Library Detector #
 
 This example walks through the process of porting a XUL-based add-on to the
 SDK. It's a very simple add-on and a good candidate for porting because
 there are suitable SDK APIs for all its features.
 
-<img class="image-right" src="static-files/media/librarydetector/library-detector.png" alt="Library Detector Screenshot" />
+<img class="image-right" src="static-files/media/librarydetector/library-detector.png" alt="Library Detector Screenshot"></img>
 
 The add-on is Paul Bakaus's
 [Library Detector](https://addons.mozilla.org/en-US/firefox/addon/library-detector/).
@@ -212,4 +216,4 @@ widget.port.on('setLibraryInfo', function(libraryInfo) {
 });
 </code></pre>
 
-<img class="image-center" src="static-files/media/librarydetector/panel-content.png" alt="Updating panel content" />
+<img class="image-center" src="static-files/media/librarydetector/panel-content.png" alt="Updating panel content"> </img>

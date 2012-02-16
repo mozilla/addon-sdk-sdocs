@@ -1,3 +1,7 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
 # CommonJS, Modules, Packages, and the SDK #
 
 CommonJS is the underlying infrastructure for both the SDK modules and add-ons
@@ -19,7 +23,8 @@ module wants to make available to other modules
 object of another module. The "wikipanel" add-on uses `require` to import the
 SDK modules it uses.
 
-![CommonJS modules](static-files/media/commonjs-modules.png)
+<img alt="CommonJS modules" src="static-files/media/commonjs-modules.png"></img>
+
 
 The SDK
 [freezes](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/freeze)

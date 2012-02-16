@@ -2,19 +2,19 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.4/" >
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
-  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
-  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushXml.js"></script>
-  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushJScript.js"></script>
-  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/base.css">
-  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/header.css">
-  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/footer.css">
-  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/sdk-docs.css">
-  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/api-reference.css">
-  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shCore.css">
-  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shThemeDefault.css">
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
   <!--[if IE]>
     <style type="text/css">
       .package-summary .module,
@@ -25,14 +25,14 @@
     </style>
   <![endif]-->
 
-  <link rel="shortcut icon" type="image/x-icon" href="static-files/media/favicon.png">
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
   <title>widget - Add-on SDK Documentation</title>
 </head>
 <body>
 
 <header id="global-header">
   <div class="funnel">
-    <a id="mozilla-tab" href="http://www.mozilla.org/?ref=logo">Mozilla</a>
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
     <div class="menu">
       <p>
         <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
@@ -47,9 +47,9 @@
 <header id="site-header">
   <div class="funnel">
     <h1>
-      <a href="dev-guide/welcome.html">Add-on SDK<span></span></a>
+      <a href="../../../dev-guide/welcome.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.4</div>
+    <div id="version">Version 1.5</div>
   </div>
 </header>
 
@@ -68,11 +68,10 @@
 
 <p>The <code>widget</code> module provides your add-on with a simple user interface that is
 consistent with other add-ons and blends in well with Firefox.</p>
-<h2>Introduction</h2>
 <p>"Widgets" are small pieces of content that live in the Firefox 4
 <a href="https://developer.mozilla.org/en/The_add-on_bar">add-on bar</a>.
 They can be simple icons or complex web pages.  You can attach
-<a href="packages/addon-kit/docs/panel.html">panels</a> to them that open when they're
+<a href="../../../packages/addon-kit/docs/panel.html">panels</a> to them that open when they're
 clicked, or you can define a custom click handler to perform some other action,
 like opening a web page in a tab.</p>
 <p>There are a few advantages to using widgets over an ad hoc user interface.
@@ -85,17 +84,31 @@ as a widget, your add-on would automatically inherit such functionality.</p>
 <p>Widgets can contain images or arbitrary web content.  You can include this
 content inline as a string by using the <code>content</code> property, or point to content
 using a URL with the <code>contentURL</code> property.</p>
-<p>For example, this widget contains an image, so it looks like a simple icon:</p>
-<pre><code>require("widget").Widget({
-  id: "mozilla-icon", 
-  label: "My Mozilla Widget",
-  contentURL: "http://www.mozilla.org/favicon.ico"
-});
-</code></pre>
 <p>Upon creation, the widget is automatically added to the add-on bar.
 You can set the width of a widget, but the height is fixed so as to fit in the
 add-on bar. If the content is an image, it is automatically scaled to be 16x16
 pixels.</p>
+<p>For example, this widget contains an image, so it looks like a simple icon:</p>
+<pre><code>require("widget").Widget({
+  id: "mozilla-icon",
+  label: "My Mozilla Widget",
+  contentURL: "http://www.mozilla.org/favicon.ico"
+});
+</code></pre>
+<img src="../../../static-files/media/screenshots/widget-mozilla-icon.png" alt="Widget displaying an icon" class="image-center">
+
+<p>You can make <code>contentURL</code> point to an HTML or icon file which you have
+packaged inside your add-on. Just save the file in your add-on's <code>data</code>
+directory, and reference it using the <code>data.url()</code> method of the
+<a href="../../../packages/addon-kit/docs/self.html"><code>self</code></a> module:</p>
+<pre><code>var data = require("self").data;
+
+require("widget").Widget({
+  id: "my-widget",
+  label: "My Widget",
+  contentURL: data.url("my-content.html")
+});
+</code></pre>
 <p>This widget contains an entire web page:</p>
 <pre><code>require("widget").Widget({
   id: "hello-display",
@@ -104,14 +117,202 @@ pixels.</p>
   width: 50
 });
 </code></pre>
+<img src="../../../static-files/media/screenshots/widget-hello-text.png" alt="Widget displaying 'hello'" class="image-center">
+
 <p>Widgets are quite small by default, so this example used the <code>width</code> property to
 grow it in order to show all the text.</p>
-<p>As with many SDK APIs, communication with the content inside your widgets is
-handled by <a href="dev-guide/addon-development/web-content.html">content scripts</a>.
-So, for example, to be notified when your widget's content has loaded, you can
-make a small script that calls back to the widget when it finishes loading.</p>
+<h2>Scripting Widget Content</h2>
+<p>To interact with the widget's content you need to load a separate script into
+the panel. In the SDK these scripts are called "content scripts" because
+they're explicitly used for interacting with web content.</p>
+<p>While content scripts can access the content they're attached to, they can't
+use the SDK's APIs. So implementing a complete solution usually means you
+have to send messages between the content script and the main add-on code.</p>
+<ul>
+<li>
+<p>You can specify one or more content scripts to load into the widget using the
+<code>contentScript</code> or <code>contentScriptFile</code> options to the
+<a href="../../../packages/addon-kit/docs/widget.html#Widget(options)"><code>Widget()</code> constructor</a>.</p>
+</li>
+<li>
+<p>You can communicate with the script using either the
+<a href="../../../dev-guide/addon-development/content-scripts/using-postmessage.html"><code>postMessage()</code></a>
+API or (preferably, usually) the
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html"><code>port</code></a> API.</p>
+</li>
+</ul>
+<div class="warning">
+<p>Unless your content script is extremely simple and consists only of a
+static string, don't use <code>contentScript</code>: if you do, you may
+have problems getting your add-on approved on AMO.</p>
+<p>Instead, keep the script in a separate file and load it using
+<code>contentScriptFile</code>. This makes your code easier to maintain,
+secure, debug and review.</p>
+</div>
+
+<!-- The icons this widget displays, shown in the screenshot, is taken from the
+Glossy Buttons icon set created by IconEden which is made freely available for
+commercial and non-commercial use.
+See: http://www.iconeden.com/icon/category/free -->
+
+<img src="../../../static-files/media/screenshots/widget-player-buttons.png" alt="Media player UI implemented as a widget" class="image-right">
+
+<p>For example, suppose we want to implement a media player as an add-on.
+We could implement the main user interface as a widget hosting an array
+of buttons to control play/pause/stop functions.</p>
+<p>We can then use a content script to listen for clicks on those buttons.
+But because content scripts can't use the SDK's APIs, we'll want the
+content script to send messages to the main add-on code, which can then
+implement the media player functions using the SDK.</p>
+<p>The widget's content is specified using HTML like this:</p>
+<script type="syntaxhighlighter" class="brush: html"><![CDATA[
+<html>
+  <body>
+    <img src="play.png" id="play-button"></img>
+    <img src="pause.png" id="pause-button"></img>
+    <img src="stop.png" id="stop-button"></img>
+  </body>
+</html>
+]]>
+</script>
+
+<p>We just include three icons, and assign an ID to each one. This HTML file,
+and the icon files it references, are saved in the add-on's <code>data</code>
+directory.</p>
+<p>Next, we write a content script that listens for click events on each icon
+and sends the corresponding message to the main add-on code:</p>
+<pre><code>var play_button = document.getElementById("play-button");
+play_button.onclick = function() {
+  self.port.emit("play");
+}
+
+var pause_button = document.getElementById("pause-button");
+pause_button.onclick = function() {
+  self.port.emit("pause");
+}
+
+var stop_button = document.getElementById("stop-button");
+stop_button.onclick = function() {
+  self.port.emit("stop");
+}
+</code></pre>
+<p>We save this file in the add-on's <code>data</code> directory as "button-script.js".
+Finally. in the add-on's "main.js" file, we create the widget, assign it
+the HTML file and the content script, and listen for events from the content
+script:</p>
+<pre><code>const widgets = require("widget");
+const data = require("self").data;
+
+var player = widgets.Widget({
+  id: "player",
+  width: 72,
+  label: "Player",
+  contentURL: data.url("buttons.html"),
+  contentScriptFile: data.url("button-script.js")
+});
+
+player.port.on("play", function() {
+  console.log("playing");
+});
+
+player.port.on("pause", function() {
+  console.log("pausing");
+});
+
+player.port.on("stop", function() {
+  console.log("stopping");
+});
+</code></pre>
+<p>To learn much more about content scripts, see the
+<a href="../../../dev-guide/addon-development/web-content.html">Working with Content Scripts</a>
+guide.</p>
+<div class="experimental">
+<h3>Scripting Trusted Widget Content</h3>
+
+<p><strong>Note that the feature described in this section is experimental: we'll
+very probably continue to support it, but the name of the <code>addon</code>
+property might change in a future release.</strong></p>
+<p>We've already seen that you can package HTML files in your add-on's <code>data</code>
+directory and use them to define the widget's content. We can call this
+"trusted" content, because unlike content loaded from a source outside the
+add-on, the add-on author knows exactly what it's doing. To
+interact with trusted content you don't need to use content scripts:
+you can just include a script from the HTML file in the normal way, using
+<code>script</code> tags.</p>
+<p>Like a content script, these scripts can communicate with the add-on code
+using the
+<a href="../../../dev-guide/addon-development/content-scripts/using-postmessage.html"><code>postMessage()</code></a>
+API or the
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html"><code>port</code></a> API.
+The crucial difference is that these scripts access the <code>postMessage</code>
+and <code>port</code> objects through the <code>addon</code> object, whereas content scripts
+access them through the <code>self</code> object.</p>
+<p>To show the difference, convert the <code>player</code> add-on above
+to use normal page scripts instead of content scripts.</p>
+<p>First, in the content script, change <code>self</code> to <code>addon</code>, and wrap it in a
+function:</p>
+<pre><code>function init() {
+  var play_button = document.getElementById("play-button");
+  play_button.onclick = function() {
+    addon.port.emit("play");
+  }
+
+  var pause_button = document.getElementById("pause-button");
+  pause_button.onclick = function() {
+    addon.port.emit("pause");
+  }
+
+  var stop_button = document.getElementById("stop-button");
+  stop_button.onclick = function() {
+    addon.port.emit("stop");
+  }
+}
+</code></pre>
+<p>Next, add a <code>script</code> tag to reference "button-script.js", and
+call its <code>init()</code> function on load:</p>
+<script type="syntaxhighlighter" class="brush: html"><![CDATA[
+<html>
+  <head>
+    <script src="button-script.js">&lt;/script>
+  </head>
+  <body onload="init()">
+    <img src="play.png" id="play-button"></img>
+    <img src="pause.png" id="pause-button"></img>
+    <img src="stop.png" id="stop-button"></img>
+  </body>
+</html>
+]]>
+</script>
+
+<p>Finally, remove the line attaching the content script from "main.js":</p>
+<pre><code>const widgets = require("widget");
+const data = require("self").data;
+
+var player = widgets.Widget({
+  id: "player",
+  width: 72,
+  label: "Player",
+  contentURL: data.url("buttons.html")
+});
+
+player.port.emit("init");
+
+player.port.on("play", function() {
+  console.log("playing");
+});
+
+player.port.on("pause", function() {
+  console.log("pausing");
+});
+
+player.port.on("stop", function() {
+  console.log("stopping");
+});
+</code></pre>
+</div>
+
 <h2>Attaching Panels to Widgets</h2>
-<p>You can supply a <a href="packages/addon-kit/docs/panel.html">panel</a> to the widget's
+<p>You can supply a <a href="../../../packages/addon-kit/docs/panel.html">panel</a> to the widget's
 constructor: if you do this, the panel is automatically displayed when the
 user clicks the widget.</p>
 <!-- The icon the widget displays, shown in the screenshot, is taken from the
@@ -119,8 +320,7 @@ Circular icon set, http://prothemedesign.com/circular-icons/ which is made
 available under the Creative Commons Attribution 2.5 Generic License:
 http://creativecommons.org/licenses/by/2.5/ -->
 
-<img class="image-right" src="static-files/media/screenshots/widget-panel-clock.png"
-alt="Panel attached to a widget">
+<img src="../../../static-files/media/screenshots/widget-panel-clock.png" alt="Panel attached to a widget" class="image-right">
 
 <pre><code>data = require("self").data
 
@@ -187,7 +387,7 @@ require("widget").Widget({
 the <code>contentScript</code> property.  In your own add-ons, you will probably want to
 create your content scripts in separate files and pass their URLs using the
 <code>contentScriptFile</code> property.  See
-<a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a> for more
+<a href="../../../dev-guide/addon-development/web-content.html">Working with Content Scripts</a> for more
 information.</p>
 <pre><code>var widgets = require("widget");
 
@@ -268,7 +468,7 @@ require("timers").setInterval(function() {
 let widget = widgets.Widget({
   id: "message-test",
   label: "Bi-directional communication!",
-  content: "&lt;foo&gt;bar&lt;/foo&gt;",
+  content: "foobar/foo",
   contentScriptWhen: "ready",
   contentScript: 'on("message", function(message) {' +
                  '  alert("Got message: " + message);' +
@@ -325,7 +525,7 @@ It may contain HTML. Widgets must have either the <code>content</code> property 
 <div class="api_component">
 <div class="api_name">[ contentURL : <span class="datatype">string</span> ]</div>
 <p>An optional string URL to content to load into the widget. This can be
-<a href="dev-guide/addon-development/web-content.html">local content</a> or remote
+<a href="../../../dev-guide/addon-development/web-content.html">local content</a> or remote
 content, an image or web content. Widgets must have either the <code>content</code>
 property or the <code>contentURL</code> property set.</p>
 <p>If the content is an image, it is automatically scaled to be 16x16 pixels.</p>
@@ -333,7 +533,7 @@ property or the <code>contentURL</code> property set.</p>
 
 <div class="api_component">
 <div class="api_name">[ panel : <span class="datatype">Panel</span> ]</div>
-<p>An optional <a href="packages/addon-kit/docs/panel.html">panel</a> to open when the
+<p>An optional <a href="../../../packages/addon-kit/docs/panel.html">panel</a> to open when the
 user clicks on the widget. Note: If you also register a "click" listener,
 it will be called instead of the panel being opened.  However, you can show
 the panel from the listener by calling <code>this.panel.show()</code>.</p>
@@ -441,7 +641,7 @@ fires</li>
 <div class="api_name">data : <span class="datatype">value</span></div>
 <p>The message to send.
   The message can be any
-<a href = "dev-guide/addon-development/content-scripts/using-port.html#json_serializable">JSON-serializable value</a>.</p>
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html#json_serializable">JSON-serializable value</a>.</p>
 </div>
 
 </div>
@@ -490,7 +690,7 @@ fires</li>
 <div class="parameter_set">
 <div class="api_component">
 <div class="api_name">window : <span class="datatype">BrowserWindow</span></div>
-<p>The <a href="packages/addon-kit/docs/windows.html">BrowserWindow</a> instance to match.</p>
+<p>The <a href="../../../packages/addon-kit/docs/windows.html">BrowserWindow</a> instance to match.</p>
 </div>
 
 </div>
@@ -523,7 +723,7 @@ has no effect.</p>
 <div class="api_component">
 <h6 class="api_name">contentURL : <span class="datatype">string</span></h6>
 <p>The URL of content to load into the widget.  This can be
-<a href="dev-guide/addon-development/web-content.html">local content</a> or remote
+<a href="../../../dev-guide/addon-development/web-content.html">local content</a> or remote
 content, an image or web content.  Setting it updates the widget's appearance
 immediately.  However, if the widget was created using <code>content</code>, then this
 property is meaningless, and setting it has no effect.</p>
@@ -531,7 +731,7 @@ property is meaningless, and setting it has no effect.</p>
 
 <div class="api_component">
 <h6 class="api_name">panel : <span class="datatype">Panel</span></h6>
-<p>A <a href="packages/addon-kit/docs/panel.html">panel</a> to open when the user clicks on
+<p>A <a href="../../../packages/addon-kit/docs/panel.html">panel</a> to open when the user clicks on
 the widget.</p>
 </div>
 
@@ -585,13 +785,13 @@ fires</li>
 
 <div class="api_component">
 <h6 class="api_name">port : <span class="datatype">EventEmitter</span></h6>
-<p><a href="packages/api-utils/docs/events.html">EventEmitter</a> object that allows you to:</p>
+<p><a href="../../../packages/api-utils/docs/events.html">EventEmitter</a> object that allows you to:</p>
 <ul>
 <li>send events to the content script using the <code>port.emit</code> function</li>
 <li>receive events from the content script using the <code>port.on</code> function</li>
 </ul>
 <p>See the guide to
-<a href="dev-guide/addon-development/content-scripts/using-port.html">
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html">
 communicating using <code>port</code></a> for details.</p>
 </div>
 
@@ -622,7 +822,7 @@ code in the widget's <code>message</code> event.</p>
 <div class="api_name"><span class="datatype">value</span></div>
 <p>Listeners are passed a single argument which is the message posted
 from the content script. The message can be any
-<a href = "dev-guide/addon-development/content-scripts/using-port.html#json_serializable">JSON-serializable value</a>.</p>
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html#json_serializable">JSON-serializable value</a>.</p>
 </div>
 
 </div>
@@ -689,7 +889,7 @@ tabs.on('activate', updateWidgetState);
 <div class="api_component">
 <div class="api_name">data : <span class="datatype">value</span></div>
 <p>The message to send. The message can be any
-<a href = "dev-guide/addon-development/content-scripts/using-port.html#json_serializable">JSON-serializable value</a>.</p>
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html#json_serializable">JSON-serializable value</a>.</p>
 </div>
 
 </div>
@@ -753,7 +953,7 @@ is meaningless, and setting it has no effect.</p>
 <div class="api_component">
 <h6 class="api_name">contentURL : <span class="datatype">string</span></h6>
 <p>The URL of content to load into the widget view.  This can be
-<a href="dev-guide/addon-development/web-content.html">local content</a> or remote
+<a href="../../../dev-guide/addon-development/web-content.html">local content</a> or remote
 content, an image or web content.  Setting it updates the widget view's
 appearance immediately.  However, if the widget view was created using
 <code>content</code>, then this property is meaningless, and setting it has no effect.</p>
@@ -761,7 +961,7 @@ appearance immediately.  However, if the widget view was created using
 
 <div class="api_component">
 <h6 class="api_name">panel : <span class="datatype">Panel</span></h6>
-<p>A <a href="packages/addon-kit/docs/panel.html">panel</a> to open when the user clicks on
+<p>A <a href="../../../packages/addon-kit/docs/panel.html">panel</a> to open when the user clicks on
 the widget view.</p>
 </div>
 
@@ -816,13 +1016,13 @@ fires</li>
 
 <div class="api_component">
 <h6 class="api_name">port : <span class="datatype">EventEmitter</span></h6>
-<p><a href="packages/api-utils/docs/events.html">EventEmitter</a> object that allows you to:</p>
+<p><a href="../../../packages/api-utils/docs/events.html">EventEmitter</a> object that allows you to:</p>
 <ul>
 <li>send events to the content script using the <code>port.emit</code> function</li>
 <li>receive events from the content script using the <code>port.on</code></li>
 </ul>
 <p>See the guide to
-<a href="dev-guide/addon-development/content-scripts/using-port.html">
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html">
 communicating using <code>port</code></a> for details.</p>
 </div>
 
@@ -855,7 +1055,7 @@ code in the widget view's <code>message</code> event.</p>
 <div class="api_name"><span class="datatype">value</span></div>
 <p>Listeners are passed a single argument which is the message posted
 from the content script. The message can be any
-<a href = "dev-guide/addon-development/content-scripts/using-port.html#json_serializable">JSON-serializable value</a>.</p>
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html#json_serializable">JSON-serializable value</a>.</p>
 </div>
 
 </div>
@@ -886,156 +1086,158 @@ from the content script. The message can be any
 
   <div id="sidebar" class="column">
     <div class="sidebar-section" id="addon-development">
-      <h2 class="sidebar-section-header"><a href="dev-guide/addon-development/about.html">Developer Guide</a></h2>
+      <h2 class="sidebar-section-header"><a href="../../../dev-guide/addon-development/about.html">Developer Guide</a></h2>
       <div class="sidebar-section-contents" id="default-section-contents">
 
         <div class="sidebar-subsection">
-          <h3><a href="dev-guide/addon-development/installation.html">Installation</a></h3>
+          <h3><a href="../../../dev-guide/addon-development/installation.html">Installation</a></h3>
           <div class="divider"></div>
-          <h3 class="sidebar-subsection-header"><a href="dev-guide/addon-development/tutorials.html">Tutorials</a></h3>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/addon-development/tutorials.html">Tutorials</a></h3>
           <div class="sidebar-subsection-contents">
           <ul>
-            <li><h4><a href="dev-guide/addon-development/getting-started.html">Getting Started</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/getting-started.html">Getting Started</a></h4>
             <ul>
-              <li><a href="dev-guide/addon-development/implementing-simple-addon.html">A Simple Add-on</a></li>
-              <li><a href="dev-guide/addon-development/commonjs.html">CommonJS</a></li>
-              <li><a href="dev-guide/addon-development/implementing-reusable-module.html">Reusable Modules</a></li>
-              <li><a href="dev-guide/addon-development/troubleshooting.html">Troubleshooting</a></li>
+              <li><a href="../../../dev-guide/addon-development/implementing-simple-addon.html">A Simple Add-on</a></li>
+              <li><a href="../../../dev-guide/addon-development/commonjs.html">CommonJS</a></li>
+              <li><a href="../../../dev-guide/addon-development/implementing-reusable-module.html">Reusable Modules</a></li>
+              <li><a href="../../../dev-guide/addon-development/troubleshooting.html">Troubleshooting</a></li>
             </ul></li>
-            <li><h4><a href="dev-guide/addon-development/api-intro.html" >Introducing the APIs</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/api-intro.html">Introducing the APIs</a></h4>
             <ul>
-              <li><a href="dev-guide/addon-development/api-idioms.html">Common Idioms</a></li>
-              <li><a href="dev-guide/addon-development/api-modules.html">API Overview</a></li>
+              <li><a href="../../../dev-guide/addon-development/api-idioms.html">Common Idioms</a></li>
+              <li><a href="../../../dev-guide/addon-development/api-modules.html">API Overview</a></li>
             </ul></li>
-            <li><h4><a href="dev-guide/addon-development/annotator/annotator.html">Example: Annotator</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/annotator/annotator.html">Example: Annotator</a></h4>
             <ul>
-              <li><a href="dev-guide/addon-development/annotator/overview.html">Design Overview</a></li>
-              <li><a href="dev-guide/addon-development/annotator/widget.html">Implementing the Widget</a></li>
-              <li><a href="dev-guide/addon-development/annotator/creating.html">Creating Annotations</a></li>
-              <li><a href="dev-guide/addon-development/annotator/storing.html">Storing Annotations</a></li>
-              <li><a href="dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/overview.html">Design Overview</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/widget.html">Implementing the Widget</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/creating.html">Creating Annotations</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/storing.html">Storing Annotations</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
             </ul></li>
-            <li><h4><a href="dev-guide/addon-development/third-party-packages.html">Using Third Party Packages</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/xul-migration.html">XUL Migration Guide</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/third-party-packages.html">Using Third Party Packages</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/l10n.html">Localization</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/mobile.html">Mobile Development</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/xul-migration.html">XUL Migration Guide</a></h4>
             <ul>
-              <li><a href="dev-guide/addon-development/sdk-vs-xul.html">XUL Versus the SDK</a></li>
+              <li><a href="../../../dev-guide/addon-development/sdk-vs-xul.html">XUL Versus the SDK</a></li>
             </ul>
             <ul>
-              <li><a href="dev-guide/addon-development/library-detector.html">Porting Example</a></li>
+              <li><a href="../../../dev-guide/addon-development/library-detector.html">Porting Example</a></li>
             </ul></li>
           </div>
         </div>
 
         <div class="sidebar-subsection">
           <div class="divider"></div>
-          <h3 class="sidebar-subsection-header"><a href="dev-guide/addon-development/guides.html">Programming Guides</a></h3>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/addon-development/guides.html">Programming Guides</a></h3>
           <div class="sidebar-subsection-contents">
           <ul>
-            <li><h4><a href="dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/events.html">Working with Events</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/events.html">Working With Events</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
               <ul>
-                <li><a href="dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
-                <li><a href="dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
-                <li><a href="dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
-                <li><a href="dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
-                <li><a href="dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
               </ul></li>
-            <li><h4><a href="dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
           </ul>
           </div>
         </div>
 
         <div class="sidebar-subsection">
           <div class="divider"></div>
-          <h3 class="sidebar-subsection-header"><a href="dev-guide/addon-development/reference.html">Reference</a></h3>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/addon-development/reference.html">Reference</a></h3>
           <div class="sidebar-subsection-contents always-show">
           <ul>
             <li id="high-level-package-summaries">
 <div style="display: block;" class="package-summary">
 <h4>
-<a href="packages/addon-kit/addon-kit.html">addon-kit</a>
+<a href="../../../packages/addon-kit/addon-kit.html">addon-kit</a>
 </h4>
 
 <ul class="modules">
 <li class="module">
-<a href="packages/addon-kit/docs/clipboard.html">clipboard</a>
+<a href="../../../packages/addon-kit/docs/clipboard.html">clipboard</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/context-menu.html">context-menu</a>
+<a href="../../../packages/addon-kit/docs/context-menu.html">context-menu</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/hotkeys.html">hotkeys</a>
+<a href="../../../packages/addon-kit/docs/hotkeys.html">hotkeys</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/notifications.html">notifications</a>
+<a href="../../../packages/addon-kit/docs/notifications.html">notifications</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/page-mod.html">page-mod</a>
+<a href="../../../packages/addon-kit/docs/page-mod.html">page-mod</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/page-worker.html">page-worker</a>
+<a href="../../../packages/addon-kit/docs/page-worker.html">page-worker</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/panel.html">panel</a>
+<a href="../../../packages/addon-kit/docs/panel.html">panel</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/passwords.html">passwords</a>
+<a href="../../../packages/addon-kit/docs/passwords.html">passwords</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/private-browsing.html">private-browsing</a>
+<a href="../../../packages/addon-kit/docs/private-browsing.html">private-browsing</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/request.html">request</a>
+<a href="../../../packages/addon-kit/docs/request.html">request</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/selection.html">selection</a>
+<a href="../../../packages/addon-kit/docs/selection.html">selection</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/self.html">self</a>
+<a href="../../../packages/addon-kit/docs/self.html">self</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/simple-prefs.html">simple-prefs</a>
+<a href="../../../packages/addon-kit/docs/simple-prefs.html">simple-prefs</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/simple-storage.html">simple-storage</a>
+<a href="../../../packages/addon-kit/docs/simple-storage.html">simple-storage</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/tabs.html">tabs</a>
+<a href="../../../packages/addon-kit/docs/tabs.html">tabs</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/timers.html">timers</a>
+<a href="../../../packages/addon-kit/docs/timers.html">timers</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/widget.html">widget</a>
+<a href="../../../packages/addon-kit/docs/widget.html">widget</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/windows.html">windows</a>
+<a href="../../../packages/addon-kit/docs/windows.html">windows</a>
 </li>
 </ul>
 </div>
 </li>
-            <li><h4><a href="dev-guide/addon-development/console.html">console</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/cfx-tool.html">cfx</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/package-spec.html">Package Specification</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/console.html">console</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/cfx-tool.html">cfx</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/package-spec.html">Package Specification</a></h4></li>
           </ul>
           </div>
         </div>
@@ -1044,211 +1246,207 @@ from the content script. The message can be any
     </div>
 
     <div class="sidebar-section" id="module-development">
-      <h2 class="sidebar-section-header"><a href="dev-guide/module-development/about.html">Internals Guide</a></h2>
+      <h2 class="sidebar-section-header"><a href="../../../dev-guide/module-development/about.html">Internals Guide</a></h2>
       <div class="sidebar-section-contents">
 
         <div class="sidebar-subsection">
-          <h3 class="sidebar-subsection-header"><a href="dev-guide/module-development/guides.html">Programming Guides</a></h3>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/module-development/guides.html">Programming Guides</a></h3>
           <div class="sidebar-subsection-contents">
           <ul>
-            <li><h4><a href="dev-guide/module-development/best-practices.html">Low-Level Module Best Practices</a></h4>
-            <li><h4><a href="dev-guide/module-development/chrome.html">Chrome Authority</a></h4>
-            <li><h4><a href="dev-guide/module-development/xpi.html">XPI Generation</a></h4>
+            <li><h4><a href="../../../dev-guide/module-development/best-practices.html">Low-Level Module Best Practices</a></h4>
+            <li><h4><a href="../../../dev-guide/module-development/chrome.html">Chrome Authority</a></h4>
+            <li><h4><a href="../../../dev-guide/module-development/xpi.html">XPI Generation</a></h4>
           </ul>
           </div>
         </div>
 
         <div class="sidebar-subsection">
           <div class="divider"></div>
-          <h3 class="sidebar-subsection-header"><a href="dev-guide/module-development/reference.html">Reference</a></h3>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/module-development/reference.html">Reference</a></h3>
           <div class="sidebar-subsection-contents">
           <ul>
             <li id="low-level-package-summaries">
 <div style="display: block;" class="package-summary">
 <h4>
-<a href="packages/api-utils/api-utils.html">api-utils</a>
+<a href="../../../packages/api-utils/api-utils.html">api-utils</a>
 </h4>
 
 <ul class="modules">
 <li class="module">
-<a href="packages/api-utils/docs/api-utils.html">api-utils</a>
+<a href="../../../packages/api-utils/docs/api-utils.html">api-utils</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/app-strings.html">app-strings</a>
+<a href="../../../packages/api-utils/docs/app-strings.html">app-strings</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/byte-streams.html">byte-streams</a>
+<a href="../../../packages/api-utils/docs/base.html">base</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/collection.html">collection</a>
+<a href="../../../packages/api-utils/docs/byte-streams.html">byte-streams</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/content.html">content</a>
+<a href="../../../packages/api-utils/docs/collection.html">collection</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/content/loader.html">content/loader</a>
+<a href="../../../packages/api-utils/docs/content.html">content</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/content/symbiont.html">content/symbiont</a>
+<a href="../../../packages/api-utils/docs/content/loader.html">content/loader</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/content/worker.html">content/worker</a>
+<a href="../../../packages/api-utils/docs/content/symbiont.html">content/symbiont</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/cortex.html">cortex</a>
+<a href="../../../packages/api-utils/docs/content/worker.html">content/worker</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/cuddlefish.html">cuddlefish</a>
+<a href="../../../packages/api-utils/docs/cortex.html">cortex</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/environment.html">environment</a>
+<a href="../../../packages/api-utils/docs/cuddlefish.html">cuddlefish</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/errors.html">errors</a>
+<a href="../../../packages/api-utils/docs/environment.html">environment</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/events.html">events</a>
+<a href="../../../packages/api-utils/docs/errors.html">errors</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/file.html">file</a>
+<a href="../../../packages/api-utils/docs/events.html">events</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/hidden-frame.html">hidden-frame</a>
+<a href="../../../packages/api-utils/docs/file.html">file</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/httpd.html">httpd</a>
+<a href="../../../packages/api-utils/docs/hidden-frame.html">hidden-frame</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/light-traits.html">light-traits</a>
+<a href="../../../packages/api-utils/docs/httpd.html">httpd</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/list.html">list</a>
+<a href="../../../packages/api-utils/docs/light-traits.html">light-traits</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/match-pattern.html">match-pattern</a>
+<a href="../../../packages/api-utils/docs/list.html">list</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/memory.html">memory</a>
+<a href="../../../packages/api-utils/docs/match-pattern.html">match-pattern</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/namespace.html">namespace</a>
+<a href="../../../packages/api-utils/docs/memory.html">memory</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/observer-service.html">observer-service</a>
+<a href="../../../packages/api-utils/docs/message-manager.html">message-manager</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/plain-text-console.html">plain-text-console</a>
+<a href="../../../packages/api-utils/docs/namespace.html">namespace</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/preferences-service.html">preferences-service</a>
+<a href="../../../packages/api-utils/docs/observer-service.html">observer-service</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/runtime.html">runtime</a>
+<a href="../../../packages/api-utils/docs/plain-text-console.html">plain-text-console</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/tab-browser.html">tab-browser</a>
+<a href="../../../packages/api-utils/docs/preferences-service.html">preferences-service</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/text-streams.html">text-streams</a>
+<a href="../../../packages/api-utils/docs/runtime.html">runtime</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/traceback.html">traceback</a>
+<a href="../../../packages/api-utils/docs/sandbox.html">sandbox</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/traits.html">traits</a>
+<a href="../../../packages/api-utils/docs/tab-browser.html">tab-browser</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/unit-test.html">unit-test</a>
+<a href="../../../packages/api-utils/docs/text-streams.html">text-streams</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/unload.html">unload</a>
+<a href="../../../packages/api-utils/docs/traceback.html">traceback</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/url.html">url</a>
+<a href="../../../packages/api-utils/docs/traits.html">traits</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/window-utils.html">window-utils</a>
+<a href="../../../packages/api-utils/docs/unit-test.html">unit-test</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/xhr.html">xhr</a>
+<a href="../../../packages/api-utils/docs/unload.html">unload</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/xpcom.html">xpcom</a>
+<a href="../../../packages/api-utils/docs/url.html">url</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/xul-app.html">xul-app</a>
+<a href="../../../packages/api-utils/docs/window-utils.html">window-utils</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/xhr.html">xhr</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/xpcom.html">xpcom</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/xul-app.html">xul-app</a>
 </li>
 </ul>
 </div>
 
 <div style="display: block;" class="package-summary">
 <h4>
-<a href="packages/test-harness/test-harness.html">test-harness</a>
+<a href="../../../packages/test-harness/test-harness.html">test-harness</a>
 </h4>
 
 <ul class="modules">
 <li class="module">
-<a href="packages/test-harness/docs/harness.html">harness</a>
+<a href="../../../packages/test-harness/docs/harness.html">harness</a>
 </li>
 
 <li class="module">
-<a href="packages/test-harness/docs/run-tests.html">run-tests</a>
-</li>
-</ul>
-</div>
-
-<div style="display: block;" class="package-summary">
-<h4>
-<a href="packages/development-mode/development-mode.html">development-mode</a>
-</h4>
-
-<ul class="modules">
-<li class="module">
-<a href="packages/development-mode/docs/bootstrap.html">bootstrap</a>
-</li>
-
-<li class="module">
-<a href="packages/development-mode/docs/main.html">main</a>
+<a href="../../../packages/test-harness/docs/run-tests.html">run-tests</a>
 </li>
 </ul>
 </div>
 </li>
-            <li><h4><a href="dev-guide/module-development/globals.html">Globals</a></h4></li>
+            <li><h4><a href="../../../dev-guide/module-development/globals.html">Globals</a></h4></li>
           </ul>
           </div>
         </div>
@@ -1260,9 +1458,9 @@ from the content script. The message can be any
           <div class="divider"></div>
         <h3><a href="https://wiki.mozilla.org/Labs/Jetpack">Jetpack Wiki</a></h3>
           <div class="divider"></div>
-        <h3><a href="dev-guide/appendices/glossary.html">Glossary</a></h3>
+        <h3><a href="../../../dev-guide/appendices/glossary.html">Glossary</a></h3>
           <div class="divider"></div>
-        <h3><a href="dev-guide/appendices/credits.html">Credits</a></h3>
+        <h3><a href="../../../dev-guide/appendices/credits.html">Credits</a></h3>
 
     </div>
 <!--end of sidebar column-->
@@ -1274,7 +1472,7 @@ from the content script. The message can be any
 
 <div role="contentinfo" id="footer">
   <div class="section">
-    <img alt="" src="static-files/media/footer-logo-med.png" class="footerlogo">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
     <div id="social-footer">
       <ul>
         <li>get to know <b>add-ons</b></li>
@@ -1288,10 +1486,10 @@ from the content script. The message can be any
 
     <div id="copyright">
       <p id="footer-links">
-        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
-        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> |
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> |
         <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
-    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+    |<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
       </p>
       <p>
       Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
@@ -1300,8 +1498,8 @@ from the content script. The message can be any
   </div>
 </div>
 
-<script type="text/javascript" src="static-files/js/jquery.js"></script>
-<script type="text/javascript" src="static-files/js/main.js"></script>
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
 
 </body>
 

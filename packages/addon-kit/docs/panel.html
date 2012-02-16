@@ -2,19 +2,19 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.4/" >
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
-  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
-  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushXml.js"></script>
-  <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushJScript.js"></script>
-  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/base.css">
-  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/header.css">
-  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/footer.css">
-  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/sdk-docs.css">
-  <link rel="stylesheet" type="text/css" media="all" href="static-files/css/api-reference.css">
-  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shCore.css">
-  <link rel="stylesheet" type="text/css" href="static-files/syntaxhighlighter/styles/shThemeDefault.css">
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
   <!--[if IE]>
     <style type="text/css">
       .package-summary .module,
@@ -25,14 +25,14 @@
     </style>
   <![endif]-->
 
-  <link rel="shortcut icon" type="image/x-icon" href="static-files/media/favicon.png">
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
   <title>panel - Add-on SDK Documentation</title>
 </head>
 <body>
 
 <header id="global-header">
   <div class="funnel">
-    <a id="mozilla-tab" href="http://www.mozilla.org/?ref=logo">Mozilla</a>
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
     <div class="menu">
       <p>
         <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
@@ -47,9 +47,9 @@
 <header id="site-header">
   <div class="funnel">
     <h1>
-      <a href="dev-guide/welcome.html">Add-on SDK<span></span></a>
+      <a href="../../../dev-guide/welcome.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.4</div>
+    <div id="version">Version 1.5</div>
   </div>
 </header>
 
@@ -62,68 +62,323 @@
     <div id="main-content">
 <div id="panel_module_api_docs" class="module_api_docs">
 <h1>panel</h1>
-<div class="module_description"><!-- contributed by Myk Melez [myk@mozilla.org] -->
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<!-- contributed by Myk Melez [myk@mozilla.org] -->
 <!-- contributed by Irakli Gozalishvili [gozala@mozilla.com] -->
 
-<p>The <code>panel</code> module creates floating modal "popup dialogs" that appear on top of
-web content and browser chrome and persist until dismissed by users or programs.
-Panels are useful for presenting temporary interfaces to users in a way that is
+<p>This module exports a single constructor function <code>Panel</code> which constructs a
+new panel.</p>
+<p>A panel is a dialog. Its content is specified as HTML and you can
+execute scripts in it, so the appearance and behaviour of the panel
+is limited only by what you can do using HTML, CSS and JavaScript.</p>
+<p>The screenshot below shows a panel whose content is built from the
+list of currently open tabs:</p>
+<img src="../../../static-files/media/screenshots/panel-tabs-osx.png" alt="Simple panel example" class="image-center">
+
+<p>Panels are useful for presenting temporary interfaces to users in a way that is
 easier for users to ignore and dismiss than a modal dialog, since panels are
 hidden the moment users interact with parts of the application interface outside
 them.</p>
-<p>The module exports a single constructor function <code>Panel</code> which constructs a
-new panel.</p>
 <p>A panel's content is loaded as soon as it is created, before the panel is shown,
 and the content remains loaded when a panel is hidden, so it is possible
 to keep a panel around in the background, updating its content as appropriate
 in preparation for the next time it is shown.</p>
 <p>Your add-on can receive notifications when a panel is shown or hidden by
 listening to its <code>show</code> and <code>hide</code> events.</p>
-<p>Panels have associated content scripts, which are JavaScript scripts that have
-access to the content loaded into the panels.  An add-on can specify one or
-more content scripts to load for a panel, and the add-on can communicate with
-those scripts either using the <code>message</code> event or by using user-defined
-events. See
-<a href="dev-guide/addon-development/web-content.html">Working with Content Scripts</a>
-for more information.</p>
-<p>The panel's default style is different for each operating system.
-For example, suppose a panel's content is specified with the following HTML:</p>
-<script type="syntaxhighlighter" class="brush: html"><![CDATA[
-<h1>Default Style</h1>
+<h2>Panel Content</h2>
+<p>The panel's content is specified as HTML, which is loaded from the URL
+supplied in the <code>contentURL</code> option to the panel's constructor.</p>
+<p>You can load remote HTML into the panel:</p>
+<pre><code>var panel = require("panel").Panel({
+  width: 180,
+  height: 180,
+  contentURL: "https://en.wikipedia.org/w/index.php?title=Jetpackuseformat=mobile"
+});
 
-This is what a panel with no custom styling looks like.
+panel.show();
+</code></pre>
+<img src="../../../static-files/media/screenshots/wikipedia-jetpack-panel.png" alt="Wikipedia Jetpack panel" class="image-center">
+
+<p>You can also load HTML that's been packaged with your add-on, and this is
+most probably how you will create dialogs. To do this, save
+the HTML in your add-on's <code>data</code> directory and load it using the <code>data.url()</code>
+method exported by the
+<a href="../../../packages/addon-kit/docs/self.html"><code>self</code></a> module, like this:</p>
+<pre><code>var panel = require("panel").Panel({
+  contentURL: require("self").data.url("myFile.html")
+});
+
+panel.show();
+</code></pre>
+<h2>Scripting Panel Content</h2>
+<p>You can't directly access your panel's content from your main add-on code.
+To access the panel's content, you need to load a script into the panel.
+In the SDK these scripts are called "content scripts" because they're
+explicitly used for interacting with web content.</p>
+<p>While content scripts can access the content they're attached to, they can't
+use the SDK's APIs. So implementing a complete solution usually means you
+have to send messages between the content script and the main add-on code.</p>
+<ul>
+<li>
+<p>You can specify one or more content scripts to load into a panel using the
+<code>contentScript</code> or <code>contentScriptFile</code> options to the
+<a href="../../../packages/addon-kit/docs/panel.html#Panel%28options%29"><code>Panel()</code> constructor</a>.</p>
+</li>
+<li>
+<p>You can communicate with the script using either the
+<a href="../../../dev-guide/addon-development/content-scripts/using-postmessage.html"><code>postMessage()</code></a>
+API or (preferably, usually) the
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html"><code>port</code></a> API.</p>
+</li>
+</ul>
+<p>For example, here's an add-on whose content script intercepts mouse clicks
+on links inside the panel, and sends the target URL to the main add-on
+code. The content script sends messages using <code>self.port.emit()</code> and the
+add-on script receives them using <code>panel.port.on()</code>.</p>
+<pre><code>var myScript = "window.addEventListener('click', function(event) {" +
+               "  var t = event.target;" +
+               "  if (t.nodeName == 'A')" +
+               "    self.port.emit('click-link', t.toString());" +
+               "}, false);"
+
+var panel = require("panel").Panel({
+  contentURL: "http://www.bbc.co.uk/mobile/index.html",
+  contentScript: myScript
+});
+
+panel.port.on("click-link", function(url) {
+  console.log(url);
+});
+
+panel.show();
+</code></pre>
+<p>This example uses <code>contentScript</code> to supply the script as a string. It's
+usually better practice to use <code>contentScriptFile</code>, which is a URL pointing
+to a script file saved under your add-on's <code>data</code> directory.</p>
+<div class="warning">
+<p>Unless your content script is extremely simple and consists only of a
+static string, don't use <code>contentScript</code>: if you do, you may
+have problems getting your add-on approved on AMO.</p>
+<p>Instead, keep the script in a separate file and load it using
+<code>contentScriptFile</code>. This makes your code easier to maintain,
+secure, debug and review.</p>
+</div>
+
+<img src="../../../static-files/media/screenshots/text-entry-panel.png" alt="Text entry panel" class="image-right">
+
+<h3>Getting User Input</h3>
+<p>The following add-on adds a widget which displays a panel when
+clicked. The panel just contains a <code>textarea</code> element: when the user
+presses the <code>return</code> key, the contents of the <code>textarea</code> is sent to the
+main add-on code.</p>
+<p>The add-on consists of three files:</p>
+<ul>
+<li><strong><code>main.js</code></strong>: the main add-on code, that creates the widget and panel</li>
+<li><strong><code>get-text.js</code></strong>: the content script that interacts with the panel content</li>
+<li><strong><code>text-entry.html</code></strong>: the panel content itself, specified as HTML</li>
+</ul>
+<p>"main.js" is saved in your add-on's <code>lib</code> directory, and the other two files
+go in your add-on's <code>data</code> directory:</p>
+<pre>
+my-addon/
+         data/
+              get-text.js
+              text-entry.html
+         lib/
+             main.js
+</pre>
+
+<p>The "main.js" looks like this:</p>
+<pre><code>var data = require("self").data;
+
+// Create a panel whose content is defined in "text-entry.html".
+// Attach a content script called "get-text.js".
+var text_entry = require("panel").Panel({
+  width: 212,
+  height: 200,
+  contentURL: data.url("text-entry.html"),
+  contentScriptFile: data.url("get-text.js")
+});
+
+// Send the content script a message called "show" when
+// the panel is shown.
+text_entry.on("show", function() {
+  text_entry.port.emit("show");
+});
+
+// Listen for messages called "text-entered" coming from
+// the content script. The message payload is the text the user
+// entered.
+// In this implementation we'll just log the text to the console.
+text_entry.port.on("text-entered", function (text) {
+  console.log(text);
+  text_entry.hide();
+});
+
+// Create a widget, and attach the panel to it, so the panel is
+// shown when the user clicks the widget.
+require("widget").Widget({
+  label: "Text entry",
+  id: "text-entry",
+  contentURL: "http://www.mozilla.org/favicon.ico",
+  panel: text_entry
+});
+</code></pre>
+<p>The content script "get-text.js" looks like this:</p>
+<pre><code>self.port.on("show", function (arg) {
+  var textArea = document.getElementById('edit-box');
+  textArea.focus();
+  // When the user hits return, send a message to main.js.
+  // The message payload is the contents of the edit box.
+  textArea.onkeyup = function(event) {
+    if (event.keyCode == 13) {
+      // Remove the newline.
+      text = textArea.value.replace(/(\r\n|\n|\r)/gm,"");
+      self.port.emit("text-entered", text);
+      textArea.value = '';
+    }
+  };
+});
+</code></pre>
+<p>Finally, the "text-entry.html" file defines the <code>textarea</code> element:</p>
+<script type="syntaxhighlighter" class="brush: html"><![CDATA[
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+  <style type="text/css" media="all">
+    textarea {
+      margin: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <textarea rows="10" cols="20" id="edit-box"></textarea>
+</body>
+
+</html>
 ]]>
 </script>
 
-<p>On OS X it will look like this:</p>
-<p><img class="image-center" src="static-files/media/screenshots/default-panel-osx.png"
-alt="OS X panel default style">
-<br></p>
-<p>On Windows 7 it will look like this:</p>
-<p><img class="image-center" src="static-files/media/screenshots/default-panel-windows.png"
-alt="Windows 7 panel default style">
-<br></p>
-<p>On Ubuntu it will look like this:</p>
-<p><img class="image-center" src="static-files/media/screenshots/default-panel-ubuntu.png"
-alt="Ubuntu panel default style">
-<br></p>
+<p>To learn much more about content scripts, see the
+<a href="../../../dev-guide/addon-development/web-content.html">Working with Content Scripts</a>
+guide.</p>
+<div class="experimental">
+<h3>Scripting Trusted Panel Content</h3>
+
+<p><strong>Note that the feature described in this section is experimental: we'll
+very probably continue to support it, but the name of the <code>addon</code>
+property might change in a future release.</strong></p>
+<p>We've already seen that you can package HTML files in your add-on's <code>data</code>
+directory and use them to define the panel's content. We can call this
+"trusted" content, because unlike content loaded from a source outside the
+add-on, the add-on author knows exactly what it's doing. To
+interact with trusted content you don't need to use content scripts:
+you can just include a script from the HTML file in the normal way, using
+<code>script</code> tags.</p>
+<p>Like a content script, these scripts can communicate with the add-on code
+using the
+<a href="../../../dev-guide/addon-development/content-scripts/using-postmessage.html"><code>postMessage()</code></a>
+API or the
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html"><code>port</code></a> API.
+The crucial difference is that these scripts access the <code>postMessage</code>
+and <code>port</code> objects through the <code>addon</code> object, whereas content scripts
+access them through the <code>self</code> object.</p>
+<p>To show the difference, we can easily convert the <code>text-entry</code> add-on above
+to use normal page scripts instead of content scripts.</p>
+<p>The main add-on code is exactly the same as the main add-on code in the
+previous example, except that we don't attach a content script:</p>
+<pre><code>var data = require("self").data;
+
+// Create a panel whose content is defined in "text-entry.html".
+var text_entry = require("panel").Panel({
+  width: 212,
+  height: 200,
+  contentURL: data.url("text-entry.html"),
+});
+
+// Send the page script a message called "show" when
+// the panel is shown.
+text_entry.on("show", function() {
+  text_entry.port.emit("show");
+});
+
+// Listen for messages called "text-entered" coming from
+// the page script. The message payload is the text the user
+// entered.
+// In this implementation we'll just log the text to the console.
+text_entry.port.on("text-entered", function (text) {
+  console.log(text);
+  text_entry.hide();
+});
+
+// Create a widget, and attach the panel to it, so the panel is
+// shown when the user clicks the widget.
+require("widget").Widget({
+  label: "Text entry",
+  id: "text-entry",
+  contentURL: "http://www.mozilla.org/favicon.ico",
+  panel: text_entry
+});
+</code></pre>
+<p>The page script is exactly the same as the content script above, except
+that instead of <code>self</code>, we use <code>addon</code> to access the messaging APIs:</p>
+<pre><code>addon.port.on("show", function (arg) {
+  var textArea = document.getElementById('edit-box');
+  textArea.focus();
+  // When the user hits return, send a message to main.js.
+  // The message payload is the contents of the edit box.
+  textArea.onkeyup = function(event) {
+    if (event.keyCode == 13) {
+      // Remove the newline.
+      text = textArea.value.replace(/(\r\n|\n|\r)/gm,"");
+      addon.port.emit("text-entered", text);
+      textArea.value = '';
+    }
+  };
+});
+</code></pre>
+<p>Finally, the HTML file now references "get-text.js" inside a <code>script</code> tag:</p>
+<script type="syntaxhighlighter" class="brush: html"><![CDATA[
+<html>
+<head>
+  <style type="text/css" media="all">
+    textarea {
+      margin: 10px;
+    }
+  </style>
+  <script src="get-text.js">&lt;/script>
+
+</head>
+
+<body>
+  <textarea rows="10" cols="20" id="edit-box"></textarea>
+</body>
+
+</html>
+]]>
+</script>
+
+</div>
+
+<h2>Styling Trusted Panel Content</h2>
+<p>When the panel's content is specified using an HTML file in your <code>data</code>
+directory, you can style it using CSS, either embedding the CSS directly
+in the file or referencing a CSS file stored under <code>data</code>.</p>
+<p>The panel's default style is different for each operating system:</p>
+<img src="../../../static-files/media/screenshots/panel-default-style.png" alt="OS X panel default style" class="image-center">
+
 <p>This helps to ensure that the panel's style is consistent with the dialogs
 displayed by Firefox and other applications, but means you need to take care
 when applying your own styles. For example, if you set the panel's
 <code>background-color</code> property to <code>white</code> and do not set the <code>color</code> property,
 then the panel's text will be invisible on OS X although it looks fine on Ubuntu.</p>
-<h2>Examples</h2>
-<p>Create and show a simple panel with content from the <code>data/</code> directory:</p>
-<pre><code>var data = require("self").data;
-var panel = require("panel").Panel({
-  contentURL: data.url("foo.html")
-});
-
-panel.show();
-</code></pre>
-<p>The tutorial section on
-<a href="dev-guide/addon-development/web-content.html">web content</a> has
-a more complex example using panels.</p>
 </div>
 
 <div class="api_reference">
@@ -327,13 +582,13 @@ the panel and might show it later, use <code>hide</code> instead.</p>
 
 <div class="api_component">
 <h6 class="api_name">port : <span class="datatype">EventEmitter</span></h6>
-<p><a href="packages/api-utils/docs/events.html">EventEmitter</a> object that allows you to:</p>
+<p><a href="../../../packages/api-utils/docs/events.html">EventEmitter</a> object that allows you to:</p>
 <ul>
 <li>send events to the content script using the <code>port.emit</code> function</li>
 <li>receive events from the content script using the <code>port.on</code> function</li>
 </ul>
 <p>See the guide to
-<a href="dev-guide/addon-development/content-scripts/using-port.html">
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html">
 communicating using <code>port</code></a> for details.</p>
 </div>
 
@@ -423,7 +678,7 @@ code in the panel's <code>message</code> event.</p>
 <div class="api_name"><span class="datatype">value</span></div>
 <p>Listeners are passed a single argument which is the message posted
 from the content script. The message can be any
-<a href = "dev-guide/addon-development/content-scripts/using-port.html#json_serializable">JSON-serializable value</a>.</p>
+<a href="../../../dev-guide/addon-development/content-scripts/using-port.html#json_serializable">JSON-serializable value</a>.</p>
 </div>
 
 </div>
@@ -460,156 +715,158 @@ object.</p>
 
   <div id="sidebar" class="column">
     <div class="sidebar-section" id="addon-development">
-      <h2 class="sidebar-section-header"><a href="dev-guide/addon-development/about.html">Developer Guide</a></h2>
+      <h2 class="sidebar-section-header"><a href="../../../dev-guide/addon-development/about.html">Developer Guide</a></h2>
       <div class="sidebar-section-contents" id="default-section-contents">
 
         <div class="sidebar-subsection">
-          <h3><a href="dev-guide/addon-development/installation.html">Installation</a></h3>
+          <h3><a href="../../../dev-guide/addon-development/installation.html">Installation</a></h3>
           <div class="divider"></div>
-          <h3 class="sidebar-subsection-header"><a href="dev-guide/addon-development/tutorials.html">Tutorials</a></h3>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/addon-development/tutorials.html">Tutorials</a></h3>
           <div class="sidebar-subsection-contents">
           <ul>
-            <li><h4><a href="dev-guide/addon-development/getting-started.html">Getting Started</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/getting-started.html">Getting Started</a></h4>
             <ul>
-              <li><a href="dev-guide/addon-development/implementing-simple-addon.html">A Simple Add-on</a></li>
-              <li><a href="dev-guide/addon-development/commonjs.html">CommonJS</a></li>
-              <li><a href="dev-guide/addon-development/implementing-reusable-module.html">Reusable Modules</a></li>
-              <li><a href="dev-guide/addon-development/troubleshooting.html">Troubleshooting</a></li>
+              <li><a href="../../../dev-guide/addon-development/implementing-simple-addon.html">A Simple Add-on</a></li>
+              <li><a href="../../../dev-guide/addon-development/commonjs.html">CommonJS</a></li>
+              <li><a href="../../../dev-guide/addon-development/implementing-reusable-module.html">Reusable Modules</a></li>
+              <li><a href="../../../dev-guide/addon-development/troubleshooting.html">Troubleshooting</a></li>
             </ul></li>
-            <li><h4><a href="dev-guide/addon-development/api-intro.html" >Introducing the APIs</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/api-intro.html">Introducing the APIs</a></h4>
             <ul>
-              <li><a href="dev-guide/addon-development/api-idioms.html">Common Idioms</a></li>
-              <li><a href="dev-guide/addon-development/api-modules.html">API Overview</a></li>
+              <li><a href="../../../dev-guide/addon-development/api-idioms.html">Common Idioms</a></li>
+              <li><a href="../../../dev-guide/addon-development/api-modules.html">API Overview</a></li>
             </ul></li>
-            <li><h4><a href="dev-guide/addon-development/annotator/annotator.html">Example: Annotator</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/annotator/annotator.html">Example: Annotator</a></h4>
             <ul>
-              <li><a href="dev-guide/addon-development/annotator/overview.html">Design Overview</a></li>
-              <li><a href="dev-guide/addon-development/annotator/widget.html">Implementing the Widget</a></li>
-              <li><a href="dev-guide/addon-development/annotator/creating.html">Creating Annotations</a></li>
-              <li><a href="dev-guide/addon-development/annotator/storing.html">Storing Annotations</a></li>
-              <li><a href="dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/overview.html">Design Overview</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/widget.html">Implementing the Widget</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/creating.html">Creating Annotations</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/storing.html">Storing Annotations</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
             </ul></li>
-            <li><h4><a href="dev-guide/addon-development/third-party-packages.html">Using Third Party Packages</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/xul-migration.html">XUL Migration Guide</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/third-party-packages.html">Using Third Party Packages</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/l10n.html">Localization</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/mobile.html">Mobile Development</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/xul-migration.html">XUL Migration Guide</a></h4>
             <ul>
-              <li><a href="dev-guide/addon-development/sdk-vs-xul.html">XUL Versus the SDK</a></li>
+              <li><a href="../../../dev-guide/addon-development/sdk-vs-xul.html">XUL Versus the SDK</a></li>
             </ul>
             <ul>
-              <li><a href="dev-guide/addon-development/library-detector.html">Porting Example</a></li>
+              <li><a href="../../../dev-guide/addon-development/library-detector.html">Porting Example</a></li>
             </ul></li>
           </div>
         </div>
 
         <div class="sidebar-subsection">
           <div class="divider"></div>
-          <h3 class="sidebar-subsection-header"><a href="dev-guide/addon-development/guides.html">Programming Guides</a></h3>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/addon-development/guides.html">Programming Guides</a></h3>
           <div class="sidebar-subsection-contents">
           <ul>
-            <li><h4><a href="dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/events.html">Working with Events</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/events.html">Working With Events</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
               <ul>
-                <li><a href="dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
-                <li><a href="dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
-                <li><a href="dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
-                <li><a href="dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
-                <li><a href="dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
               </ul></li>
-            <li><h4><a href="dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
           </ul>
           </div>
         </div>
 
         <div class="sidebar-subsection">
           <div class="divider"></div>
-          <h3 class="sidebar-subsection-header"><a href="dev-guide/addon-development/reference.html">Reference</a></h3>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/addon-development/reference.html">Reference</a></h3>
           <div class="sidebar-subsection-contents always-show">
           <ul>
             <li id="high-level-package-summaries">
 <div style="display: block;" class="package-summary">
 <h4>
-<a href="packages/addon-kit/addon-kit.html">addon-kit</a>
+<a href="../../../packages/addon-kit/addon-kit.html">addon-kit</a>
 </h4>
 
 <ul class="modules">
 <li class="module">
-<a href="packages/addon-kit/docs/clipboard.html">clipboard</a>
+<a href="../../../packages/addon-kit/docs/clipboard.html">clipboard</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/context-menu.html">context-menu</a>
+<a href="../../../packages/addon-kit/docs/context-menu.html">context-menu</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/hotkeys.html">hotkeys</a>
+<a href="../../../packages/addon-kit/docs/hotkeys.html">hotkeys</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/notifications.html">notifications</a>
+<a href="../../../packages/addon-kit/docs/notifications.html">notifications</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/page-mod.html">page-mod</a>
+<a href="../../../packages/addon-kit/docs/page-mod.html">page-mod</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/page-worker.html">page-worker</a>
+<a href="../../../packages/addon-kit/docs/page-worker.html">page-worker</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/panel.html">panel</a>
+<a href="../../../packages/addon-kit/docs/panel.html">panel</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/passwords.html">passwords</a>
+<a href="../../../packages/addon-kit/docs/passwords.html">passwords</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/private-browsing.html">private-browsing</a>
+<a href="../../../packages/addon-kit/docs/private-browsing.html">private-browsing</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/request.html">request</a>
+<a href="../../../packages/addon-kit/docs/request.html">request</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/selection.html">selection</a>
+<a href="../../../packages/addon-kit/docs/selection.html">selection</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/self.html">self</a>
+<a href="../../../packages/addon-kit/docs/self.html">self</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/simple-prefs.html">simple-prefs</a>
+<a href="../../../packages/addon-kit/docs/simple-prefs.html">simple-prefs</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/simple-storage.html">simple-storage</a>
+<a href="../../../packages/addon-kit/docs/simple-storage.html">simple-storage</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/tabs.html">tabs</a>
+<a href="../../../packages/addon-kit/docs/tabs.html">tabs</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/timers.html">timers</a>
+<a href="../../../packages/addon-kit/docs/timers.html">timers</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/widget.html">widget</a>
+<a href="../../../packages/addon-kit/docs/widget.html">widget</a>
 </li>
 
 <li class="module">
-<a href="packages/addon-kit/docs/windows.html">windows</a>
+<a href="../../../packages/addon-kit/docs/windows.html">windows</a>
 </li>
 </ul>
 </div>
 </li>
-            <li><h4><a href="dev-guide/addon-development/console.html">console</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/cfx-tool.html">cfx</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/package-spec.html">Package Specification</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/console.html">console</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/cfx-tool.html">cfx</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/package-spec.html">Package Specification</a></h4></li>
           </ul>
           </div>
         </div>
@@ -618,211 +875,207 @@ object.</p>
     </div>
 
     <div class="sidebar-section" id="module-development">
-      <h2 class="sidebar-section-header"><a href="dev-guide/module-development/about.html">Internals Guide</a></h2>
+      <h2 class="sidebar-section-header"><a href="../../../dev-guide/module-development/about.html">Internals Guide</a></h2>
       <div class="sidebar-section-contents">
 
         <div class="sidebar-subsection">
-          <h3 class="sidebar-subsection-header"><a href="dev-guide/module-development/guides.html">Programming Guides</a></h3>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/module-development/guides.html">Programming Guides</a></h3>
           <div class="sidebar-subsection-contents">
           <ul>
-            <li><h4><a href="dev-guide/module-development/best-practices.html">Low-Level Module Best Practices</a></h4>
-            <li><h4><a href="dev-guide/module-development/chrome.html">Chrome Authority</a></h4>
-            <li><h4><a href="dev-guide/module-development/xpi.html">XPI Generation</a></h4>
+            <li><h4><a href="../../../dev-guide/module-development/best-practices.html">Low-Level Module Best Practices</a></h4>
+            <li><h4><a href="../../../dev-guide/module-development/chrome.html">Chrome Authority</a></h4>
+            <li><h4><a href="../../../dev-guide/module-development/xpi.html">XPI Generation</a></h4>
           </ul>
           </div>
         </div>
 
         <div class="sidebar-subsection">
           <div class="divider"></div>
-          <h3 class="sidebar-subsection-header"><a href="dev-guide/module-development/reference.html">Reference</a></h3>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/module-development/reference.html">Reference</a></h3>
           <div class="sidebar-subsection-contents">
           <ul>
             <li id="low-level-package-summaries">
 <div style="display: block;" class="package-summary">
 <h4>
-<a href="packages/api-utils/api-utils.html">api-utils</a>
+<a href="../../../packages/api-utils/api-utils.html">api-utils</a>
 </h4>
 
 <ul class="modules">
 <li class="module">
-<a href="packages/api-utils/docs/api-utils.html">api-utils</a>
+<a href="../../../packages/api-utils/docs/api-utils.html">api-utils</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/app-strings.html">app-strings</a>
+<a href="../../../packages/api-utils/docs/app-strings.html">app-strings</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/byte-streams.html">byte-streams</a>
+<a href="../../../packages/api-utils/docs/base.html">base</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/collection.html">collection</a>
+<a href="../../../packages/api-utils/docs/byte-streams.html">byte-streams</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/content.html">content</a>
+<a href="../../../packages/api-utils/docs/collection.html">collection</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/content/loader.html">content/loader</a>
+<a href="../../../packages/api-utils/docs/content.html">content</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/content/symbiont.html">content/symbiont</a>
+<a href="../../../packages/api-utils/docs/content/loader.html">content/loader</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/content/worker.html">content/worker</a>
+<a href="../../../packages/api-utils/docs/content/symbiont.html">content/symbiont</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/cortex.html">cortex</a>
+<a href="../../../packages/api-utils/docs/content/worker.html">content/worker</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/cuddlefish.html">cuddlefish</a>
+<a href="../../../packages/api-utils/docs/cortex.html">cortex</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/environment.html">environment</a>
+<a href="../../../packages/api-utils/docs/cuddlefish.html">cuddlefish</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/errors.html">errors</a>
+<a href="../../../packages/api-utils/docs/environment.html">environment</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/events.html">events</a>
+<a href="../../../packages/api-utils/docs/errors.html">errors</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/file.html">file</a>
+<a href="../../../packages/api-utils/docs/events.html">events</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/hidden-frame.html">hidden-frame</a>
+<a href="../../../packages/api-utils/docs/file.html">file</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/httpd.html">httpd</a>
+<a href="../../../packages/api-utils/docs/hidden-frame.html">hidden-frame</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/light-traits.html">light-traits</a>
+<a href="../../../packages/api-utils/docs/httpd.html">httpd</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/list.html">list</a>
+<a href="../../../packages/api-utils/docs/light-traits.html">light-traits</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/match-pattern.html">match-pattern</a>
+<a href="../../../packages/api-utils/docs/list.html">list</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/memory.html">memory</a>
+<a href="../../../packages/api-utils/docs/match-pattern.html">match-pattern</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/namespace.html">namespace</a>
+<a href="../../../packages/api-utils/docs/memory.html">memory</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/observer-service.html">observer-service</a>
+<a href="../../../packages/api-utils/docs/message-manager.html">message-manager</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/plain-text-console.html">plain-text-console</a>
+<a href="../../../packages/api-utils/docs/namespace.html">namespace</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/preferences-service.html">preferences-service</a>
+<a href="../../../packages/api-utils/docs/observer-service.html">observer-service</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/runtime.html">runtime</a>
+<a href="../../../packages/api-utils/docs/plain-text-console.html">plain-text-console</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/tab-browser.html">tab-browser</a>
+<a href="../../../packages/api-utils/docs/preferences-service.html">preferences-service</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/text-streams.html">text-streams</a>
+<a href="../../../packages/api-utils/docs/runtime.html">runtime</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/traceback.html">traceback</a>
+<a href="../../../packages/api-utils/docs/sandbox.html">sandbox</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/traits.html">traits</a>
+<a href="../../../packages/api-utils/docs/tab-browser.html">tab-browser</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/unit-test.html">unit-test</a>
+<a href="../../../packages/api-utils/docs/text-streams.html">text-streams</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/unload.html">unload</a>
+<a href="../../../packages/api-utils/docs/traceback.html">traceback</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/url.html">url</a>
+<a href="../../../packages/api-utils/docs/traits.html">traits</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/window-utils.html">window-utils</a>
+<a href="../../../packages/api-utils/docs/unit-test.html">unit-test</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/xhr.html">xhr</a>
+<a href="../../../packages/api-utils/docs/unload.html">unload</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/xpcom.html">xpcom</a>
+<a href="../../../packages/api-utils/docs/url.html">url</a>
 </li>
 
 <li class="module">
-<a href="packages/api-utils/docs/xul-app.html">xul-app</a>
+<a href="../../../packages/api-utils/docs/window-utils.html">window-utils</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/xhr.html">xhr</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/xpcom.html">xpcom</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/xul-app.html">xul-app</a>
 </li>
 </ul>
 </div>
 
 <div style="display: block;" class="package-summary">
 <h4>
-<a href="packages/test-harness/test-harness.html">test-harness</a>
+<a href="../../../packages/test-harness/test-harness.html">test-harness</a>
 </h4>
 
 <ul class="modules">
 <li class="module">
-<a href="packages/test-harness/docs/harness.html">harness</a>
+<a href="../../../packages/test-harness/docs/harness.html">harness</a>
 </li>
 
 <li class="module">
-<a href="packages/test-harness/docs/run-tests.html">run-tests</a>
-</li>
-</ul>
-</div>
-
-<div style="display: block;" class="package-summary">
-<h4>
-<a href="packages/development-mode/development-mode.html">development-mode</a>
-</h4>
-
-<ul class="modules">
-<li class="module">
-<a href="packages/development-mode/docs/bootstrap.html">bootstrap</a>
-</li>
-
-<li class="module">
-<a href="packages/development-mode/docs/main.html">main</a>
+<a href="../../../packages/test-harness/docs/run-tests.html">run-tests</a>
 </li>
 </ul>
 </div>
 </li>
-            <li><h4><a href="dev-guide/module-development/globals.html">Globals</a></h4></li>
+            <li><h4><a href="../../../dev-guide/module-development/globals.html">Globals</a></h4></li>
           </ul>
           </div>
         </div>
@@ -834,9 +1087,9 @@ object.</p>
           <div class="divider"></div>
         <h3><a href="https://wiki.mozilla.org/Labs/Jetpack">Jetpack Wiki</a></h3>
           <div class="divider"></div>
-        <h3><a href="dev-guide/appendices/glossary.html">Glossary</a></h3>
+        <h3><a href="../../../dev-guide/appendices/glossary.html">Glossary</a></h3>
           <div class="divider"></div>
-        <h3><a href="dev-guide/appendices/credits.html">Credits</a></h3>
+        <h3><a href="../../../dev-guide/appendices/credits.html">Credits</a></h3>
 
     </div>
 <!--end of sidebar column-->
@@ -848,7 +1101,7 @@ object.</p>
 
 <div role="contentinfo" id="footer">
   <div class="section">
-    <img alt="" src="static-files/media/footer-logo-med.png" class="footerlogo">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
     <div id="social-footer">
       <ul>
         <li>get to know <b>add-ons</b></li>
@@ -862,10 +1115,10 @@ object.</p>
 
     <div id="copyright">
       <p id="footer-links">
-        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
-        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> |
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> |
         <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
-    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+    |<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
       </p>
       <p>
       Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
@@ -874,8 +1127,8 @@ object.</p>
   </div>
 </div>
 
-<script type="text/javascript" src="static-files/js/jquery.js"></script>
-<script type="text/javascript" src="static-files/js/main.js"></script>
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
 
 </body>
 

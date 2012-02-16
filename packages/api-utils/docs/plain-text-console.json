@@ -1,1 +1,0 @@
-[["version", 4], ["markdown", "The `plain-text-console` module provides a minimalist implementation\nof the [console](dev-guide/addon-development/console.html) global,\nwhich simply logs all messages to standard output.\n"]]

@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-  <base href="https://addons.mozilla.org/en-US/developers/docs/sdk/1.4/" >
+  <base  >
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shCore.js"></script>
   <script type="text/javascript" src="static-files/syntaxhighlighter/scripts/shBrushCss.js"></script>
@@ -49,7 +49,7 @@
     <h1>
       <a href="dev-guide/welcome.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.4</div>
+    <div id="version">Version 1.5</div>
   </div>
 </header>
 
@@ -59,7 +59,11 @@
 
   <div id="main-content-column" class="column">
     <div id="toc"></div>
-    <div id="main-content"><h1>Add-on Development Made Easy</h1>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Add-on Development Made Easy</h1>
 <p>Using the Add-on SDK you can create add-ons using standard Web technologies:
 JavaScript, HTML, and CSS.</p>
 <p>The SDK includes:</p>
@@ -122,6 +126,8 @@ advanced developers and people working on the SDK itself.</p>
               <li><a href="dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
             </ul></li>
             <li><h4><a href="dev-guide/addon-development/third-party-packages.html">Using Third Party Packages</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/l10n.html">Localization</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/mobile.html" >Mobile Development</a></h4>
             <li><h4><a href="dev-guide/addon-development/xul-migration.html">XUL Migration Guide</a></h4>
             <ul>
               <li><a href="dev-guide/addon-development/sdk-vs-xul.html">XUL Versus the SDK</a></li>
@@ -138,7 +144,7 @@ advanced developers and people working on the SDK itself.</p>
           <div class="sidebar-subsection-contents">
           <ul>
             <li><h4><a href="dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
-            <li><h4><a href="dev-guide/addon-development/events.html">Working with Events</a></h4></li>
+            <li><h4><a href="dev-guide/addon-development/events.html">Working With Events</a></h4></li>
             <li><h4><a href="dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
               <ul>
                 <li><a href="dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
@@ -285,6 +291,10 @@ advanced developers and people working on the SDK itself.</p>
 </li>
 
 <li class="module">
+<a href="packages/api-utils/docs/base.html">base</a>
+</li>
+
+<li class="module">
 <a href="packages/api-utils/docs/byte-streams.html">byte-streams</a>
 </li>
 
@@ -357,6 +367,10 @@ advanced developers and people working on the SDK itself.</p>
 </li>
 
 <li class="module">
+<a href="packages/api-utils/docs/message-manager.html">message-manager</a>
+</li>
+
+<li class="module">
 <a href="packages/api-utils/docs/namespace.html">namespace</a>
 </li>
 
@@ -374,6 +388,10 @@ advanced developers and people working on the SDK itself.</p>
 
 <li class="module">
 <a href="packages/api-utils/docs/runtime.html">runtime</a>
+</li>
+
+<li class="module">
+<a href="packages/api-utils/docs/sandbox.html">sandbox</a>
 </li>
 
 <li class="module">
@@ -434,22 +452,6 @@ advanced developers and people working on the SDK itself.</p>
 
 <li class="module">
 <a href="packages/test-harness/docs/run-tests.html">run-tests</a>
-</li>
-</ul>
-</div>
-
-<div style="display: block;" class="package-summary">
-<h4>
-<a href="packages/development-mode/development-mode.html">development-mode</a>
-</h4>
-
-<ul class="modules">
-<li class="module">
-<a href="packages/development-mode/docs/bootstrap.html">bootstrap</a>
-</li>
-
-<li class="module">
-<a href="packages/development-mode/docs/main.html">main</a>
 </li>
 </ul>
 </div>
