@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -89,6 +89,22 @@ URL using the <code>data.url()</code> method of the
 <pre><code>pageWorker = require("page-worker").Page({
   contentScript: "console.log(document.body.innerHTML);",
   contentURL: require("self").data.url("myFile.html")
+});
+</code></pre>
+<p>You can load a new page by setting the page worker's <code>contentURL</code> property.
+In this example we fetch the first paragraph of a page from Wikipedia, then
+the first paragraph of a different page:</p>
+<pre><code>var getFirstParagraph = "var paras = document.getElementsByTagName('p');" +
+                        "console.log(paras[0].textContent);" +
+                        "self.port.emit('loaded');"
+
+pageWorker = require("page-worker").Page({
+  contentScript: getFirstParagraph,
+  contentURL: "http://en.wikipedia.org/wiki/Chalk"
+});
+
+pageWorker.port.on("loaded", function() {
+  pageWorker.contentURL = "http://en.wikipedia.org/wiki/Cheese"
 });
 </code></pre>
 <h2>Scripting Page-Worker Content</h2>
@@ -357,7 +373,9 @@ communicating using <code>port</code></a> for details.</p>
 
 <div class="api_component">
 <h6 class="api_name">contentURL : <span class="datatype">string</span></h6>
-<p>The URL of the content loaded.</p>
+<p>The URL of content to load.  This can point to
+local content loaded from your add-on's "data" directory or remote content.
+Setting it loads the content immediately.</p>
 </div>
 
 <div class="api_component">
@@ -557,9 +575,15 @@ object.</p>
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -585,6 +609,10 @@ object.</p>
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -604,6 +632,8 @@ object.</p>
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

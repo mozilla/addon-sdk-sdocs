@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -90,8 +90,8 @@ tabs.open({
 </code></pre>
 <p>Even then, you don't get direct access to any content hosted in the tab.</p>
 <p>To access tab content you need to attach a script to the tab
-using <code>tab.attach()</code>. This add-on attaches a script to all open
-tabs. The script adds a red border to the tab's document:</p>
+using <code>tab.attach()</code>. This add-on loads a page, then attaches a script to
+the page which adds a red border to it:</p>
 <pre><code>var tabs = require("tabs");
 tabs.open({
   url: "http://www.example.com",
@@ -220,9 +220,15 @@ function runScript(tab) {
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -248,6 +254,10 @@ function runScript(tab) {
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -267,6 +277,8 @@ function runScript(tab) {
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

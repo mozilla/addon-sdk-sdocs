@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -154,6 +154,25 @@ have problems getting your add-on approved on AMO.</p>
 secure, debug and review.</p>
 </div>
 
+<h3>Styling web pages</h3>
+<p>Sometimes adding a script to web pages is not enough, you also want to styling
+them. <code>PageMod</code> provides an easy way to do that through options' <code>contentStyle</code>
+and <code>contentStyleFile</code> properties:</p>
+<pre><code>var data = require("self").data;
+var pageMod = require("page-mod");
+
+pageMod.PageMod({
+  include: "*.org",
+
+  contentStyleFile: data.url("my-page-mod.css"),
+  contentStyle: [
+    "div { padding: 10px; border: 1px solid silver}",
+    "img { display: none}"
+  ]
+})
+</code></pre>
+<p>It's important to note that <code>PageMod</code> will add these styles as
+<a href="https://developer.mozilla.org/en/CSS/Getting_Started/Cascading_and_inheritance">user style sheet</a>.</p>
 <h2>Communicating With Content Scripts</h2>
 <p>When a matching page is loaded the <code>PageMod</code> will call the function that the
 add-on code supplied to <code>onAttach</code>. The <code>PageMod</code> supplies one argument to
@@ -387,6 +406,20 @@ fires</li>
 </div>
 
 <div class="api_component">
+<div class="api_name">[ contentStyleFile : <span class="datatype">string,array</span> ]</div>
+<p>The local file URLs of stylesheet to load. Content style specified by this
+option are loaded <em>before</em> those specified by the <code>contentStyle</code> option.
+Optional.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ contentStyle : <span class="datatype">string,array</span> ]</div>
+<p>The texts of stylesheet rules to add. Content styles specified by this
+option are loaded <em>after</em> those specified by the <code>contentStyleFile</code> option.
+Optional.</p>
+</div>
+
+<div class="api_component">
 <div class="api_name">[ onAttach : <span class="datatype">function</span> ]</div>
 <p>A function to call when the PageMod attaches content scripts to
 a matching page. The function will be called with one argument, a <code>worker</code>
@@ -409,7 +442,8 @@ attached to the page in question.</p>
 <h6 class="api_name">destroy()</h6>
 <p>Stops the page mod from making any more modifications.  Once destroyed the page
 mod can no longer be used.  Note that modifications already made to open pages
-will not be undone.</p>
+will not be undone, except for any stylesheet added by <code>contentStyle</code> or
+<code>contentStyleFile</code>, that are unregistered immediately.</p>
 </div>
 
 </div>
@@ -583,9 +617,15 @@ object.</p>
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -611,6 +651,10 @@ object.</p>
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -630,6 +674,8 @@ object.</p>
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

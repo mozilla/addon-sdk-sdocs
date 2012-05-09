@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -76,6 +76,9 @@ But it's extensible by design, so anyone can build and publish
 modules for add-on developers to use. Luckily, Erik Vold has written
 a <a href="https://github.com/erikvold/menuitems-jplib"><code>menuitems</code></a> package
 that enables us to add menu items.</p>
+<p>This tutorial does double-duty. It describes the general method for
+using an external, third-party package in your add-on, and it
+describes how to add a menu item using the <code>menuitems</code> package in particular.</p>
 <h2>Installing <code>menuitems</code></h2>
 <p>First we'll download <code>menuitems</code> from
 <a href="https://github.com/erikvold/menuitems-jplib/zipball/51080383cbb0fe2a05f8992a8aae890f4c014176">https://github.com/erikvold/menuitems-jplib</a>.</p>
@@ -156,8 +159,9 @@ be aware of:</p>
 <li>
 <p>our support for third party packages is still fairly immature. One
 consequence of this is that it's not always obvious where to find third-party
-packages, although some are collected in the
-<a href="https://wiki.mozilla.org/Jetpack/Modules">Jetpack Wiki</a></p>
+packages, although the
+<a href="https://github.com/mozilla/addon-sdk/wiki/Community-developed-modules">Community Developed Modules</a>
+page in the SDK's GitHub Wiki lists a number of packages.</p>
 </li>
 <li>
 <p>because third party modules typically use low-level APIs, they may be broken
@@ -275,9 +279,15 @@ by new releases of Firefox.</p>
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -303,6 +313,10 @@ by new releases of Firefox.</p>
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -322,6 +336,8 @@ by new releases of Firefox.</p>
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

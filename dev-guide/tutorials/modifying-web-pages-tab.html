@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -175,8 +175,13 @@ var widget = widgets.Widget({
   }
 });
 </code></pre>
-<p>The "drawBorder" message isn't a built-in message, it's one that this
+<p>The <code>drawBorder</code> message isn't a built-in message, it's one that this
 add-on defines in the <code>port.emit()</code> call.</p>
+<h2>Injecting CSS</h2>
+<p>Unlike the <a href="../../dev-guide/tutorials/modifying-web-pages-url.html"><code>page-mod</code></a> API,
+<code>tab.attach()</code> doesn't enable you to inject CSS directly into a page.</p>
+<p>To modify the style of a page you have to use JavaScript, as in
+the example above.</p>
 <h2>Learning More</h2>
 <p>To learn more about working with tabs in the SDK, see the
 <a href="../../dev-guide/tutorials/open-a-web-page.html">Open a Web Page</a>
@@ -296,9 +301,15 @@ tutorial, and the <a href="../../packages/addon-kit/tabs.html"><code>tabs</code>
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -324,6 +335,10 @@ tutorial, and the <a href="../../packages/addon-kit/tabs.html"><code>tabs</code>
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -343,6 +358,8 @@ tutorial, and the <a href="../../packages/addon-kit/tabs.html"><code>tabs</code>
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

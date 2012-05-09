@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -78,16 +78,17 @@
 
 <div class="api_component">
 <h4 class="api_name">Request</h4>
-<p>The <code>Request</code> object is used to make <code>GET</code> or <code>POST</code> network requests. It is
-constructed with a URL to which the request is sent. Optionally the user may
-specify a collection of headers and content to send alongside the request and
-a callback which will be executed once the request completes.</p>
+<p>The <code>Request</code> object is used to make <code>GET</code>, <code>POST</code> or <code>PUT</code> network requests.
+It is constructed with a URL to which the request is sent. Optionally the user
+may specify a collection of headers and content to send alongside the request
+and a callback which will be executed once the request completes.</p>
 <p>Once a <code>Request</code> object has been created a <code>GET</code> request can be executed by
-calling its <code>get()</code> method, or a <code>POST</code> request by calling its <code>post()</code> method.</p>
+calling its <code>get()</code> method, a <code>POST</code> request by calling its <code>post()</code> method,
+or a <code>PUT</code> request by calling its <code>put()</code> method.</p>
 <p>When the server completes the request, the <code>Request</code> object emits a "complete"
 event.  Registered event listeners are passed a <code>Response</code> object.</p>
-<p>Each <code>Request</code> object is designed to be used once. Once <code>GET</code> or <code>POST</code> are
-called, attempting to call either will throw an error.</p>
+<p>Each <code>Request</code> object is designed to be used once. Once <code>GET</code>, <code>POST</code> or <code>PUT</code>
+are called, attempting to call either will throw an error.</p>
 <p>Since the request is not being made by any particular website, requests made
 here are not subject to the same-domain restriction that requests made in web
 pages are subject to.</p>
@@ -156,8 +157,8 @@ URL-encoded (use <code>encodeURIComponent</code>). If <code>content</code> is an
 should be a collection of name/value pairs. Nested objects &amp; arrays should
 encode safely.</p>
 <p>For <code>GET</code> requests, the query string (<code>content</code>) will be appended to the
-URL. For <code>POST</code> requests, the query string will be sent as the body of the
-request.</p>
+URL. For <code>POST</code> and <code>PUT</code> requests, the query string will be sent as the body
+of the request.</p>
 </div>
 
 <div class="api_component">
@@ -211,6 +212,14 @@ quijote.get();
 <div class="api_component">
 <h6 class="api_name">post()</h6>
 <p>Make a <code>POST</code> request.</p>
+<div class="returns">Returns: <span class="datatype">Request</span>
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">put()</h6>
+<p>Make a <code>PUT</code> request.</p>
 <div class="returns">Returns: <span class="datatype">Request</span>
 </div>
 
@@ -272,7 +281,7 @@ response has been received.</p>
 <div class="api_component">
 <h4 class="api_name">Response</h4>
 <p>The Response object contains the response to a network request issued using a
-<code>Request</code> object. It is returned by the <code>get()</code> or <code>post()</code> method of a
+<code>Request</code> object. It is returned by the <code>get()</code>, <code>post()</code> or <code>put()</code> method of a
 <code>Request</code> object.</p>
 <p>All members of a <code>Response</code> object are read-only.</p>
 <div class="api_component_group">
@@ -430,9 +439,15 @@ if the document cannot be processed by <code>JSON.parse</code>.</p>
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -458,6 +473,10 @@ if the document cannot be processed by <code>JSON.parse</code>.</p>
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -477,6 +496,8 @@ if the document cannot be processed by <code>JSON.parse</code>.</p>
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -143,28 +143,83 @@ hello_string= Bonjour!
 </pre>
 
 <h2>Plurals</h2>
-<p>The <code>l10n</code> module has basic support for plural forms. The following
-<code>.properties</code> file includes separate localizations for the singular
-and plural form of "child":</p>
+<p>The <code>l10n</code> module supports plural forms. Different languages have
+different rules for the formation of plurals. For example,
+English has two forms: a singular form for "one", and a plural form
+for "everything else, including zero":</p>
 <pre>
-child_id[one]= one child
-child_id= %d children
+one tomato
+no tomatoes
+two tomatoes
 </pre>
 
-<p>To use it, list the count of the item after its identifier:</p>
+<p>But Russian has different forms for numbers ending in 1 (except 11),
+numbers ending in 2-4 (except 12-14) and other numbers:</p>
+<pre>
+один помидор     // one tomato
+два помидора     // two tomatoes
+пять помидоров   // five tomatoes
+</pre>
+
+<p>The SDK uses the <a href="http://cldr.unicode.org/index">Unicode CLDR</a> data
+to describe the different plural forms used by different languages.</p>
+<h3>Unicode CLDR Plural Forms</h3>
+<p>The Unicode CLDR project defines a scheme for describing a particular
+language's plural rules. In this scheme a language maps each distinct
+range of numbers on to one of up to six forms, identified by the
+following categories: <em>zero</em>, <em>one</em>, <em>two</em>, <em>few</em>, <em>many</em>, and <em>other</em>.</p>
+<p>English has two forms, which can be described by mapping "1" to "one"
+and "everything else" to "other":</p>
+<pre>
+one   → n is 1;
+other → everything else
+</pre>
+
+<p>Russian uses four forms, that can be described as follows:</p>
+<pre>
+one   → n mod 10 is 1 and n mod 100 is not 11;
+few   → n mod 10 in 2..4 and n mod 100 not in 12..14;
+many  → n mod 10 is 0 or n mod 10 in 5..9 or n mod 100 in 11..14;
+other → everything else
+</pre>
+
+<p>Plural rules for all languages can be found in the CLDR
+<a href="http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/language_plural_rules.html">Language Plural Rules</a>
+page (although this table is out of date compared to the
+<a href="http://unicode.org/repos/cldr/trunk/common/supplemental/plurals.xml">CLDR XML source</a>).</p>
+<h3>Plural Forms in the SDK</h3>
+<p>In the code, you supply an extra parameter alongside the identifier,
+describing how many items there are:</p>
 <pre><code>var _ = require("l10n").get;
-console.log(_("child_id", 1));
-console.log(_("child_id", 2));
+console.log(_("tomato_id"));
+console.log(_("tomato_id", 1));
+console.log(_("tomato_id", 2));
+console.log(_("tomato_id", 5));
+console.log(_("tomato_id", .5));
 </code></pre>
-<p>This will give the following output:</p>
+<p>In the <code>.properties</code> file for each language you can define a different
+localization for each plural form possible in that language, using the
+CLDR keywords. So in English we could have two plural localizations
+(note that the "other" category does <strong>not</strong> take the CLDR keyword):</p>
 <pre>
-info: one child
-info: 2 children
+# en-US translations
+tomato_id[one]= %d tomato
+tomato_id= %d tomatoes
 </pre>
 
-<p>At the moment <code>l10n</code> only distinguishes between two plural forms:
-"one", and "not one". So it doesn't support
-<a href="https://developer.mozilla.org/en/Localization_and_Plurals">languages which have different plural rules</a>.</p>
+<p>In Russian we could have four plural localizations:</p>
+<pre>
+# ru-RU translations
+tomato_id[one]= %d помидор
+tomato_id[few]= %d помидора
+tomato_id[many]= %d помидоров
+tomato_id= %d помидоры
+</pre>
+
+<p>The localization module itself understands the CLDR definitions for each
+language, enabling it to map between, for example, "2" in the code and
+"few" in the <code>ru-RU.properties</code> file. Then it retrieves and returns
+the localization appropriate for the count you supplied.</p>
 <h2>Placeholders</h2>
 <p>The <code>l10n</code> module supports placeholders, allowing you to
 insert a string which should not be localized into one which is.
@@ -230,6 +285,16 @@ home_town_id= %2s is %1s's home town.
 info: London is Bob's home town.
 </pre>
 
+<h2>Locale Updater</h2>
+<p>The <a href="https://github.com/downloads/ochameau/locale-updater/locale-updater.xpi">locale updater</a>
+add-on makes it easier to update locale files. Once you've installed it,
+open the Add-on Manager, and you'll see a see a new button labeled
+"Update l10n" next to each add-on you've installed:</p>
+<img src="../../static-files/media/screenshots/locale-updater.png" alt="Add-on manager with locale updater installed" class="align-center"/>
+
+<p>Click the button and you'll be prompted for a new <code>.properties</code> file
+for that add-on. If you provide a new file, the add-on's locale data
+will be updated with the new file.</p>
 <h2><a name="limitations">Limitations</a></h2>
 <p>The current localization support is a first step towards full support,
 and contains a number of limitations.</p>
@@ -256,13 +321,6 @@ strings that make up the locale files. In a future release we'll add
 a command to <code>cfx</code> that scans the add-on for localizable strings and
 builds a template <code>.properties</code> file listing all the strings that need
 to be translated.</p>
-</li>
-<li>
-<p>The algorithm used to find a matching locale is based on the
-<a href="http://mxr.mozilla.org/mozilla-central/source/chrome/src/nsChromeRegistryChrome.cpp#93">Firefox implementation</a>
-which is known to be sub-optimal for some locales. We're working on
-improving this in
-<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=711041">bug 711041</a>.</p>
 </li>
 </ul></div>
   </div>
@@ -376,9 +434,15 @@ improving this in
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -404,6 +468,10 @@ improving this in
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -423,6 +491,8 @@ improving this in
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

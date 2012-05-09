@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -113,6 +113,40 @@ method exported by the
 });
 
 panel.show();
+</code></pre>
+<h2>Updating Panel Content</h2>
+<p>You can update the panel's content simply by setting the panel's <code>contentURL</code>
+property.</p>
+<p>Here's an add-on that adds two widgets to the add-on bar, one which
+shows Google's mobile site and one which shows Bing's mobile site. The widgets
+share a panel object, and switch between the two sites by updating the panel's
+<code>contentURL</code> property:</p>
+<pre><code>var panel = require("panel").Panel({
+  contentURL: "about:blank",
+  onHide: function () {
+    panel.contentURL = "about:blank";
+  }
+});
+
+require("widget").Widget({
+  id: "bing",
+  label: "Bing",
+  contentURL: "http://www.bing.com/favicon.ico",
+  panel: panel,
+  onClick: function() {
+    panel.contentURL = "http://m.bing.com/";
+  }
+});
+
+require("widget").Widget({
+  id: "google",
+  label: "Google",
+  contentURL: "http://www.google.com/favicon.ico",
+  panel: panel,
+  onClick: function() {
+    panel.contentURL = "http://www.google.com/xhtml";
+  }
+});
 </code></pre>
 <h2>Scripting Panel Content</h2>
 <p>You can't directly access your panel's content from your main add-on code.
@@ -606,7 +640,9 @@ communicating using <code>port</code></a> for details.</p>
 
 <div class="api_component">
 <h6 class="api_name">contentURL : <span class="datatype">string</span></h6>
-<p>The URL of the content loaded in the panel.</p>
+<p>The URL of content loaded into the panel.  This can point to
+local content loaded from your add-on's "data" directory or remote content.
+Setting it updates the panel's content immediately.</p>
 </div>
 
 <div class="api_component">
@@ -819,9 +855,15 @@ object.</p>
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -847,6 +889,10 @@ object.</p>
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -866,6 +912,8 @@ object.</p>
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

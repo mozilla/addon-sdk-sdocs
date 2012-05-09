@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -68,6 +68,21 @@
 <p>If you're having trouble getting the Add-on SDK up and running, don't panic!
 This page lists some starting points that might help you track down your
 problem.</p>
+<h2>Quarantine Problem on Mac OS X</h2>
+<p>On Mac OS X, you might see the following error when you try to run <code>cfx</code>:</p>
+<pre>
+/path/to/sdk/bin/cfx: /usr/bin/env: bad interpreter: Operation not permitted
+</pre>
+
+<p>This might be because the <code>cfx</code> executable file has been placed in quarantine
+during download from the Internet.</p>
+<p>To get it out of quarantine, use the <code>xattr -d</code> command, specifying
+<code>com.apple.quarantine</code> as the name of the attribute to delete, and <code>cfx</code> as
+the file from which to delete that attribute:</p>
+<pre>
+xattr -d com.apple.quarantine /path/to/sdk/bin/cfx
+</pre>
+
 <h2>Check Your Python</h2>
 <p>The SDK's <code>cfx</code> tool runs on Python.  If you're having trouble getting <code>cfx</code> to
 run at all, make sure you have Python correctly installed.</p>
@@ -310,9 +325,15 @@ the project mailing list.  See the previous section for information on doing so.
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -338,6 +359,10 @@ the project mailing list.  See the previous section for information on doing so.
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -357,6 +382,8 @@ the project mailing list.  See the previous section for information on doing so.
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

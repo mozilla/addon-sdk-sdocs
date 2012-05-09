@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -63,7 +63,11 @@
     <div id="main-content">
 <div id="widget_module_api_docs" class="module_api_docs">
 <h1>widget</h1>
-<div class="module_description"><!-- contributed by Dietrich Ayala [dietrich@mozilla.com]  -->
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<!-- contributed by Dietrich Ayala [dietrich@mozilla.com]  -->
 <!-- contributed by Drew Willcoxon [adw@mozilla.com]  -->
 <!-- edited by Noelle Murata [fiveinchpixie@gmail.com]  -->
 
@@ -721,8 +725,8 @@ has no effect.</p>
 
 <div class="api_component">
 <h6 class="api_name">contentURL : <span class="datatype">string</span></h6>
-<p>The URL of content to load into the widget.  This can be
-<a href="../../dev-guide/guides/content-scripts/index.html">local content</a> or remote
+<p>The URL of content to load into the widget.  This can  point to
+local content loaded from your add-on's "data" directory or remote
 content, an image or web content.  Setting it updates the widget's appearance
 immediately.  However, if the widget was created using <code>content</code>, then this
 property is meaningless, and setting it has no effect.</p>
@@ -951,11 +955,11 @@ is meaningless, and setting it has no effect.</p>
 
 <div class="api_component">
 <h6 class="api_name">contentURL : <span class="datatype">string</span></h6>
-<p>The URL of content to load into the widget view.  This can be
-<a href="../../dev-guide/guides/content-scripts/index.html">local content</a> or remote
-content, an image or web content.  Setting it updates the widget view's
-appearance immediately.  However, if the widget view was created using
-<code>content</code>, then this property is meaningless, and setting it has no effect.</p>
+<p>The URL of content to load into the widget.  This can  point to
+local content loaded from your add-on's "data" directory or remote
+content, an image or web content.  Setting it updates the widget's appearance
+immediately.  However, if the widget was created using <code>content</code>, then this
+property is meaningless, and setting it has no effect.</p>
 </div>
 
 <div class="api_component">
@@ -1192,9 +1196,15 @@ from the content script. The message can be any
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -1220,6 +1230,10 @@ from the content script. The message can be any
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -1239,6 +1253,8 @@ from the content script. The message can be any
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

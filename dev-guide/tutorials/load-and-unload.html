@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -75,9 +75,9 @@ and learned the
 <p>Your add-on's <code>main.js</code> code is executed as soon as it is loaded. It is loaded
 when it is installed, when it is enabled, or when Firefox starts.</p>
 <p>If your add-on exports a function called <code>main()</code>, that function will be
-called immediately after main() will be invoked a moment after the overall
-<code>main.js</code> is evaluated, and after all top-level require() statements have
-run (so generally after all dependent modules have been loaded).</p>
+called immediately after the overall <code>main.js</code> is evaluated, and after all
+top-level <code>require()</code> statements have run (so generally after all dependent
+modules have been loaded).</p>
 <pre><code>exports.main = function (options, callbacks) {};
 </code></pre>
 <p><code>options</code> is an object describing the parameters with which your add-on was
@@ -125,13 +125,13 @@ and will therefore be used whenever the program in the XPI is run.`</p>
 will be called when the add-on is unloaded.</p>
 <pre><code>exports.onUnload = function (reason) {};
 </code></pre>
-<p><span class="aside">
-Note that if your add-on is unloaded with reason <code>disable</code>, it will not be
-notified about <code>uninstall</code> while it is disabled: see
-bug <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=571049">571049</a>.
-</span></p>
 <p><code>reason</code> is one of the following strings describing the reason your add-on was
 unloaded:</p>
+<p><span class="aside">But note that due to
+<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=627432">bug 627432</a>,
+your <code>onUnload</code> listener will never be called with <code>uninstall</code>: it
+will only be called with <code>disable</code>. See in particular
+<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=627432#c12">comment 12 on that bug</a>.</span></p>
 <pre>
 uninstall
 disable
@@ -255,9 +255,15 @@ you won't get access to the <code>options</code> or <code>callbacks</code> argum
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -283,6 +289,10 @@ you won't get access to the <code>options</code> or <code>callbacks</code> argum
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -302,6 +312,8 @@ you won't get access to the <code>options</code> or <code>callbacks</code> argum
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 

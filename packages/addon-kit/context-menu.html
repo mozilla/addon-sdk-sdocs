@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.6</div>
+    <div id="version">Version 1.7</div>
   </div>
 </div>
 
@@ -218,9 +218,10 @@ script.  In that case, the declarative contexts are evaluated first.  If they
 are not current, then your context listener is never called.</p>
 <p>This example takes advantage of that fact.  The listener can be assured that
 <code>node</code> will always be an image:</p>
-<pre><code>require("context-menu").Item({
+<pre><code>var cm = require("context-menu");
+cm.Item({
   label: "A Mozilla Image",
-  context: contextMenu.SelectorContext("img"),
+  context: cm.SelectorContext("img"),
   contentScript: 'self.on("context", function (node) {' +
                  '  return /mozilla/.test(node.src);' +
                  '});'
@@ -266,9 +267,10 @@ associated with the content script, the content script can call the
 <code>postMessage</code> function attached to the global <code>self</code> object, passing it some
 JSON-able data.  The menu item's <code>"message"</code> event listener will be called with
 that data.</p>
-<pre><code>require("context-menu").Item({
+<pre><code>var cm = require("context-menu");
+cm.Item({
   label: "Edit Image",
-  context: contextMenu.SelectorContext("img"),
+  context: cm.SelectorContext("img"),
   contentScript: 'self.on("click", function (node, data) {' +
                  '  self.postMessage(node.src);' +
                  '});',
@@ -347,9 +349,10 @@ part of the page:</p>
 });
 </code></pre>
 <p>Show an "Edit Image" item when the menu is invoked on an image:</p>
-<pre><code>require("context-menu").Item({
+<pre><code>var cm = require("context-menu");
+cm.Item({
   label: "Edit Image",
-  context: contextMenu.SelectorContext("img"),
+  context: cm.SelectorContext("img"),
   contentScript: 'self.on("click", function (node, data) {' +
                  '  self.postMessage(node.src);' +
                  '});',
@@ -376,10 +379,11 @@ cm.Item({
 });
 </code></pre>
 <p>Show an "Edit Page Images" item when the page contains at least one image:</p>
-<pre><code>require("context-menu").Item({
+<pre><code>var cm = require("context-menu");
+cm.Item({
   label: "Edit Page Images",
   // This ensures the item only appears during the page context.
-  context: contextMenu.PageContext(),
+  context: cm.PageContext(),
   contentScript: 'self.on("context", function (node) {' +
                  '  var pageHasImgs = !!document.querySelector("img");' +
                  '  return pageHasImgs;' +
@@ -409,7 +413,7 @@ var wikipediaItem = cm.Item({
 });
 var searchMenu = cm.Menu({
   label: "Search With",
-  context: contextMenu.SelectorContext("a[href]"),
+  context: cm.SelectorContext("a[href]"),
   contentScript: 'self.on("click", function (node, data) {' +
                  '  var searchURL = data + node.textContent;' +
                  '  window.location.href = searchURL;' +
@@ -1018,9 +1022,15 @@ match pattern strings.</p>
 
 <a href="../../packages/api-utils/errors.html">errors</a>
 
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
 <a href="../../packages/api-utils/events.html">events</a>
 
 <a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
 
@@ -1046,6 +1056,10 @@ match pattern strings.</p>
 
 <a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
 
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
 <a href="../../packages/api-utils/runtime.html">runtime</a>
 
 <a href="../../packages/api-utils/sandbox.html">sandbox</a>
@@ -1065,6 +1079,8 @@ match pattern strings.</p>
 <a href="../../packages/api-utils/url.html">url</a>
 
 <a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
 
 <a href="../../packages/api-utils/window-utils.html">window-utils</a>
 
