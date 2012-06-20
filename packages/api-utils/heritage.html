@@ -26,7 +26,7 @@
   <![endif]-->
 
   <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
-  <title>base - Add-on SDK Documentation</title>
+  <title>heritage - Add-on SDK Documentation</title>
 </head>
 <body>
 
@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.7</div>
+    <div id="version">Version 1.8</div>
   </div>
 </div>
 
@@ -61,17 +61,17 @@
   <div id="main-content-column" class="column">
     <div id="toc"></div>
     <div id="main-content">
-<div id="base_module_api_docs" class="module_api_docs">
-<h1>base</h1>
+<div id="heritage_module_api_docs" class="module_api_docs">
+<h1>heritage</h1>
 <div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<h3>Inheritance</h3>
+<h1>Inheritance</h1>
 <p>Doing <a href="https://developer.mozilla.org/en/Introduction_to_Object-Oriented_JavaScript">inheritance in JavaScript</a>
-is both verbose and painful. Reading or writing such code requires requires
-sharp eye and lot's of discipline, mainly due to code fragmentation and lots of
-machinery exposed:</p>
+is both verbose and painful. Reading or writing such code requires sharp eye
+and lot's of discipline, mainly due to code fragmentation and lots of machinery
+being exposed:</p>
 <pre><code>// Defining a simple Class
 function Dog(name) {
   // Classes are for creating instances, calling them without `new` changes
@@ -107,38 +107,23 @@ Pet.prototype.call = function(name) {
   return this.name === name ? this.bark() : '';
 };
 </code></pre>
-<p>An "exemplar" is a factory for instances. Usually exemplars are defined as
-(constructor) functions as in examples above. But that does not necessary has
-to be the case. Prototype (object) can form far more simpler exemplars. After
-all what could be more object oriented than objects that inherit from objects.</p>
-<pre><code>var Dog = {
-  new: function(name) {
-    var instance = Object.create(this);
-    this.initialize.apply(instance, arguments);
-    return instance;
-  },
-  initialize: function initialize(name) {
-    this.name = name;
-  },
-  type: 'dog',
-  bark: function bark() {
-    return 'Ruff! Ruff!'
-  }
-};
-var fluffy = Dog.new('fluffy');
-
-var Pet = Object.create(Dog);
-Pet.initialize = function initialize(name, breed) {
-  Dog.initialize.call(this, name);
-  this.breed = breed;
-};
-Pet.call = function call(name) {
-  return this.name === name ? this.bark() : '';
-};
+<p>Since SDK APIs may be interacting with untrusted code an extra security
+measures are required to guarantee that documented behavior can't be changed
+at runtime. To do that we need to freeze constructor's prototype chain to
+make sure functions are frozen:</p>
+<pre><code>Object.freeze(Dog.prototype);
+Object.freeze(Pet.prototype);
 </code></pre>
-<p>While this small trick solves some readability issues, there are still more. To
-address them this module exports <code>Base</code> exemplar with few methods predefined:</p>
-<pre><code>var Dog = Base.extend({
+<p><em>Note: Also, this is not quite enough as <code>Object.prototype</code> stays mutable &amp;
+in fact we do little bit more in SDK to address that, but it's not in the scope
+of this documentation.</em></p>
+<p>Doing all of this manually is both tedious and error prone task. That is why
+SDK provides utility functions to make it more declarative and less verbose.</p>
+<h2>Class</h2>
+<p>Module exports <code>Class</code> utility function for making <code>constructor</code> functions
+with a proper <code>prototype</code> chain setup in declarative manner:</p>
+<pre><code>var { Class } = require('api-utils/heritage');
+var Dog = Class({
   initialize: function initialize(name) {
     this.name = name;
   },
@@ -147,118 +132,191 @@ address them this module exports <code>Base</code> exemplar with few methods pre
     return 'Ruff! Ruff!'
   }
 });
-
-var Pet = Dog.extend({
-  initialize: function initialize(name, breed) {
-    Dog.initialize.call(this, name);
+</code></pre>
+<p>Note: We use term <code>Class</code> to refer an exemplar constructs in a form of
+constructor functions with a proper prototype chain setup. Constructors
+created using <code>Class</code> function don't require <code>new</code> keyword (even though
+it can be used) for instantiation. Also, idiomatic SDK code does not uses
+optional <code>new</code> keywords, but you're free to use it in your add-on code:</p>
+<pre><code>var fluffy = Dog('Fluffy');   // instatiation
+fluffy instanceof Dog         // =&gt; true
+fluffy instanceof Class       // =&gt; true
+</code></pre>
+<p>As you could notice from example above classes created via <code>Class</code> function
+by default inherits from a <code>Class</code> itself. Also you could specify which class
+you want to inherit from by passing special <code>extends</code> property:</p>
+<pre><code>var Pet = Class({
+  extends: Dog,              // should inherit from Dog
+  initialize: function initialize(breed, name) {
+    // To call ancestor methods you will have to access them
+    // explicitly
+    Dog.prototype.initialize.call(this, name);
     this.breed = breed;
   },
-  function call(name) {
+  call: function call(name) {
     return this.name === name ? this.bark() : '';
   }
 });
 
-var fluffy = Dog.new('fluffy');
-dog.bark();                       // 'Ruff! Ruff!'
-Dog.isPrototypeOf(fluffy);        // true
-Pet.isPrototypeOf(fluffy);        // true
+var tsuga = Pet('Labrador', 'Tsuga');
+tsuga instanceof Pet                    // =&gt; true
+tsuga instanceof Dog                    // =&gt; true
+tsuga.call('Tsuga')                     // =&gt; 'Ruff! Ruff!'
 </code></pre>
-<h3>Composition</h3>
-<p>Even though (single) inheritance is very powerful it's not always enough.
-Sometimes it's more useful suitable to define reusable pieces of functionality
-and then compose bigger pieces out of them:</p>
-<pre><code>var HEX = Base.extend({
+<p>Please note that <code>Class</code> is just an utility function which we use in SDK, and
+recommend our users to use it, but it's in no way enforced. As a matter of fact
+since result is just a plain constructor function with proper prototype chain
+setup you could sub-class it as any other constructor:</p>
+<pre><code>function Labrador() {
+  // ...
+}
+Labrador.prototype = Object.create(Dog.prototype);
+Labrador.prototype.jump = function() {
+  // ...
+}
+
+var leo = new Labrador()
+leo.bark();                           // =&gt; 'Ruff! Ruff!'
+leo.instanceof Labrador               // =&gt; true
+leo.instanceof Dog                    // =&gt; true
+</code></pre>
+<p>Also, you could use <code>Class</code> function to subclass constructor functions that
+were not created by a <code>Class</code> itself:</p>
+<pre><code>var Foo = Class({
+  extends: Labrador
+  // ...
+})
+</code></pre>
+<p>Sometimes (single) inheritance is not enough and defining reusable, composable
+pieces of functionality does a better job:</p>
+<pre><code>var HEX = Class({
   hex: function hex() {
-    return '#' + this.color
-  }
-})
-
-var RGB = Base.extend({
-  red: function red() {
-    return parseInt(this.color.substr(0, 2), 16)
-  },
-  green: function green() {
-    return parseInt(this.color.substr(2, 2), 16)
-  },
-  blue: function blue() {
-    return parseInt(this.color.substr(4, 2), 16)
-  }
-})
-
-var CMYK = Base.extend(RGB, {
-  black: function black() {
-    var color = Math.max(Math.max(this.red(), this.green()), this.blue())
-    return (1 - color / 255).toFixed(4)
-  },
-  magenta: function magenta() {
-    var K = this.black();
-    return (((1 - this.green() / 255).toFixed(4) - K) / (1 - K)).toFixed(4)
-  },
-  yellow: function yellow() {
-    var K = this.black();
-    return (((1 - this.blue() / 255).toFixed(4) - K) / (1 - K)).toFixed(4)
-  },
-  cyan: function cyan() {
-    var K = this.black();
-    return (((1 - this.red() / 255).toFixed(4) - K) / (1 - K)).toFixed(4)
-  }
-})
-
-// Composing `Color` prototype out of reusable components:
-var Color = Base.extend(HEX, RGB, CMYK, {
-  initialize: function initialize(color) {
-    this.color = color
-  }
-})
-
-var pink = Color.new('FFC0CB')
-// RGB
-pink.red()        // 255
-pink.green()      // 192
-pink.blue()       // 203
-
-// CMYK
-pink.magenta()    // 0.2471
-pink.yellow()     // 0.2039
-pink.cyan()       // 0.0000
-</code></pre>
-<h3>Combining composition &amp; inheritance</h3>
-<p>Also it's easy to mix composition with inheritance:</p>
-<pre><code>var Pixel = Color.extend({
-  initialize: function initialize(x, y, color) {
-    Color.initialize.call(this, color)
-    this.x = x
-    this.y = y
-  },
-  toString: function toString() {
-    return this.x + ':' + this.y + '@' + this.hex()
+    return '#' + this.color;
   }
 });
 
-var pixel = Pixel.new(11, 23, 'CC3399');
-pixel.toString()              // 11:23@#CC3399
-Pixel.isPrototypeOf(pixel)    // true
+var RGB = Class({
+  red: function red() {
+    return parseInt(this.color.substr(0, 2), 16);
+  },
+  green: function green() {
+    return parseInt(this.color.substr(2, 2), 16);
+  },
+  blue: function blue() {
+    return parseInt(this.color.substr(4, 2), 16);
+  }
+});
 
-// Pixel instances inhertis from `Color`
-Color.isPrototypeOf(pixel);   // true
-
-// In fact `Pixel` itself inherits from `Color`, remember just simple and
-// pure prototypal inheritance where object inherit from objects.
-Color.isPrototypeOf(Pixel);   // true
+var CMYK = Class({
+  black: function black() {
+    var color = Math.max(Math.max(this.red(), this.green()), this.blue());
+    return (1 - color / 255).toFixed(4);
+  },
+  magenta: function magenta() {
+    var K = this.black();
+    return (((1 - this.green() / 255).toFixed(4) - K) / (1 - K)).toFixed(4);
+  },
+  yellow: function yellow() {
+    var K = this.black();
+    return (((1 - this.blue() / 255).toFixed(4) - K) / (1 - K)).toFixed(4);
+  },
+  cyan: function cyan() {
+    var K = this.black();
+    return (((1 - this.red() / 255).toFixed(4) - K) / (1 - K)).toFixed(4);
+  }
+});
 </code></pre>
-<h3>Classes</h3>
-<p>Module exports <code>Class</code> function. <code>Class</code> takes argument of exemplar object
-extending <code>Base</code> and returns <code>constructor</code> function that can be used for
-simulating classes defined by given exemplar.</p>
-<pre><code>var CPixel = Class(Pixel);
-var pixel = CPixel(11, 12, '000000');
-pixel instanceof CPixel     // true
-Pixel.prototypeOf(pixel);   // true
+<p>Such composable pieces can be combined into a single class definition by
+passing special <code>implements</code> option to a <code>Class</code> function:</p>
+<pre><code>// Composing `Color` prototype out of reusable components:
+var Color = Class({
+  implements: [ HEX, RGB, CMYK ],
+  initialize: function initialize(color) {
+    this.color = color;
+  }
+});
 
-// Use of `new` is optional, but possible.
-var p2 = CPixel(17, 2, 'cccccc');
-p2 instanceof CPixel      // true
-p2.prototypeOf(pixel);    // true
+var pink = Color('FFC0CB');
+
+// RGB
+pink.red()                  // =&gt; 255
+pink.green()                // =&gt; 192
+pink.blue()                 // =&gt; 203
+
+// CMYK
+pink.magenta()              // =&gt; 0.2471
+pink.yellow()               // =&gt; 0.2039
+pink.cyan()                 // =&gt; 0.0000
+
+pink instanceof Color       // =&gt; true
+</code></pre>
+<p>Be aware though that it's not multiple inheritance and ancestors prototypes of
+the classes passed under <code>implements</code> option are ignored. As mentioned before
+you could pass constructors that were not created using <code>Class</code> function as
+long as they have proper <code>prototype</code> setup.</p>
+<p>Also you can mix inheritance and composition together if necessary:</p>
+<pre><code>var Point = Class({
+  initialize: function initialize(x, y) {
+    this.x = x;
+    this.y = y;
+  },
+  toString: function toString() {
+    return this.x + ':' + this.y;
+  }
+})
+
+var Pixel = Class({
+  extends: Point,
+  implements: [ Color ],
+  initialize: function initialize(x, y, color) {
+    Color.prototype.initialize.call(this, color);
+    Point.prototype.initialize.call(this, x, y);
+  },
+  toString: function toString() {
+    return this.hex() + '@' + Point.prototype.toString.call(this)
+  }
+});
+
+var pixel = Pixel(11, 23, 'CC3399');
+pixel.toString();                     // =&gt; #CC3399@11:23
+pixel instanceof Pixel                // =&gt; true
+pixel instanceof Point                // =&gt; true
+</code></pre>
+<h2>extend</h2>
+<p>Module exports <code>extend</code> utility function, that is useful for creating objects
+that inherit from other objects, without associated classes. It's very similar
+to <code>Object.create</code>, only difference is that second argument is an object
+containing properties to be defined, instead of property descriptor map. Also,
+keep in mind that returned object will be frozen.</p>
+<pre><code>var { extend } = require('api-utils/heritage');
+var base = { a: 1 };
+var derived = extend(base, { b: 2 });
+
+derived.a                         // =&gt; 1
+derived.b                         // =&gt; 2
+base.isPrototypeOf(derived)       // =&gt; true
+</code></pre>
+<h2>mix</h2>
+<p>Module exports <code>mix</code> utility function that is useful for mixing properties of
+multiple objects into a single one. Function takes arbitrary number of source
+objects and returns a fresh object that inherits from the same prototype as a
+first one and implements all own properties of all given objects. If two or
+more argument objects have own properties with the same name, the property is
+overridden, with precedence from right to left, implying, that properties of
+the object on the left are overridden by a same named property of the object
+on the right.</p>
+<pre><code>var { mix } = require('api-utils/heritage');
+var object = mix({ a: 1, b: 1 }, { b: 2 }, { c: 3 });
+JSON.stringify(object)            // =&gt; { "a": 1, "b": 2, "c": 3 }
+</code></pre>
+<h2>obscure</h2>
+<p>Module exports <code>obscure</code> utility function that is useful for defining
+<code>non-enumerable</code> properties. Function takes an object and returns a new one
+in return that inherits from the same object as given one and implements all
+own properties of given object but as non-enumerable ones:</p>
+<pre><code>var { obscure } = require('api-utils/heritage');
+var object = mix({ a: 1 }, obscure({ b: 2 }));
+Object.getOwnPropertyNames(foo);    // =&gt; [ 'a' ]
 </code></pre>
 </div>
 
@@ -298,11 +356,15 @@ p2.prototypeOf(pixel);    // true
 <a href="../../packages/addon-kit/index.html">addon-kit</a>
 </h4>
 
+<a href="../../packages/addon-kit/addon-page.html">addon-page</a>
+
 <a href="../../packages/addon-kit/clipboard.html">clipboard</a>
 
 <a href="../../packages/addon-kit/context-menu.html">context-menu</a>
 
 <a href="../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../packages/addon-kit/l10n.html">l10n</a>
 
 <a href="../../packages/addon-kit/notifications.html">notifications</a>
 
@@ -351,8 +413,6 @@ p2.prototypeOf(pixel);    // true
 
 <a href="../../packages/api-utils/app-strings.html">app-strings</a>
 
-<a href="../../packages/api-utils/base.html">base</a>
-
 <a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../packages/api-utils/collection.html">collection</a>
@@ -386,6 +446,8 @@ p2.prototypeOf(pixel);    // true
 <a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
 
 <a href="../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../packages/api-utils/heritage.html">heritage</a>
 
 <a href="../../packages/api-utils/hidden-frame.html">hidden-frame</a>
 

@@ -26,7 +26,7 @@
   <![endif]-->
 
   <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
-  <title>environment - Add-on SDK Documentation</title>
+  <title>l10n - Add-on SDK Documentation</title>
 </head>
 <body>
 
@@ -61,44 +61,121 @@
   <div id="main-content-column" class="column">
     <div id="toc"></div>
     <div id="main-content">
-<div id="environment_module_api_docs" class="module_api_docs">
-<h1>environment</h1>
+<div id="l10n_module_api_docs" class="module_api_docs">
+<h1>l10n</h1>
 <div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<p>Module provides API to access, set and unset environment variables via exported
-<code>env</code> object.</p>
-<pre><code>var { env } = require('api-utils/environment');
+<p>The <code>l10n</code> module enables add-ons to localize strings appearing in the
+add-on's JavaScript code.</p>
+<p>To learn how to use this module to write localizable code, read the
+<a href="../../dev-guide/tutorials/l10n.html">Localization tutorial</a>.</p>
+<p>Note that you can't currently use localize strings appearing in content
+scripts or HTML files.</p>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">get(identifier, count, placeholder1...n)</h4>
+<p>This function takes a string parameter which it uses as an identifier
+  to look up and return a localized string in the locale currently set for
+  Firefox. Localized strings are supplied by the add-on developer in
+  <a href="http://en.wikipedia.org/wiki/.properties"><code>.properties</code></a> files
+  stored in the add-ons "locale" directory.</p>
+<p>The <a href="https://www.gnu.org/software/gettext/gettext.html">gettext</a> tools
+  uses "_" for the name of the function that retrieves localized strings.
+  For compatibility with tools that expect this syntax, you can assign
+  this function to "_":</p>
+<pre><code>var _ = require("l10n").get;
 </code></pre>
-<p>You can get the value of an environment variable, by accessing property that
-has name of desired variable:</p>
-<pre><code>var PATH = env.PATH;
+<p>Given a <code>.properties</code> file for the current locale containing
+  an entry like:</p>
+<pre>
+hello_string= Hello!
+</pre>
+
+<p>and the following code:</p>
+<pre><code>var _ = require("l10n").get;
+console.log(_("hello_string"));
 </code></pre>
-<p>You can check existence of an environment variable by checking if property with
-such variable name exists:</p>
-<pre><code>console.log('PATH' in env); // true
-console.log('FOO' in env);  // false
+<p>the following output will be logged:</p>
+<pre>
+info: Hello!
+</pre>
+
+<p>If this function can't find the string referenced by the identifier
+  parameter, it returns the identifier itself. This enables you to write
+  functional, localizable code without localizing any strings - just make
+  the identifiers the default language:</p>
+<pre><code>var _ = require("l10n").get;
+console.log(_("Hello!"));
 </code></pre>
-<p>You can set value of an environment variable by setting a property:</p>
-<pre><code>env.FOO = 'foo';
-env.PATH += ':/my/path/'
+<p>However, this will make it more difficult to maintain your code if you
+  have many localizations, because any changes to the identifier values
+  break all your <code>.properties</code> files.</p>
+<p>If you're supplying different localizations for a string depending on
+  the number of items (that is, whether to use a singular or plural form)
+  then <code>get()</code> takes a second integer parameter which indicates the
+  number of items there are.</p>
+<p>You can supply one or more placeholders to <code>get()</code>, which are strings,
+  such as proper names, that should not be translated themselves but instead
+  should be inserted into the translated string.</p>
+<p>You can't use plurals and placeholders in the same expression: if you do,
+  the placeholders will be ignored.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">identifier : <span class="datatype">string</span></div>
+<p>A identifier for the localization of a particular string in the current
+locale.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ count : <span class="datatype">integer</span> ]</div>
+<p>Optional parameter.
+If you're supplying different localizations for a string for singular or
+plural forms, this parameter is the number of items there are in this
+case.</p>
+<pre><code>var _ = require("l10n").get;
+console.log(_("child_id", 1));
+console.log(_("child_id", 2));
 </code></pre>
-<p>You can unset environment variable by deleting a property:</p>
-<pre><code>delete env.FOO;
+<p>See the tutorial on <a href="../../dev-guide/tutorials/l10n.html#Plurals">plural support</a>
+for more information.</p>
+<p>Note that if you use this parameter, you can't supply any placeholders.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ placeholder1...n : <span class="datatype">string</span> ]</div>
+<p>Optional parameters.
+If you do not include the count parameter, you can supply one or
+more placeholder strings that are to be inserted into the translated
+string at locations defined by the translator.</p>
+<p>If you supply multiple placeholders, each one is a separate string
+parameter.</p>
+<pre><code>var _ = require("l10n").get;
+console.log(_("home_town", "Alan", "Norwich"));
 </code></pre>
-<h2>Limitations</h2>
-<p>There is no way to enumerate existing environment variables, also <code>env</code>
-won't have any enumerable properties:</p>
-<pre><code>console.log(Object.keys(env)); // []
-</code></pre>
-<p>Environment variable will be unset, show up as non-existing if it's set
-to <code>null</code>, <code>undefined</code> or <code>''</code>.</p>
-<pre><code>env.FOO = null;
-console.log('FOO' in env);  // false
-env.BAR = '';
-console.log(env.BAR);       // undefined
-</code></pre>
+<p>See the tutorial on
+<a href="../../dev-guide/tutorials/l10n.html#Placeholders">placeholder support</a> for more
+information.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">string</span><p>The localized string referenced by the identifier parameter passed in, or
+the identifier itself if no referent for the identifier can be found.</p>
+</div>
+
+</div>
+
+</div>
+
 </div>
 
 </div>

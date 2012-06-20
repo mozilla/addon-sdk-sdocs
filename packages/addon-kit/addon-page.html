@@ -26,7 +26,7 @@
   <![endif]-->
 
   <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
-  <title>environment - Add-on SDK Documentation</title>
+  <title>addon-page - Add-on SDK Documentation</title>
 </head>
 <body>
 
@@ -61,44 +61,40 @@
   <div id="main-content-column" class="column">
     <div id="toc"></div>
     <div id="main-content">
-<div id="environment_module_api_docs" class="module_api_docs">
-<h1>environment</h1>
+<div id="addon-page_module_api_docs" class="module_api_docs">
+<h1>addon-page</h1>
 <div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<p>Module provides API to access, set and unset environment variables via exported
-<code>env</code> object.</p>
-<pre><code>var { env } = require('api-utils/environment');
+<div class="experimental">
+
+<p><strong>This is currently an experimental API, so we might change it
+in future releases. In particular, we might make this the default
+style for certain pages loaded from "data".</strong></p>
+<p>With the Add-on SDK you can present information to the user,
+such as a guide to using your add-on, in a browser tab.
+You can supply the content in an HTML file in your add-on's
+"data" directory.</p>
+<p>For pages like this, navigational elements such as the
+<a href="http://support.mozilla.org/en-US/kb/Location%20bar%20autocomplete">Awesome Bar</a>,
+<a href="http://support.mozilla.org/en-US/kb/Search%20bar">Search Bar</a>, or
+<a href="http://support.mozilla.org/en-US/kb/Bookmarks%20Toolbar">Bookmarks Toolbar</a>
+are not usually relevant and distract from the content
+you are presenting. The <code>addon-page</code> module provides a simple
+way to have a page which excludes these elements.</p>
+<p>To use the module import it using <code>require()</code>. After this,
+the page loaded from "data/index.html" will not contain
+navigational elements:</p>
+<pre><code>var addontab = require("addon-page");
+var data = require("self").data;
+
+require("tabs").open(data.url("index.html"));
 </code></pre>
-<p>You can get the value of an environment variable, by accessing property that
-has name of desired variable:</p>
-<pre><code>var PATH = env.PATH;
-</code></pre>
-<p>You can check existence of an environment variable by checking if property with
-such variable name exists:</p>
-<pre><code>console.log('PATH' in env); // true
-console.log('FOO' in env);  // false
-</code></pre>
-<p>You can set value of an environment variable by setting a property:</p>
-<pre><code>env.FOO = 'foo';
-env.PATH += ':/my/path/'
-</code></pre>
-<p>You can unset environment variable by deleting a property:</p>
-<pre><code>delete env.FOO;
-</code></pre>
-<h2>Limitations</h2>
-<p>There is no way to enumerate existing environment variables, also <code>env</code>
-won't have any enumerable properties:</p>
-<pre><code>console.log(Object.keys(env)); // []
-</code></pre>
-<p>Environment variable will be unset, show up as non-existing if it's set
-to <code>null</code>, <code>undefined</code> or <code>''</code>.</p>
-<pre><code>env.FOO = null;
-console.log('FOO' in env);  // false
-env.BAR = '';
-console.log(env.BAR);       // undefined
-</code></pre>
+<p><img src="../../static-files/media/screenshots/addon-page.png" alt="Example add-on page" class="image-center"/>
+This only affects the page at "data/index.html":
+all other pages are displayed normally.</p>
+</div>
 </div>
 
 </div>
