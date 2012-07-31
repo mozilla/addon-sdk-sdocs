@@ -26,7 +26,7 @@
   <![endif]-->
 
   <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
-  <title>Displaying Annotations - Add-on SDK Documentation</title>
+  <title>assert - Add-on SDK Documentation</title>
 </head>
 <body>
 
@@ -60,190 +60,387 @@
 
   <div id="main-content-column" class="column">
     <div id="toc"></div>
-    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+    <div id="main-content">
+<div id="assert_module_api_docs" class="module_api_docs">
+<h1>assert</h1>
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<h1>Displaying Annotations</h1>
-<p>In this chapter we'll use a page-mod to locate elements of web pages that have
-annotations associated with them, and a panel to display the annotations.</p>
-<h2>Matcher page-mod</h2>
-<h3>Matcher Content Script</h3>
-<p>The content script for the matcher page-mod is initialized with a list
-of all the annotations that the user has created.</p>
-<p>When a page is loaded the matcher searches the DOM for elements that match
-annotations. If it finds any it binds functions to that element's
-<a href="http://api.jquery.com/mouseenter/">mouseenter</a> and
-<a href="http://api.jquery.com/mouseleave/">mouseleave</a> events to send messages to the
-<code>main</code> module, asking it to show or hide the annotation.</p>
-<p>Like the selector, the matcher also listens for the window's <code>unload</code> event
-and on unload sends a <code>detach</code> message to the <code>main</code> module, so the add-on
-can clean it up.</p>
-<p>The complete content script is here:</p>
-<pre><code>self.on('message', function onMessage(annotations) {
-  annotations.forEach(
-    function(annotation) {
-      if(annotation.url == document.location.toString()) {
-        createAnchor(annotation);
-      }
-  });
+<p>The <code>assert</code> module implements the <code>assert</code> interface defined in
+the <a href="http://wiki.commonjs.org/wiki/Unit_Testing/1.1">CommonJS Unit Testing specification version 1.1</a>.</p>
+<p>To use the <code>assert</code> module, write a set of
+unit tests following the instructions in the
+<a href="../../../dev-guide/tutorials/unit-testing.html">unit testing tutorial</a>.
+Each test will be passed an <code>Assert</code> object when you run the tests using
+<a href="file:///Users/Work/mozilla/jetpack-sdk/doc/dev-guide/cfx-tool.html#cfx_test"><code>cfx test</code></a>.
+You can use this object to make assertions about your program's state.</p>
+<p>For example:</p>
+<pre><code>var a = 1;
 
-  $('.annotated').css('border', 'solid 3px yellow');
-
-  $('.annotated').bind('mouseenter', function(event) {
-    self.port.emit('show', $(this).attr('annotation'));
-    event.stopPropagation();
-    event.preventDefault();
-  });
-
-  $('.annotated').bind('mouseleave', function() {
-    self.port.emit('hide');
-  });
-});
-
-function createAnchor(annotation) {
-  annotationAnchorAncestor = $('#' + annotation.ancestorId);
-  annotationAnchor = $(annotationAnchorAncestor).parent().find(
-                     ':contains(' + annotation.anchorText + ')').last();
-  $(annotationAnchor).addClass('annotated');
-  $(annotationAnchor).attr('annotation', annotation.annotationText);
+exports["test value of a"] = function(assert) {
+  assert.ok(a == 1, "test that a is 1");
 }
+
+require("test").run(exports);
 </code></pre>
-<p>Save this in <code>data</code> as <code>matcher.js</code>.</p>
-<h3>Updating main.js</h3>
-<p>First, initialize an array to hold workers associated with the matcher's
-content scripts:</p>
-<pre><code>var matchers = [];
-</code></pre>
-<p>In the <code>main</code> function, add the code to create the matcher:</p>
-<pre><code>var matcher = pageMod.PageMod({
-  include: ['*'],
-  contentScriptWhen: 'ready',
-  contentScriptFile: [data.url('jquery-1.4.2.min.js'),
-                      data.url('matcher.js')],
-  onAttach: function(worker) {
-    if(simpleStorage.storage.annotations) {
-      worker.postMessage(simpleStorage.storage.annotations);
-    }
-    worker.port.on('show', function(data) {
-      annotation.content = data;
-      annotation.show();
-    });
-    worker.port.on('hide', function() {
-      annotation.content = null;
-      annotation.hide();
-    });
-    worker.on('detach', function () {
-      detachWorker(this, matchers);
-    });
-    matchers.push(worker);
-  }
-});
-</code></pre>
-<p>When a new page is loaded the function assigned to <code>onAttach</code> is called. This
-function:</p>
-<ul>
-<li>initializes the content script instance with the current set of
-annotations</li>
-<li>provides a handler for messages from that content script, handling the three
-messages - <code>show</code>, <code>hide</code> and <code>detach</code> - that the content script might send</li>
-<li>adds the worker to an array, so we it can send messages back later.</li>
-</ul>
-<p>Then in the module's scope implement a function to update the matcher's
-workers, and edit <code>handleNewAnnotation</code> to call this new function when the
-user enters a new annotation:</p>
-<pre><code>function updateMatchers() {
-  matchers.forEach(function (matcher) {
-    matcher.postMessage(simpleStorage.storage.annotations);
-  });
-}
-</code></pre>
-<br>
-
-<pre><code>function handleNewAnnotation(annotationText, anchor) {
-  var newAnnotation = new Annotation(annotationText, anchor);
-  simpleStorage.storage.annotations.push(newAnnotation);
-  updateMatchers();
-}
-</code></pre>
-<br>
-
-<h2>Annotation panel</h2>
-<p>The annotation panel just shows the content of an annotation.</p>
-<p>There are two files associated with the annotation panel:</p>
-<ul>
-<li>a simple HTML file to use as a template</li>
-<li>a simple content script to build the panel's content</li>
-</ul>
-<p>These files will live in a new subdirectory of <code>data</code> which we'll call
-<code>annotation</code>.</p>
-<h3>Annotation panel HTML</h3>
-<script type="syntaxhighlighter" class="brush: html"><![CDATA[
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-    <title>Annotation</title>
-    <style media="all" type="text/css">
-
-body {
-        font: 100% arial, helvetica, sans-serif;
-        background-color: #F5F5F5;
-    }
-
-div {
-        text-align:left;
-    }
-
-</style>
-
-</head>
-
-<body>
-
-<div id="annotation">
 </div>
 
-</body>
-</html>
-]]>
-</script>
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
 
-<p>Save this in <code>data/annotation</code> as <code>annotation.html</code>.</p>
-<h3>Annotation panel Content Script</h3>
-<p>The annotation panel has a minimal content script that sets the text:</p>
-<pre><code> self.on('message', function(message) {
-  $('#annotation').text(message);
-});
+<div class="api_component_group">
+<h3 class="api_header">Classes</h3>
+
+<div class="api_component">
+<h4 class="api_name">Assert</h4>
+<p>An object used to make assertions about a program's state in order
+to implement unit tests.</p>
+<p>The <code>Assert</code> object's interface is defined by the
+<a href="http://wiki.commonjs.org/wiki/Unit_Testing/1.1">CommonJS Unit Testing specification, version 1.1</a>.</p>
+<div class="api_component_group">
+<h5 class="api_header">Constructors</h5>
+
+<div class="api_component">
+<h6 class="api_name">Assert(logger)</h6>
+<p>Create a new Assert object. This function is only called by the
+unit test framework, and not by unit tests themselves.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">logger : <span class="datatype">object</span></div>
+<p>Object used to log the results of assertions.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Methods</h5>
+
+<div class="api_component">
+<h6 class="api_name">ok(guard, message)</h6>
+<p>Tests whether an expression evaluates to true.</p>
+<pre><code>assert.ok(a == 1, "test that a is equal to one");
 </code></pre>
-<p>Save this in <code>data/annotation</code> as <code>annotation.js</code>.</p>
-<h3>Updating main.js</h3>
-<p>Finally, update <code>main.js</code> with the code to construct the annotation panel:</p>
-<pre><code>var annotation = panels.Panel({
-  width: 200,
-  height: 180,
-  contentURL: data.url('annotation/annotation.html'),
-  contentScriptFile: [data.url('jquery-1.4.2.min.js'),
-                      data.url('annotation/annotation.js')],
-  onShow: function() {
-    this.postMessage(this.content);
-  }
-});
+<p>This is equivalent to:</p>
+<pre><code>assert.equal(a == 1, true, "test that a is equal to one");
 </code></pre>
-<p>Execute <code>cfx run</code> one last time. Activate the annotator and enter an
-annotation. You should see a yellow border around the item you annotated:</p>
-<p><img src="../../../static-files/media/annotator/matcher.png" alt="Annotator Matcher" class="image-center">
-<br></p>
-<p>When you move your mouse over the item, the annotation should appear:</p>
-<p><img src="../../../static-files/media/annotator/annotation-panel.png" alt="Annotation Panel" class="image-center">
-<br></p>
-<p>Obviously this add-on isn't complete yet. It could do with more beautiful
-styling, it certainly needs a way to delete annotations, it should deal with
-<code>OverQuota</code> more reliably, and the matcher could be made to match more
-reliably.</p>
-<p>But we hope this gives you an idea of the things that are possible with the
-modules in the <code>addon-kit</code> package.</p></div>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">guard : <span class="datatype">expression</span></div>
+<p>The expression to evaluate.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">equal(actual, expected, message)</h6>
+<p>Tests shallow, coercive equality with <code>==</code>:</p>
+<pre><code>assert.equal(1, 1, "test that one is one");
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">notEqual(actual, expected, message)</h6>
+<p>Tests that two objects are not equal, using <code>!=</code>:</p>
+<pre><code>assert.notEqual(1, 2, "test that one is not two");
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">deepEqual(actual, expected, message)</h6>
+<p>Tests that two objects have a deep equality relation.
+  Deep equality is defined in the
+  <a href="http://wiki.commonjs.org/wiki/Unit_Testing/1.0#Assert">CommonJS specification for Assert</a>,
+  item 7, which is quoted here:</p>
+<div class="quote">
+<ol>
+<li>All identical values are equivalent, as determined by ===.</li>
+<li>If the expected value is a Date object, the actual value is equivalent
+if it is also a Date object that refers to the same time.</li>
+<li>Other pairs that do not both pass typeof value == "object", equivalence
+is determined by ==.</li>
+<li>For all other Object pairs, including Array objects, equivalence
+is determined by having the same number of owned properties (as verified
+with Object.prototype.hasOwnProperty.call), the same set of keys (although
+not necessarily the same order), equivalent values for every corresponding
+key, and an identical "prototype" property. Note: this accounts for both
+named and indexed properties on Arrays.</li>
+</div>
+
+<pre><code>assert.deepEqual({ a: "foo" }, { a: "foo" }, "equivalent objects");
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">notDeepEqual(actual, expected, message)</h6>
+<p>Tests that two objects do not have a deep equality relation, using
+  the negation of the test for deep equality:</p>
+<pre><code>assert.notDeepEqual({ a: "foo" }, Object.create({ a: "foo" }),
+                    "object's inherit from different prototypes");
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">strictEqual(actual, expected, message)</h6>
+<p>Tests that two objects are equal, using the strict equality operator <code>===</code>:</p>
+<pre><code>// This test will pass, because "==" will perform type conversion
+exports["test coercive equality"] = function(assert) {
+  assert.equal(1, "1", "test coercive equality between 1 and '1'");
+}
+
+// This test will fail, because the types are different
+exports["test strict equality"] = function(assert) {
+  assert.strictEqual(1, "1", "test strict equality between 1 and '1'");
+}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">notStrictEqual(actual, expected, message)</h6>
+<p>Tests that two objects are not equal, using the negation of the strict
+  equality operator <code>===</code>:</p>
+<pre><code>// This test will fail, because "==" will perform type conversion
+exports["test coercive equality"] = function(assert) {
+  assert.notEqual(1, "1", "test coercive equality between 1 and '1'");
+}
+
+// This test will pass, because the types are different
+exports["test strict equality"] = function(assert) {
+  assert.notStrictEqual(1, "1", "test strict equality between 1 and '1'");
+}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">throws(block, error, message)</h6>
+<p>Assert that a block of code throws the expected exception.</p>
+<p>This method takes an optional <code>Error</code> argument:</p>
+<ul>
+<li>
+<p>to check that the exception thrown is of the expected type, pass
+  a constructor function: the exception thrown must be an
+  instance of the object returned by that function.</p>
+</li>
+<li>
+<p>to check that the exception thrown contains a specific message, pass
+  a regular expression here: the <code>message</code> property of the exception
+  thrown must match the regular expression</p>
+</li>
+</ul>
+<!--terminate Markdown list-->
+
+<p>For example, suppose we define two different custom exceptions:</p>
+<pre><code>function MyError(message) {  
+  this.name = "MyError";  
+  this.message = message || "Default Message";  
+}
+
+MyError.prototype = new Error();  
+MyError.prototype.constructor = MyError;
+
+function AnotherError(message) {
+  this.name = "AnotherError";  
+  this.message = message || "Default Message"; 
+    console.log(this.message); 
+}
+
+AnotherError.prototype = new Error();  
+AnotherError.prototype.constructor = AnotherError;
+</code></pre>
+<p>We can check the type of exception by passing a function as the <code>Error</code>
+  argument:</p>
+<pre><code>exports["test exception type 1 expected to pass"] = function(assert) {
+  assert.throws(function() {
+    throw new MyError("custom message");
+  },
+  MyError,
+  "test throwing a specific exception");
+}
+
+exports["test exception type 2 expected to fail"] = function(assert) {
+  assert.throws(function() {
+    throw new MyError("custom message");
+  },
+  AnotherError,
+  "test throwing a specific exception");
+}
+</code></pre>
+<p>We can check the message by passing a regular expression:</p>
+<pre><code>exports["test exception message 1 expected to pass"] = function(assert) {
+  assert.throws(function() {
+    throw new MyError("custom message");
+  },
+  /custom message/,
+  "test throwing a specific message");
+}
+
+exports["test exception message 2 expected to pass"] = function(assert) {
+  assert.throws(function() {
+    throw new AnotherError("custom message");
+  },
+  /custom message/,
+  "test throwing a specific exception");
+}
+
+exports["test exception message 3 expected to fail"] = function(assert) {
+  assert.throws(function() {
+    throw new MyError("another message");
+  },
+  /custom message/,
+  "test throwing a specific message");
+}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">block : <span class="datatype">block</span></div>
+<p>The block of code to test.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ error : <span class="datatype">function|RegExp</span> ]</div>
+<p>Either a constructor function returning the type of exception
+expected, or a regular expression expected to match the exception's
+<code>message</code> property. </p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
   </div>
 
   <div id="sidebar" class="column">

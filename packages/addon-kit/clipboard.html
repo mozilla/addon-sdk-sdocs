@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.8</div>
+    <div id="version">Version 1.9</div>
   </div>
 </div>
 
@@ -76,22 +76,46 @@ The following types are supported:</p>
 <ul>
 <li><code>text</code> (plain text)</li>
 <li><code>html</code> (a string of HTML)</li>
+<li><code>image</code> (a base-64 encoded png)</li>
 </ul>
 <p>If no data type is provided, then the module will detect it for you.</p>
+<p>Currently <code>image</code>'s type doesn't support transparency on Windows.</p>
 <h2>Examples</h2>
 <p>Set and get the contents of the clipboard.</p>
-<pre><code>let clipboard = require("clipboard");
+<pre><code>var clipboard = require("clipboard");
 clipboard.set("Lorem ipsum dolor sit amet");
-let contents = clipboard.get();
+var contents = clipboard.get();
 </code></pre>
 <p>Set the clipboard contents to some HTML.</p>
-<pre><code>let clipboard = require("clipboard");
+<pre><code>var clipboard = require("clipboard");
 clipboard.set("&lt;blink&gt;Lorem ipsum dolor sit amet&lt;/blink&gt;", "html");
 </code></pre>
 <p>If the clipboard contains HTML content, open it in a new tab.</p>
-<pre><code>let clipboard = require("clipboard");
+<pre><code>var clipboard = require("clipboard");
 if (clipboard.currentFlavors.indexOf("html") != -1)
   require("tabs").open("data:text/html," + clipboard.get("html"));
+</code></pre>
+<p>Set the clipboard contents to an image.</p>
+<pre><code>var clipboard = require("clipboard");
+clipboard.set("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYA" +
+              "AABzenr0AAAASUlEQVRYhe3O0QkAIAwD0eyqe3Q993AQ3cBSUKpygfsNTy" +
+              "N5ugbQpK0BAADgP0BRDWXWlwEAAAAAgPsA3rzDaAAAAHgPcGrpgAnzQ2FG" +
+              "bWRR9AAAAABJRU5ErkJggg%3D%3D");
+</code></pre>
+<p>If the clipboard contains an image, open it in a new tab.</p>
+<pre><code>var clipboard = require("clipboard");
+if (clipboard.currentFlavors.indexOf("image") != -1)
+  require("tabs").open(clipboard.get());
+</code></pre>
+<p>As noted before, data type can be easily omitted for images.</p>
+<p>If the intention is set the clipboard to a data URL as string and not as image,
+it can be easily done specifying a different flavor, like <code>text</code>.</p>
+<pre><code>var clipboard = require("clipboard");
+
+clipboard.set("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYA" +
+              "AABzenr0AAAASUlEQVRYhe3O0QkAIAwD0eyqe3Q993AQ3cBSUKpygfsNTy" +
+              "N5ugbQpK0BAADgP0BRDWXWlwEAAAAAgPsA3rzDaAAAAHgPcGrpgAnzQ2FG" +
+              "bWRR9AAAAABJRU5ErkJggg%3D%3D", "text");
 </code></pre>
 </div>
 
@@ -244,6 +268,8 @@ of all types in which the data currently on the clipboard is available.</p>
 
 <a href="../../packages/api-utils/app-strings.html">app-strings</a>
 
+<a href="../../packages/api-utils/base64.html">base64</a>
+
 <a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../packages/api-utils/collection.html">collection</a>
@@ -288,6 +314,8 @@ of all types in which the data currently on the clipboard is available.</p>
 
 <a href="../../packages/api-utils/list.html">list</a>
 
+<a href="../../packages/api-utils/loader.html">loader</a>
+
 <a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
 
 <a href="../../packages/api-utils/memory.html">memory</a>
@@ -312,13 +340,13 @@ of all types in which the data currently on the clipboard is available.</p>
 
 <a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
 
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
 <a href="../../packages/api-utils/text-streams.html">text-streams</a>
 
 <a href="../../packages/api-utils/traceback.html">traceback</a>
 
 <a href="../../packages/api-utils/traits.html">traits</a>
-
-<a href="../../packages/api-utils/unit-test.html">unit-test</a>
 
 <a href="../../packages/api-utils/unload.html">unload</a>
 

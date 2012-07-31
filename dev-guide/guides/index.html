@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.8</div>
+    <div id="version">Version 1.9</div>
   </div>
 </div>
 
@@ -162,11 +162,19 @@
 
 <tr>
     <td>
-      <h4><a href="../../dev-guide/guides/content-scripts/access.html">Content script access</a></h4>
-      Detailed information on the objects available to content scripts,
-      the differences between content scripts and normal page scripts,
-      and how to communicate between content scripts and page scripts.
+      <h4><a href="../../dev-guide/guides/content-scripts/accessing-the-dom.html">Accessing the DOM</a></h4>
+      Detail about the access content scripts get to the DOM.
     </td>
+
+<td>
+      <h4><a href="../../dev-guide/guides/content-scripts/communicating-with-other-scripts.html">Communicating with other scripts</a></h4>
+      Detail about how content scripts can communicate with "main.js", with other
+      content scripts, and with scripts loaded by the web page itself.
+    </td>
+
+</tr>
+
+<tr>
 
 <td>
       <h4><a href="../../dev-guide/guides/content-scripts/using-port.html">Using "port"</a></h4>
@@ -174,15 +182,16 @@
       using the <code>port</code> object.
     </td>
 
-</tr>
-
-<tr>
-    <td>
+<td>
       <h4><a href="../../dev-guide/guides/content-scripts/using-postmessage.html">Using "postMessage()"</a></h4>
       Communicating between a content script and the rest of your add-on
       using the <code>postMessage()</code> API, and a comparison between
       this technique and the <code>port</code> object.
     </td>
+
+</tr>
+
+<tr>
 
 <td>
       <h4><a href="../../dev-guide/guides/content-scripts/reddit-example.html">Reddit example</a></h4>
@@ -320,6 +329,8 @@
 
 <a href="../../packages/api-utils/app-strings.html">app-strings</a>
 
+<a href="../../packages/api-utils/base64.html">base64</a>
+
 <a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../packages/api-utils/collection.html">collection</a>
@@ -364,6 +375,8 @@
 
 <a href="../../packages/api-utils/list.html">list</a>
 
+<a href="../../packages/api-utils/loader.html">loader</a>
+
 <a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
 
 <a href="../../packages/api-utils/memory.html">memory</a>
@@ -388,13 +401,13 @@
 
 <a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
 
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
 <a href="../../packages/api-utils/text-streams.html">text-streams</a>
 
 <a href="../../packages/api-utils/traceback.html">traceback</a>
 
 <a href="../../packages/api-utils/traits.html">traits</a>
-
-<a href="../../packages/api-utils/unit-test.html">unit-test</a>
 
 <a href="../../packages/api-utils/unload.html">unload</a>
 

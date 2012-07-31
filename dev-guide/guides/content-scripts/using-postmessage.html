@@ -50,7 +50,7 @@
     <h1>
       <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.8</div>
+    <div id="version">Version 1.9</div>
   </div>
 </div>
 
@@ -109,6 +109,44 @@ argument to the constructor:</p>
     // Handle message from the content script
   }
 });
+</code></pre>
+<h2>Timing Issues Using postMessage</h2>
+<p>Content scripts are loaded according to the value of the
+<a href="../../../dev-guide/guides/content-scripts/loading.html"><code>contentScriptWhen</code></a>
+option: until that point is reached, any attempt to send a message to
+the script using <code>postMessage()</code> will trigger an exception, probably
+the unintuitive message:</p>
+<p><span class="aside">
+This is a generic message which is emitted whenever we try to
+send a message to a content script, but can't find the worker
+which is supposed to receive it.
+</span></p>
+<pre>
+Error: The page has been destroyed and can no longer be used.
+</pre>
+
+<p>So code like this, where we create a panel and then
+synchronously send it a message using <code>postMessage()</code>, will not work:</p>
+<pre><code>var data = require("self").data;
+
+var panel = require("panel").Panel({
+  contentURL: "http://www.bbc.co.uk/mobile/index.html",
+  contentScriptFile: data.url("panel.js")
+});
+
+panel.postMessage("hi from main.js");
+</code></pre>
+<p><a href="../../../dev-guide/guides/content-scripts/using-port.html"><code>port.emit()</code></a>
+queues messages until the content script is ready to receive them,
+so the equivalent code using <code>port.emit()</code> will work:</p>
+<pre><code>var data = require("self").data;
+
+var panel = require("panel").Panel({
+  contentURL: "http://www.bbc.co.uk/mobile/index.html",
+  contentScriptFile: data.url("panel.js")
+});
+
+panel.port.emit("hi from main.js");
 </code></pre>
 <h2>Message Events Versus User-Defined Events</h2>
 <p>You can use message events as an alternative to user-defined events:</p>
@@ -275,6 +313,8 @@ var pageMod = require('page-mod').PageMod({
 
 <a href="../../../packages/api-utils/app-strings.html">app-strings</a>
 
+<a href="../../../packages/api-utils/base64.html">base64</a>
+
 <a href="../../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../../packages/api-utils/collection.html">collection</a>
@@ -319,6 +359,8 @@ var pageMod = require('page-mod').PageMod({
 
 <a href="../../../packages/api-utils/list.html">list</a>
 
+<a href="../../../packages/api-utils/loader.html">loader</a>
+
 <a href="../../../packages/api-utils/match-pattern.html">match-pattern</a>
 
 <a href="../../../packages/api-utils/memory.html">memory</a>
@@ -343,13 +385,13 @@ var pageMod = require('page-mod').PageMod({
 
 <a href="../../../packages/api-utils/tab-browser.html">tab-browser</a>
 
+<a href="../../../packages/api-utils/test/assert.html">test/assert</a>
+
 <a href="../../../packages/api-utils/text-streams.html">text-streams</a>
 
 <a href="../../../packages/api-utils/traceback.html">traceback</a>
 
 <a href="../../../packages/api-utils/traits.html">traits</a>
-
-<a href="../../../packages/api-utils/unit-test.html">unit-test</a>
 
 <a href="../../../packages/api-utils/unload.html">unload</a>
 

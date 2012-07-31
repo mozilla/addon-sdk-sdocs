@@ -50,7 +50,7 @@
     <h1>
       <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.8</div>
+    <div id="version">Version 1.9</div>
   </div>
 </div>
 
@@ -78,7 +78,7 @@ application windows.</p>
 <a href="https://developer.mozilla.org/en/nsIDOMWindow">nsIXULWindow</a> for the given
 <a href="https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIXULWindow">nsIDOMWindow</a>:</p>
 <pre><code>let { Ci } = require('chrome');
-let utils = require('api-utils/window-utils');
+let utils = require('api-utils/window/utils');
 let active = utils.activeBrowserWindow;
 active instanceof Ci.nsIXULWindow // =&gt; false
 utils.getXULWindow(active) instanceof Ci.nsIXULWindow // =&gt; true
@@ -88,7 +88,7 @@ utils.getXULWindow(active) instanceof Ci.nsIXULWindow // =&gt; true
 <a href="http://mxr.mozilla.org/mozilla-central/source/widget/nsIBaseWindow.idl">nsIBaseWindow</a>
 for the given <a href="https://developer.mozilla.org/en/nsIDOMWindow">nsIDOMWindow</a>:</p>
 <pre><code>let { Ci } = require('chrome');
-let utils = require('api-utils/window-utils');
+let utils = require('api-utils/window/utils');
 let active = utils.activeBrowserWindow;
 active instanceof Ci.nsIBaseWindow // =&gt; false
 utils.getBaseWindow(active) instanceof Ci.nsIBaseWindow // =&gt; true
@@ -97,7 +97,7 @@ utils.getBaseWindow(active) instanceof Ci.nsIBaseWindow // =&gt; true
 <p>Module exports <code>open</code> function that may be used to open top level
 (application) windows. Function takes <code>uri</code> of the window document as a first
 argument and optional hash of <code>options</code> as second argument.</p>
-<pre><code>let { open } = require('api-utils/window-utils');
+<pre><code>let { open } = require('api-utils/window/utils');
 let window = open('data:text/html,Hello Window');
 </code></pre>
 <p>Following options may be provided to configure created window behavior:</p>
@@ -139,11 +139,14 @@ let bgwin = backgroundify(open('data:text/html,Hello backgroundy'));
 <code>options.close</code> is <code>false</code> unregistered window won't automatically
 be closed on application quit, preventing application from quitting. While this
 is possible you should make sure to close all such windows manually:</p>
-<pre><code>let { backgroundify, open } = require('api-utils/window-utils');
+<pre><code>let { backgroundify, open } = require('api-utils/window/utils');
 let bgwin = backgroundify(open('data:text/html,Foo'), {
   close: false
 });
 </code></pre>
+<h3>isBrowser</h3>
+<p>Returns true if the given window is a Firefox browser window.
+(i.e windows with chrome://browser/content/browser.xul document)</p>
 </div>
 
 </div>
@@ -239,6 +242,8 @@ let bgwin = backgroundify(open('data:text/html,Foo'), {
 
 <a href="../../../packages/api-utils/app-strings.html">app-strings</a>
 
+<a href="../../../packages/api-utils/base64.html">base64</a>
+
 <a href="../../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../../packages/api-utils/collection.html">collection</a>
@@ -283,6 +288,8 @@ let bgwin = backgroundify(open('data:text/html,Foo'), {
 
 <a href="../../../packages/api-utils/list.html">list</a>
 
+<a href="../../../packages/api-utils/loader.html">loader</a>
+
 <a href="../../../packages/api-utils/match-pattern.html">match-pattern</a>
 
 <a href="../../../packages/api-utils/memory.html">memory</a>
@@ -307,13 +314,13 @@ let bgwin = backgroundify(open('data:text/html,Foo'), {
 
 <a href="../../../packages/api-utils/tab-browser.html">tab-browser</a>
 
+<a href="../../../packages/api-utils/test/assert.html">test/assert</a>
+
 <a href="../../../packages/api-utils/text-streams.html">text-streams</a>
 
 <a href="../../../packages/api-utils/traceback.html">traceback</a>
 
 <a href="../../../packages/api-utils/traits.html">traits</a>
-
-<a href="../../../packages/api-utils/unit-test.html">unit-test</a>
 
 <a href="../../../packages/api-utils/unload.html">unload</a>
 

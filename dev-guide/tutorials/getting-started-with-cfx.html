@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.8</div>
+    <div id="version">Version 1.9</div>
   </div>
 </div>
 
@@ -115,8 +115,22 @@ Your sample add-on is now ready for testing:
 <h2><a name="cfx-run">cfx run</a></h2>
 <p>Use <code>cfx run</code> to run a new instance of Firefox with your add-on installed.
 This is the command you'll use to test out your add-on while developing it.</p>
-<p><code>cfx init</code> actually creates a very basic add-on, so to see <code>cfx run</code> in action
-we don't need to write any code. Just type:</p>
+<p>The main code for an add-on is always kept in a file called <code>main.js</code> in your
+add-on's <code>lib</code> directory. Open the <code>main.js</code> for this add-on, and
+add the following code:</p>
+<pre><code>var widgets = require("widget");
+var tabs = require("tabs");
+
+var widget = widgets.Widget({
+  id: "mozilla-link",
+  label: "Mozilla website",
+  contentURL: "http://www.mozilla.org/favicon.ico",
+  onClick: function() {
+    tabs.open("http://www.mozilla.org/");
+  }
+});
+</code></pre>
+<p>Now type:</p>
 <pre>
 cfx run
 </pre>
@@ -133,20 +147,6 @@ package.json modified: please re-run 'cfx run'
 bottom-right corner of the browser you'll see an icon with the Firefox
 logo. Click the icon, and a new tab will open with
 <a href="http://www.mozilla.org/">http://www.mozilla.org/</a> loaded into it.</p>
-<p>The main code for an add-on is always kept in a file called <code>main.js</code> in your
-add-on's <code>lib</code> directory. Open the <code>main.js</code> for this add-on:</p>
-<pre><code>const widgets = require("widget");
-const tabs = require("tabs");
-
-var widget = widgets.Widget({
-  id: "mozilla-link",
-  label: "Mozilla website",
-  contentURL: "http://www.mozilla.org/favicon.ico",
-  onClick: function() {
-    tabs.open("http://www.mozilla.org/");
-  }
-});
-</code></pre>
 <p>This add-on uses two SDK modules: the
 <a href="../../packages/addon-kit/widget.html"><code>widget</code></a> module, which enables you
 to add buttons to the browser, and the
@@ -294,6 +294,8 @@ add-on.</p>
 
 <a href="../../packages/api-utils/app-strings.html">app-strings</a>
 
+<a href="../../packages/api-utils/base64.html">base64</a>
+
 <a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../packages/api-utils/collection.html">collection</a>
@@ -338,6 +340,8 @@ add-on.</p>
 
 <a href="../../packages/api-utils/list.html">list</a>
 
+<a href="../../packages/api-utils/loader.html">loader</a>
+
 <a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
 
 <a href="../../packages/api-utils/memory.html">memory</a>
@@ -362,13 +366,13 @@ add-on.</p>
 
 <a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
 
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
 <a href="../../packages/api-utils/text-streams.html">text-streams</a>
 
 <a href="../../packages/api-utils/traceback.html">traceback</a>
 
 <a href="../../packages/api-utils/traits.html">traits</a>
-
-<a href="../../packages/api-utils/unit-test.html">unit-test</a>
 
 <a href="../../packages/api-utils/unload.html">unload</a>
 

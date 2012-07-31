@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.8</div>
+    <div id="version">Version 1.9</div>
   </div>
 </div>
 
@@ -158,7 +158,8 @@ and only argument.</p>
 
 <div class="api_component">
 <h4 class="api_name">windowIterator()</h4>
-<p>An iterator for windows currently open in the application.</p>
+<p>An iterator for windows currently open in the application. Only windows whose
+  document is already loaded will be dispatched.</p>
 <p><strong>Example</strong></p>
 <pre><code>var winUtils = require("window-utils");
 for (window in winUtils.windowIterator())
@@ -276,6 +277,8 @@ for (window in winUtils.windowIterator())
 
 <a href="../../packages/api-utils/app-strings.html">app-strings</a>
 
+<a href="../../packages/api-utils/base64.html">base64</a>
+
 <a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../packages/api-utils/collection.html">collection</a>
@@ -320,6 +323,8 @@ for (window in winUtils.windowIterator())
 
 <a href="../../packages/api-utils/list.html">list</a>
 
+<a href="../../packages/api-utils/loader.html">loader</a>
+
 <a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
 
 <a href="../../packages/api-utils/memory.html">memory</a>
@@ -344,13 +349,13 @@ for (window in winUtils.windowIterator())
 
 <a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
 
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
 <a href="../../packages/api-utils/text-streams.html">text-streams</a>
 
 <a href="../../packages/api-utils/traceback.html">traceback</a>
 
 <a href="../../packages/api-utils/traits.html">traits</a>
-
-<a href="../../packages/api-utils/unit-test.html">unit-test</a>
 
 <a href="../../packages/api-utils/unload.html">unload</a>
 

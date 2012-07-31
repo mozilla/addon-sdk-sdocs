@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.8</div>
+    <div id="version">Version 1.9</div>
   </div>
 </div>
 
@@ -116,8 +116,7 @@ of the box for that window.</p>
 <p>The test objects in the original script need access to the DOM window object,
 so in the SDK port, they need to run in a content script. In fact, they need
 access to the un-proxied DOM window, so they can see the objects added by
-libraries, so we’ll need to use the experimental
-<a href="../../dev-guide/guides/content-scripts/access.html">unsafeWindow</a> object.</p>
+libraries, so we’ll need to use the experimental <a href="../../dev-guide/guides/content-scripts/accessing-the-dom.html#unsafeWindow">unsafeWindow</a></p>
 <p>The main add-on script, <code>main.js</code>, will use a
 <a href="../../packages/addon-kit/page-mod.html"><code>page-mod</code></a>
 to inject the content script into every new page.</p>
@@ -344,6 +343,8 @@ widget.port.on('setLibraryInfo', function(libraryInfo) {
 
 <a href="../../packages/api-utils/app-strings.html">app-strings</a>
 
+<a href="../../packages/api-utils/base64.html">base64</a>
+
 <a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../packages/api-utils/collection.html">collection</a>
@@ -388,6 +389,8 @@ widget.port.on('setLibraryInfo', function(libraryInfo) {
 
 <a href="../../packages/api-utils/list.html">list</a>
 
+<a href="../../packages/api-utils/loader.html">loader</a>
+
 <a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
 
 <a href="../../packages/api-utils/memory.html">memory</a>
@@ -412,13 +415,13 @@ widget.port.on('setLibraryInfo', function(libraryInfo) {
 
 <a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
 
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
 <a href="../../packages/api-utils/text-streams.html">text-streams</a>
 
 <a href="../../packages/api-utils/traceback.html">traceback</a>
 
 <a href="../../packages/api-utils/traits.html">traits</a>
-
-<a href="../../packages/api-utils/unit-test.html">unit-test</a>
 
 <a href="../../packages/api-utils/unload.html">unload</a>
 

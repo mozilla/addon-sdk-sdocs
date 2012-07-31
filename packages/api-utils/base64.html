@@ -26,7 +26,7 @@
   <![endif]-->
 
   <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
-  <title>preferences-service - Add-on SDK Documentation</title>
+  <title>base64 - Add-on SDK Documentation</title>
 </head>
 <body>
 
@@ -61,19 +61,27 @@
   <div id="main-content-column" class="column">
     <div id="toc"></div>
     <div id="main-content">
-<div id="preferences-service_module_api_docs" class="module_api_docs">
-<h1>preferences-service</h1>
+<div id="base64_module_api_docs" class="module_api_docs">
+<h1>base64</h1>
 <div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<!-- contributed by Myk Melez [myk@mozilla.org]  -->
-<!-- contributed by Daniel Aquino [mr.danielaquino@gmail.com]  -->
-<!-- contributed by Atul Varma [atul@mozilla.com]  -->
-<!-- edited by Noelle Murata [fiveinchpixie@gmail.com]  -->
+<p>The module provides data encoding and decoding using Base64 algorithms.</p>
+<h2>Example</h2>
+<pre><code>var base64 = require("api-utils/base64");
 
-<p>The <code>preferences-service</code> module provides access to the
-application-wide preferences service singleton.</p>
+var encodedData = base64.encode("Hello, World");
+var decodedData = base64.decode(encodedData);
+</code></pre>
+<h2>Unicode Strings</h2>
+<p>In order to <code>encode</code> and <code>decode</code> properly Unicode strings, the <code>charset</code>
+parameter needs to be set to <code>"utf-8"</code>:</p>
+<pre><code>var base64 = require("api-utils/base64");
+
+var encodedData = base64.encode(unicodeString, "utf-8");
+var decodedData = base64.decode(encodedData, "utf-8");
+</code></pre>
 </div>
 
 <div class="api_reference">
@@ -83,182 +91,45 @@ application-wide preferences service singleton.</p>
 <h3 class="api_header">Functions</h3>
 
 <div class="api_component">
-<h4 class="api_name">set(name, value)</h4>
-<p>Sets the application preference <code>name</code> to <code>value</code>.</p>
+<h4 class="api_name">encode(data, charset)</h4>
+<p>Creates a base-64 encoded ASCII string from a string of binary data.</p>
 <div class="parameter_set">
 <div class="api_component">
-<div class="api_name">name : <span class="datatype">string</span></div>
-<p>Preference name.</p>
+<div class="api_name">data : <span class="datatype">string</span></div>
+<p>The data to encode</p>
 </div>
 
 <div class="api_component">
-<div class="api_name">value : <span class="datatype">string,number,bool</span></div>
-<p>Preference value.</p>
-<p><strong>Example:</strong></p>
-<pre><code>var name = "extensions.checkCompatibility.nightly";
-require("preferences-service").set(name, false);
-</code></pre>
+<div class="api_name">[ charset : <span class="datatype">string</span> ]</div>
+<p>The charset of the string to encode (optional).
+The only accepted value is <code>"utf-8"</code>.</p>
 </div>
 
+</div>
+
+<div class="returns">Returns: <span class="datatype">string</span><p>The encoded string</p>
 </div>
 
 </div>
 
 <div class="api_component">
-<h4 class="api_name">get(name, defaultValue)</h4>
-<p>Gets the application preference <code>name</code>.</p>
+<h4 class="api_name">decode(data, charset)</h4>
+<p>Decodes a string of data which has been encoded using base-64 encoding.</p>
 <div class="parameter_set">
 <div class="api_component">
-<div class="api_name">name : <span class="datatype">string</span></div>
-
+<div class="api_name">data : <span class="datatype">string</span></div>
+<p>The encoded data</p>
 </div>
 
 <div class="api_component">
-<div class="api_name">defaultValue : <span class="datatype">string,number,bool</span></div>
-<p>Preference value.</p>
+<div class="api_name">[ charset : <span class="datatype">string</span> ]</div>
+<p>The charset of the string to encode (optional).
+The only accepted value is <code>"utf-8"</code>.</p>
 </div>
 
 </div>
 
-<div class="returns">Returns: <span class="datatype">string,number,bool</span><p>Preference value, returns a default value if no
-preference is set.</p>
-<p><strong>Example:</strong></p>
-<pre><code>var name = "extensions.checkCompatibility.nightly";
-var nightlyCompatChk = require("preferences-service").get(name);
-</code></pre>
-</div>
-
-</div>
-
-<div class="api_component">
-<h4 class="api_name">has(name)</h4>
-
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">name : <span class="datatype">string</span></div>
-<p>Preference name.</p>
-</div>
-
-</div>
-
-<div class="returns">Returns: <span class="datatype">bool</span><p>Returns whether or not the application preference <code>name</code> exists.</p>
-<p><strong>Example:</strong></p>
-<pre><code>var name = "extensions.checkCompatibility.nightly";
-if (require("preferences-service").has(name)) {
-  // ...
-}
-</code></pre>
-</div>
-
-</div>
-
-<div class="api_component">
-<h4 class="api_name">keys(root)</h4>
-
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">root : <span class="datatype">string</span></div>
-<p>Preference root name.</p>
-</div>
-
-</div>
-
-<div class="returns">Returns: <span class="datatype">array</span><p>Returns an array of strings representing the child preferences of the root of this branch.</p>
-</div>
-
-</div>
-
-<div class="api_component">
-<h4 class="api_name">isSet(name)</h4>
-
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">name : <span class="datatype">string</span></div>
-<p>Preference name.</p>
-</div>
-
-</div>
-
-<div class="returns">Returns: <span class="datatype">bool</span><p>Returns whether or not the application preference <code>name</code> both exists
-and has been set to a non-default value by the user (or a program
-acting on the user's behalf).</p>
-<p><strong>Example:</strong></p>
-<pre><code>var name = "extensions.checkCompatibility.nightly";
-if (require("preferences-service").isSet(name)) {
-  // ...
-}
-</code></pre>
-</div>
-
-</div>
-
-<div class="api_component">
-<h4 class="api_name">reset(name)</h4>
-<p>Clears a non-default, user-set value from the application preference
-<code>name</code>. If no user-set value is defined on <code>name</code>, the function
-does nothing. If no default value exists the preference will cease to exist.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">name : <span class="datatype">string</span></div>
-<p>Preference name.</p>
-<p><strong>Example:</strong></p>
-<pre><code>var name = "extensions.checkCompatibility.nightly";
-require("preferences-service").reset(name);
-</code></pre>
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component">
-<h4 class="api_name">getLocalized(name, defaultValue)</h4>
-<p>Gets the localized value for an application preference <code>name</code>.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">name : <span class="datatype">string</span></div>
-
-</div>
-
-<div class="api_component">
-<div class="api_name">defaultValue : <span class="datatype">string</span></div>
-<p>Preference value.</p>
-</div>
-
-</div>
-
-<div class="returns">Returns: <span class="datatype">string</span><p>Localized preference value, returns a default value if no
-preference is set. Some preferences refer to a properties file.
-So that <code>prefs.get</code> returns the properties file URL whereas
-<code>prefs.getLocalized</code> returns the value defined in the properties file.</p>
-<p><strong>Example:</strong></p>
-<pre><code>var prefs = require("preferences-service");
-var name = "general.useragent.locale";
-prefs.get(name); // is equal to "chrome://global/locale/intl.properties"
-prefs.getLocalized(name) // is equal to "en-US"
-</code></pre>
-</div>
-
-</div>
-
-<div class="api_component">
-<h4 class="api_name">setLocalized(name, value)</h4>
-<p>Sets the localized application preference <code>name</code> to <code>value</code>.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">name : <span class="datatype">string</span></div>
-<p>Preference name.</p>
-</div>
-
-<div class="api_component">
-<div class="api_name">value : <span class="datatype">string</span></div>
-<p>Preference value, a URL to a properties file</p>
-<p><strong>Example:</strong></p>
-<pre><code>require("preferences-service").set("general.useragent.locale",
-                                   "chrome://global/locale/intl.properties");
-</code></pre>
-</div>
-
+<div class="returns">Returns: <span class="datatype">string</span><p>The decoded string</p>
 </div>
 
 </div>

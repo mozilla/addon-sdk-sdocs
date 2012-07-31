@@ -26,7 +26,7 @@
   <![endif]-->
 
   <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
-  <title>Content Script Access - Add-on SDK Documentation</title>
+  <title>Accessing the DOM - Add-on SDK Documentation</title>
 </head>
 <body>
 
@@ -50,7 +50,7 @@
     <h1>
       <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.8</div>
+    <div id="version">Version 1.9</div>
   </div>
 </div>
 
@@ -64,14 +64,9 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<h1>Content Script Access</h1>
-<p>This page talks about the access content scripts have to:</p>
-<ul>
-<li>DOM objects in the pages they are attached to</li>
-<li>other content scripts</li>
-<li>other scripts loaded by the page they are attached to</li>
-</ul>
-<h2>Access to the DOM</h2>
+<h1>Accessing the DOM</h1>
+<p>This page talks about the access content scripts have to DOM objects
+in the pages they are attached to.</p>
 <p>Content scripts need to be able to access DOM objects in arbitrary web
 pages, but this could cause two potential security problems:</p>
 <ol>
@@ -174,81 +169,7 @@ so the content script uses <code>unsafeWindow.confirm()</code> instead of
 Greasemonkey's unsafeWindow, and the
 <a href="http://wiki.greasespot.net/UnsafeWindow">warnings for that</a> apply equally
 here. Also, <code>unsafeWindow</code> isn't a supported API, so it could be removed or
-changed in a future version of the SDK.</p>
-<h2>Access to Other Content Scripts</h2>
-<p>Content scripts loaded into the same document can interact
-with each other directly as well as with the web content itself. However,
-content scripts which have been loaded into different documents
-cannot interact with each other.</p>
-<p>For example:</p>
-<ul>
-<li>
-<p>if an add-on creates a single <code>panel</code> object and loads several content
-scripts into the panel, then they can interact with each other</p>
-</li>
-<li>
-<p>if an add-on creates two <code>panel</code> objects and loads a script into each
-one, they can't interact with each other.</p>
-</li>
-<li>
-<p>if an add-on creates a single <code>page-mod</code> object and loads several content
-scripts into the page mod, then only content scripts associated with the
-same page can interact with each other: if two different matching pages are
-loaded, content scripts attached to page A cannot interact with those attached
-to page B.</p>
-</li>
-</ul>
-<p>The web content has no access to objects created by the content script, unless
-the content script explicitly makes them available.</p>
-<h2>Access to Page Scripts</h2>
-<p>You can communicate between the content script and page scripts using
-<a href="https://developer.mozilla.org/en/DOM/window.postMessage"><code>postMessage()</code></a>,
-but there's a twist: in early versions of the SDK, the global <code>postMessage()</code>
-function in content scripts was used for communicating between the content
-script and the main add-on code. Although this has been
-<a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes/1.0b5#Major_Changes">deprecated in favor of <code>self.postMessage</code></a>,
-the old globals are still supported, so you can't currently use
-<code>window.postMessage()</code>. You must use <code>document.defaultView.postMessage()</code>
-instead.</p>
-<p>The following page script uses
-<a href="https://developer.mozilla.org/en/DOM/element.addEventListener"><code>window.addEventListener</code></a>
-to listen for messages:</p>
-<script type="syntaxhighlighter" class="brush: html"><![CDATA[
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang='en' xml:lang='en' xmlns="http://www.w3.org/1999/xhtml">
-
-<head>
-    <script>
-      window.addEventListener("message", function(event) {
-        window.alert(event.data);
-      }, false);
-    &lt;/script>
-
-</head>
-
-</html>
-
-</script>
-
-<p>Content scripts can send it messages using <code>document.defaultView.postMessage()</code>:</p>
-<pre><code>var widgets = require("widget");
-var tabs = require("tabs");
-var data = require("self").data;
-
-var widget = widgets.Widget({
-  id: "postMessage",
-  label: "demonstrate document.defaultView.postMessage",
-  contentURL: "http://www.mozilla.org/favicon.ico",
-  onClick: function() {
-    tabs.activeTab.attach({
-      contentScript: "document.defaultView.postMessage('hi there!', '*');"
-    });
-  }
-});
-
-tabs.open(data.url("listener.html"));
-</code></pre></div>
+changed in a future version of the SDK.</p></div>
   </div>
 
   <div id="sidebar" class="column">
@@ -340,6 +261,8 @@ tabs.open(data.url("listener.html"));
 
 <a href="../../../packages/api-utils/app-strings.html">app-strings</a>
 
+<a href="../../../packages/api-utils/base64.html">base64</a>
+
 <a href="../../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../../packages/api-utils/collection.html">collection</a>
@@ -384,6 +307,8 @@ tabs.open(data.url("listener.html"));
 
 <a href="../../../packages/api-utils/list.html">list</a>
 
+<a href="../../../packages/api-utils/loader.html">loader</a>
+
 <a href="../../../packages/api-utils/match-pattern.html">match-pattern</a>
 
 <a href="../../../packages/api-utils/memory.html">memory</a>
@@ -408,13 +333,13 @@ tabs.open(data.url("listener.html"));
 
 <a href="../../../packages/api-utils/tab-browser.html">tab-browser</a>
 
+<a href="../../../packages/api-utils/test/assert.html">test/assert</a>
+
 <a href="../../../packages/api-utils/text-streams.html">text-streams</a>
 
 <a href="../../../packages/api-utils/traceback.html">traceback</a>
 
 <a href="../../../packages/api-utils/traits.html">traits</a>
-
-<a href="../../../packages/api-utils/unit-test.html">unit-test</a>
 
 <a href="../../../packages/api-utils/unload.html">unload</a>
 

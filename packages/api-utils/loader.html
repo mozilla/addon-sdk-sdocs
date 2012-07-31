@@ -1,0 +1,786 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>loader - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.9</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content">
+<div id="loader_module_api_docs" class="module_api_docs">
+<h1>loader</h1>
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<p>The <code>loader</code> module exposes a low level API for creating
+<a href="http://wiki.commonjs.org/wiki/Modules/1.1.1">CommonJS module</a>
+loaders. The code is intentionally authored so that it
+can be loaded in several ways:</p>
+<ol>
+<li>
+<p>It can be loaded as a regular script tag in documents that have
+<a href="https://developer.mozilla.org/en/Security_check_basics#Principals">system principals</a>:</p>
+<p><pre class="brush: html">
+    &lt;script type='application/javascript' src='resource://gre/modules/toolkit/loader.js'&gt;&lt;/script&gt;
+</pre></p>
+<p>This will expose a single <code>loader</code> object containing all of the
+API functions described in this document.</p>
+</li>
+<li>
+<p>It can be loaded as a <a href="https://developer.mozilla.org/en/JavaScript_code_modules/Using">JavaScript code module</a>:</p>
+<pre><code>let { Loader, Require, unload } = Components.utils.import('resource://gre/modules/toolkit/loader.js');
+</code></pre>
+</li>
+<li>
+<p>It can be required as a CommonJS module from a module loaded in
+the loader itself:</p>
+<pre><code>let { Loader, Require, unload } = require('toolkit/loader');
+</code></pre>
+</li>
+</ol>
+<h2>What is it good for ?</h2>
+<ul>
+<li>Create somewhat standardized JS environments that people doing
+non-browser JS are familiar with.</li>
+<li>Provide an environment for loading
+  <a href="http://wiki.commonjs.org/wiki/Modules/1.1.1">CommonJS style modules</a>, which makes it possible
+  to consume <a href="http://search.npmjs.org/">lots of interesting code</a> that
+  has already been developed.</li>
+<li>Secure each module in an isolated JS sandbox and makes any
+  capability imports explicit via calls to the <code>require()</code> function.</li>
+<li>create task specific loaders with restricted module access.</li>
+<li>Provide unload hooks that may be used to undo changes made by
+  anything loaded into it.</li>
+</ul>
+<h2>Instantiation</h2>
+<p>The <code>loader</code> module provides a <code>Loader()</code> function that may be used
+to instantiate new loader instances:</p>
+<pre><code>let loader = Loader(options);
+</code></pre>
+<h2>Configuration</h2>
+<p><code>Loader()</code> may be provided with a set of configuration options:</p>
+<ul>
+<li><a href="../../packages/api-utils/loader.html#paths"><code>paths</code></a>: describes where the loader should
+find the modules it is asked to load. <strong>Mandatory</strong>.</li>
+<li><a href="../../packages/api-utils/loader.html#modules"><code>modules</code></a>: provides a set of module exports. <strong>Optional</strong>.</li>
+<li><a href="../../packages/api-utils/loader.html#globals"><code>globals</code></a>: provides a set of globals shared across modules loaded
+via this loader. <strong>Optional</strong>.</li>
+<li><a href="../../packages/api-utils/loader.html#resolve"><code>resolve</code></a>: provide customized module resolution logic. <strong>Optional</strong>.</li>
+</ul>
+<h3>paths</h3>
+<p>The loader needs to be provided with a set of locations to indicate
+where to find modules loaded using <code>require()</code>. This is provided by
+a mandatory <code>options.paths</code> hash that represents the mapping between
+module ID prefixes and locations. There are lots of
+different possibilities, but the most common setup looks like this:</p>
+<pre><code>let { Loader } = require('toolkit/loader');
+let loader = Loader({
+  paths: {
+    // Resolve all modules starting with `toolkit/` as follows:
+    // toolkit/foo      -&gt;  resource://gre/modules/toolkit/foo.js
+    // toolkit/foo/bar  -&gt;  resource://gre/modules/toolkit/foo/bar.js
+    'toolkit/': 'resource://gre/modules/toolkit/',
+    // Resolve all other non-relative module requirements as follows:
+    // devtools/gcli    -&gt;  resource:///modules/devtools/gcli.js
+    // panel            -&gt;  resource:///modules/panel.js
+    '': 'resource:///modules/',
+  }
+})
+</code></pre>
+<p>All relative URL <code>require()</code> statements (those that start with ".")
+are first resolved relative to the requirer module ID and the result
+of it is then resolved using the <code>paths</code> option. You may
+still end up with a relative module ID if the entry point module ID is
+itself relative. In those cases you have to decide what the entry point
+module is relative to and provide an appropriate mapping for it:</p>
+<pre><code>let { Loader } = require('toolkit/loader');
+let loader = Loader({
+  paths: {
+    // Resolve all modules starting with `toolkit/` as follows:
+    // toolkit/foo      -&gt;  resource://gre/modules/toolkit/foo.js
+    // toolkit/foo/bar  -&gt;  resource://gre/modules/toolkit/foo/bar.js
+    'toolkit/': 'resource://gre/modules/toolkit/',
+    // Resolev all other non-relative module requirements as follows:
+    // devtools/gcli    -&gt;  resource:///modules/devtools/gcli.js
+    // panel            -&gt;  resource:///modules/panel.js
+    '': 'resource:///modules/',
+    // Allow relative URLs and resolve them to add-on root:
+    // ./main           -&gt;  resource://my-addon/root/main.js
+    './': 'resource://my-addon/root/'
+  }
+});
+</code></pre>
+<p>The order of keys in <code>paths</code> is irrelevant since they are sorted
+by keys from longest to shortest to allow overlapping mapping.
+The example above overlays the base path <code>''</code> with a different mapping
+for <code>'toolkit/'</code> prefixed modules.</p>
+<h3>modules</h3>
+<p>The loader may <strong>optionally</strong> be provided with a set of module exports.
+In the SDK we call these "pseudo modules".
+This feature may be used in a few different ways:</p>
+<ol>
+<li>
+<p>To expose an API that doesn't have a JS file with an implementation
+   or is written in an incompatible format such as
+   <a href="https://developer.mozilla.org/en/JavaScript_code_modules/Using">JSM</a>:</p>
+<pre><code>let { Loader } = require('toolkit/loader');
+let loader = Loader({
+  modules: {
+    // require('net/utils') will get NetUtil.jsm
+    'net/utils': Cu.import('resource:///modules/NetUtil.jsm', {})
+  }
+});
+</code></pre>
+<p>Each loader instance comes with a set of built-in pseudo modules
+   that are described in detail in the <a href="../../packages/api-utils/loader.html#Built-in_Modules">Built-in Modules</a>  section.</p>
+</li>
+<li>
+<p>To reuse module instances that are already loaded.
+   For example in the SDK, the loader is loaded at bootstrap as a JSM module
+   but is then exposed as a pseudo-module to avoid the overhead of subsequent
+   loads:</p>
+<pre><code>let loaderModule = Cu.import('resource://gre/modules/toolkit/loader.js');
+let loader = loaderModule.Loader({
+  modules: {
+    // Overlay `toolkit/loader` so that `require('toolkit/loader')`
+    // will return our `loaderModule`.
+    'toolkit/loader': loaderModule
+  }
+});
+</code></pre>
+</li>
+</ol>
+<p>Use this feature with a great care though. While reuse may sound like a
+   compelling idea it comes with the side effect of shared state, which can
+   cause problems. For example, unload of a loader won't trigger
+   unload hooks on pseudo-modules.</p>
+<h3>globals</h3>
+<p>Each module loaded via the loader instance is secured in own JS sandbox.
+These modules don't share scope and get their own set of built-ins
+(<code>Object</code>, <code>Array</code>, <code>String</code> ...). But sometimes it's convenient to
+define a set of common globals that will be shared across modules. This can be
+done using the optional <code>globals</code> option.</p>
+<p>For example, the SDK uses this feature to provide a global <code>console</code> object:</p>
+<pre><code>let { Loader } = require('toolkit/loader');
+let loader = Loader({
+  globals: {
+    console: console: {
+      log: dump.bind(dump, 'log: '),
+      info: dump.bind(dump, 'info: '),
+      warn: dump.bind(dump, 'warn: '),
+      error: dump.bind(dump, 'error: ')
+    }
+  }
+});
+</code></pre>
+<p>Be careful not to misuse this feature! In general it is not recommended
+to provide features via globals, it's almost always better to use
+pseudo-modules or, even better, modules.</p>
+<h3>resolve</h3>
+<p>The optional <code>resolve</code> option enables you to completely customize
+module resolution logic.</p>
+<p><code>resolve</code> is assigned a function that takes:</p>
+<ul>
+<li>the ID of the module passed into <code>require()</code></li>
+<li>the ID of the module that called <code>require()</code></li>
+</ul>
+<p>On each <code>require()</code> call, the supplied function is then called with
+the ID of the required module and that of the requiring module.</p>
+<p>The function returns a string representing the resolved module ID, which
+is then resolved to its location URL using the mapping provided in
+the <code>paths</code> option.</p>
+<p>If this option is not provided, the loader will use plain path resolution. </p>
+<p>This feature may also be used to implement specific security constraints.
+For example, the SDK generates a manifest file at build time representing
+a dependency graph of all modules used by an add-on. Any attempt to load
+a module not listed in the manifest is unauthorized and is rejected with an
+exception:</p>
+<pre><code>let { Loader } = require('toolkit/loader');
+let manifest = {
+  './main': {
+    'requirements': {
+      'panel': 'sdk/panel'
+    }
+  },
+  'sdk/panel': {
+    'requirements': {
+      'chrome': 'chrome'
+    }
+  }
+  'chrome': {
+    'requirements': {}
+  }
+};
+let loader = Loader({
+  resolve: function(id, requirer) {
+    let requirements = manifest[requirer].requirements;
+    if (id in manifest)
+      return requirements[id];
+    else
+      throw Error('Module "' + requirer + '" has no authority to require ' +
+                  'module "' + id + "')
+  }
+});
+</code></pre>
+<p>Thrown exceptions will propagate to the caller of <code>require()</code>. If
+the function assigned to <code>resolve</code>
+does not return a string value, an exception will still be thrown as
+the loader will be unable to resolve the required module's location.</p>
+<h3>All Together</h3>
+<p>All of these options can be combined to configure the loader for
+a specific use case. Don't get too excited about configuration options, keep
+in mind that modules are more useful if they can be used across
+loader instances. Unless you have specific needs it's best to stick to an
+SDK-compatible configuration, like this:</p>
+<pre><code>let { Loader } = require('toolkit/loader');
+let loader = Loader({
+  // Please note: Illustrated `paths` is expected to be a default base,
+  // but depending on your use case you may have more mappings.
+  paths: {
+    // Resolve all non-relative module requirements to
+    // `resource:///modules/` base URI.
+    '': 'resource:///modules/',
+
+    // Reserve `toolkit/` prefix for generic, mozilla toolkit modules
+    // and resolve them to `resource://gre/modules/toolkit/` URI.
+    'toolkit/': 'resource://gre/modules/toolkit/'
+  },
+  // Please note: Both `globals` and `modules` are just for illustration
+  // purposes we don't suggest populating them with these values.
+  globals: {
+    // Provide developers with well known `console` object, hopefully
+    // with a more advanced implementation.
+    console: {
+      log: dump.bind(dump, "log: "),
+      info: dump.bind(dump, "info: "),
+      warn: dump.bind(dump, "warn: "),
+      error: dump.bind(dump, "error: ")
+    }
+  },
+  modules: {
+    // Expose legacy API via pseudo modules that eventually may be
+    // replaced with a real ones :)
+    "devtools/gcli": Cu.import("resource:///modules/gcli.jsm", {}),
+    "net/utils": Cu.import("resource:///modules/NetUtil.jsm", {})
+  }
+});
+</code></pre>
+<h3>Loader Instances</h3>
+<p>The loader produces instances that are nothing more than representations
+of the environment into which modules are loaded. It is intentionally made
+immutable and all its properties are just an implementation detail that
+no one should depend on, they may change at any point without any further
+notice.</p>
+<h2>Loading Modules</h2>
+<p>The CommonJS specification defines the notion of a <strong>main</strong> module, which
+represents an entry point to a program. </p>
+<p>The <code>loader</code> module exposes a <code>main()</code> function that can
+be used to load a main module.
+All other modules will be loaded by this module or its dependencies:</p>
+<pre><code>let { main, Loader } = require('toolkit/loader');
+let loader = Loader(options);
+let program = main(loader, './main');
+</code></pre>
+<p>A module can find out whether it was loaded as main:</p>
+<pre><code>if (require.main === module)
+  main();
+</code></pre>
+<p>It is possible to load other modules before a main one, but it's inherently
+harder to do. That's because every module except main has a requirer,
+based on which resolution and authority decisions are made. In order to load
+a module before a main one (for example to bootstrap an environment) the
+requirer must be created first:</p>
+<pre><code>let { Require, Loader, Module } = require('toolkit/loader');
+let loader = Loader(options);
+let requirer = Module(requirerID, requirerURI);
+let require = Require(loader, requirer);
+let boostrap = require(bootstrapID);
+</code></pre>
+<h2>Built-in Modules</h2>
+<p>Each loader instance exposes the following built-in pseudo modules
+in addition to those passed via <code>modules</code>:</p>
+<h3>chrome</h3>
+<p>This pseudo module exposes everything that is typically available for JS
+contexts with <a href="https://developer.mozilla.org/en/Security_check_basics#Principals">system principals</a> under the <a href="https://developer.mozilla.org/en/Components">Components</a> global.
+This alternative approach of providing capabilities via modules makes
+it possible to build module capability graphs by analyzing require
+statements. These graphs can be used to reason about modules without diving
+into implementation details.</p>
+<h3>@loader/options</h3>
+<p>This pseudo module exposes all the <code>options</code> that were used to configure this
+loader. It enables you to create new loader instances identical to the
+current one:</p>
+<pre><code>    let { Loader } = require('toolkit/loader');
+    let options = require('@loader/options');
+    let loader = Loader(options);
+</code></pre>
+<p>This module is useful in very specific cases. For example the SDK uses this
+feature during test execution to create an identical environment with a
+different state to test how specific modules handle unloads.</p>
+<h3>@loader/unload</h3>
+<p>This pseudo module exposes an object that is unique per loader
+instance. It is used as a subject for <a href="https://developer.mozilla.org/en/Observer_Notifications">observer notification</a> to allow
+use of the <a href="https://developer.mozilla.org/en/nsiobserverservice">observer service</a> for defining hooks reacting on the unload of
+a specific loader.
+The SDK builds a higher level API on top of this for handling unloads and
+performing cleanup:</p>
+<pre><code>    let unloadSubject = require('@loader/unload');
+    let observerService = Cc['@mozilla.org/observer-service;1'].
+                          getService(Ci.nsIObserverService);
+
+    let observer = {
+      observe: function onunload(subject, topic, data) {
+        // If this loader is unload then `subject.wrappedJSObject` will be
+        // `unloadSubject`. `topic` is `'sdk:loader:destroy'`. `data` is
+        // string describing unload reason.
+        let unloadReason = data;
+        if (subject.wrappedJSObject === unloadSubject)
+          cleanup(reason)
+      }
+    };
+    observerService.addObserver(observer, 'sdk:loader:destroy', false);
+</code></pre>
+<h2>Unload</h2>
+<p>The <code>loader</code> module exposes an <code>unload()</code> function that can be used to
+unload specific loader instance and undo changes made by modules loaded
+into it. <code>unload</code> takes <code>loader</code> as a first argument and optionally a
+<code>reason</code> string identifying the reason why this loader was unloaded.</p>
+<p>For example in the SDK <code>reason</code> may be one of:
+<code>shutdown</code>, <code>disable</code>, <code>uninstall</code>.</p>
+<pre><code>    unload(loader, 'disable');
+</code></pre>
+<p>Calls to this function will dispatch the unload
+<a href="https://developer.mozilla.org/en/Observer_Notifications">observer notification</a> that modules can listen to as described above.</p>
+<h2>Other Utilities</h2>
+<p>The loader module exposes several other utility functions that are used
+internally and can also be handy while bootstrapping the loader itself.
+They are low level helpers and should be used only during
+loader bootstrap.</p>
+<h3>Module()</h3>
+<p>The <code>Module()</code> function takes a module ID and URI and creates a module
+instance object that is exposed as the <code>module</code> variable in the
+module scope.</p>
+<pre><code>let module  = Module('foo/bar', 'resource:///modules/foo/bar.js');
+</code></pre>
+<p>Note that this won't actually load any module code, it just creates
+a placeholder for it. The section below describes how to load the module.</p>
+<h3>load()</h3>
+<p>The <code>load()</code> function takes <code>loader</code> and loads the given <code>module</code> into it:</p>
+<pre><code>let loader = Loader(options);
+let module  = Module('foo/bar', 'resource:///modules/foo/bar.js');
+load(loader, module);
+</code></pre>
+<h3>Sandbox()</h3>
+<p>The <code>Sandbox()</code> function is a utility function for creating
+<a href="https://developer.mozilla.org/en/Components.utils.Sandbox">JS sandboxes</a>. It is used by the loader to create scopes into which
+modules are loaded. It takes the following set of configuration options:</p>
+<ul>
+<li><code>name</code>: A string value which identifies the sandbox in about:memory.
+  Will throw exception if omitted.</li>
+<li><code>principal</code>: String URI or <code>nsIPrincipal</code> for the sandbox.
+  If omitted defaults to system principal.</li>
+<li><code>prototype</code>: Object that the returned sandbox will inherit from.
+   Defaults to <code>{}</code>.</li>
+<li><code>wantXrays</code>: A Boolean value indicating whether code outside the sandbox
+   wants X-ray vision with respect to objects inside the sandbox. Defaults
+   to <code>true</code>.</li>
+</ul>
+<!-- this comment is used to terminate the Markdown list -->
+
+<pre><code>   let sandbox = Sandbox({
+     name: 'resource:///modules/foo/bar.js',
+     wantXrays: false,
+     prototype: {
+       console: {
+         log: dump.bind(dump, 'log: '),
+         info: dump.bind(dump, 'info: '),
+         warn: dump.bind(dump, 'warn: '),
+         error: dump.bind(dump, 'error: ')
+       }
+     }
+   });
+</code></pre>
+<h3>evaluate()</h3>
+<p>Evaluates code in the supplied <code>sandbox</code>.
+If <code>options.source</code> is provided then its value is evaluated, otherwise
+source is read from the supplied <code>uri</code>. Either way, any exceptions will
+be reported as from the <code>uri</code>.</p>
+<p>Optionally more options may be specified:</p>
+<ul>
+<li><code>options.encoding</code>: source encoding, defaults to 'UTF-8'.</li>
+<li><code>options.line</code>: line number to start count from in stack traces.
+  Defaults to 1.</li>
+<li><code>options.version</code>: version of JS used, defaults to '1.8'.</li>
+</ul>
+<!-- this comment is used to terminate the Markdown list -->
+
+<pre><code>// Load script from the given location to a given sandbox:
+evaluate(sandbox, 'resource://path/to/script.js')
+
+// Evaluate `code` as if it was from `foo/bar.js`:
+evaluate(sandbox, 'foo/bar.js', {
+  source: code,
+  version: '1.7'
+  // You could also use other options described above.
+})
+</code></pre>
+<h3>Require()</h3>
+<p>As already mentioned in
+<a href="../../packages/api-utils/loader.html#Loading_Modules">Loading Modules</a>
+it's common to start execution by loading a main module.
+But sometimes you may want to prepare the environment using
+existing modules before doing that. In such cases you can create a
+requirer module instance and a version of <code>require</code> exposed to it with
+this function:</p>
+<pre><code>let requirer = Module(requirerID, requirerURI);
+let require = Require(loader, requirer);
+let boostrap = require(bootstrapID);
+</code></pre>
+<h3>resolveURI()</h3>
+<p>This function is used by the loader to resolve module URI from an ID using
+a mapping array generated from the loader's <code>paths</code> option.
+It examines each element until it finds the prefix matching the supplied
+ID and replaces it with the location it maps to:</p>
+<pre><code>let mapping = [
+  [ 'toolkit/', 'resource://gre/modules/toolkit/' ],
+  [ './',       'resource://my-addon/'    ], 
+  [ '',         'resource:///modules/'    ]
+];
+resolveURI('./main', mapping);           // =&gt; resource://my-addon/main.js
+resolveURI('devtools/gcli', mapping);    // =&gt; resource:///modules/devtools/gcli.js
+resolveURI('toolkit/promise', mapping);  // =&gt; resource://gre/modules/toolkit/promise.js
+</code></pre>
+<h3>override()</h3>
+<p>This function is used to create a fresh object that contains own properties of
+two arguments it takes. If arguments have properties with conflicting names
+the property from the second argument overrides that from the first. This
+function is helpful for combining default and passed properties:</p>
+<pre><code>override({ a: 1, b: 1 }, { b: 2, c: 2 }) // =&gt; { a: 1, b: 2, c: 2 }
+</code></pre>
+<h3>descriptor()</h3>
+<p>This utility function takes an object and as an argument and returns property
+descriptor map for its own properties. It is useful when working with object
+functions introduced in ES5 (<code>Object.create, Object.defineProperties, ..</code>):</p>
+<pre><code>// define properties of `source` on `target`.
+Object.defineProperties(target, descriptor(source))
+</code></pre>
+</div>
+
+</div>
+</div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../packages/addon-kit/request.html">request</a>
+
+<a href="../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../packages/addon-kit/self.html">self</a>
+
+<a href="../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../packages/api-utils/base64.html">base64</a>
+
+<a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../packages/api-utils/content.html">content</a>
+
+<a href="../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../packages/api-utils/events.html">events</a>
+
+<a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../packages/api-utils/list.html">list</a>
+
+<a href="../../packages/api-utils/loader.html">loader</a>
+
+<a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
+<a href="../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../packages/api-utils/url.html">url</a>
+
+<a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../dev-guide/console.html">console</a>
+            <a href="../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

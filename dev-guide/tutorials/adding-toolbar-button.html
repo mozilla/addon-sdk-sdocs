@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.8</div>
+    <div id="version">Version 1.9</div>
   </div>
 </div>
 
@@ -73,15 +73,11 @@ and learned the
 </span></p>
 <p>To add a button to the toolbar, use the
 <a href="../../packages/addon-kit/widget.html"><code>widget</code></a> module.</p>
-<p>The default add-on created by <code>cfx init</code>
-uses a widget, so we'll start with that as an example. If you haven't already
-followed the tutorial introducing
-<a href="../../dev-guide/tutorials/getting-started-with-cfx.html#cfx-init"><code>cfx init</code></a>,
-do that now, then come back here.</p>
-<p>Create a new directory, navigate to it, and execute <code>cfx init</code>. Then open the file called
-"main.js" in the "lib" directory:</p>
-<pre><code>const widgets = require("widget");
-const tabs = require("tabs");
+<p>Create a new directory, navigate to it, and execute <code>cfx init</code>.
+Then open the file called "main.js" in the "lib" directory and
+add the following code to it:</p>
+<pre><code>var widgets = require("widget");
+var tabs = require("tabs");
 
 var widget = widgets.Widget({
   id: "mozilla-link",
@@ -300,6 +296,8 @@ require("widget").Widget({
 
 <a href="../../packages/api-utils/app-strings.html">app-strings</a>
 
+<a href="../../packages/api-utils/base64.html">base64</a>
+
 <a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../packages/api-utils/collection.html">collection</a>
@@ -344,6 +342,8 @@ require("widget").Widget({
 
 <a href="../../packages/api-utils/list.html">list</a>
 
+<a href="../../packages/api-utils/loader.html">loader</a>
+
 <a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
 
 <a href="../../packages/api-utils/memory.html">memory</a>
@@ -368,13 +368,13 @@ require("widget").Widget({
 
 <a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
 
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
 <a href="../../packages/api-utils/text-streams.html">text-streams</a>
 
 <a href="../../packages/api-utils/traceback.html">traceback</a>
 
 <a href="../../packages/api-utils/traits.html">traits</a>
-
-<a href="../../packages/api-utils/unit-test.html">unit-test</a>
 
 <a href="../../packages/api-utils/unload.html">unload</a>
 

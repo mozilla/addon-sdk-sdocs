@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.8</div>
+    <div id="version">Version 1.9</div>
   </div>
 </div>
 
@@ -72,8 +72,7 @@
 <!-- edited by Noelle Murata [fiveinchpixie@gmail.com]  -->
 
 <p>The <code>unload</code> module allows modules to register callbacks that are called
-when they are unloaded.  It is similar to the CommonJS module of the same
-name in the <a href="http://narwhaljs.org/">Narwhal</a> platform.</p>
+when they are unloaded.</p>
 </div>
 
 <div class="api_reference">
@@ -88,8 +87,8 @@ name in the <a href="http://narwhaljs.org/">Narwhal</a> platform.</p>
 <ol>
 <li>It replaces a destructor method with a wrapper method that will never call
    the destructor more than once.</li>
-<li>It ensures that this wrapper method is called when <code>send()</code> is
-   called.</li>
+<li>It ensures that this wrapper method is called when the object's module is
+unloaded.</li>
 </ol>
 <p>Therefore, when you register an object with <code>ensure()</code>, you can call its
 destructor method yourself, you can let it happen for you, or you can do both.</p>
@@ -113,34 +112,18 @@ destructor method, then an exception is thrown when <code>ensure()</code> is cal
 
 <div class="api_component">
 <h4 class="api_name">when(callback)</h4>
-<p>Registers a function to be called when <code>send()</code> is called.</p>
+<p>Registers a function to be called when the module is unloaded.</p>
 <div class="parameter_set">
 <div class="api_component">
 <div class="api_name">callback : <span class="datatype">function</span></div>
-<p>A function that will be called when <code>send()</code> is called.  It is called with a
-single argument, one of the following strings describing the reason for
-unload: <code>"uninstall"</code>, <code>"disable"</code>, <code>"shutdown"</code>, <code>"upgrade"</code>, or
-<code>"downgrade"</code>.  (On Gecko 1.9.2-based applications such as Firefox 3.6,
-<code>"upgrade"</code> and <code>"downgrade"</code> are not available, and <code>"shutdown"</code> will be sent
-in their place.)  If a reason could not be determined, <code>undefined</code> will be
-passed instead.  Note that if an add-on is unloaded with reason <code>"disable"</code>,
-it will not be notified about <code>"uninstall"</code> while it is disabled.  A solution
-to this issue is being investigated; see bug 571049.</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="api_component">
-<h4 class="api_name">send(reason)</h4>
-<p>Sends an "unload signal", thereby triggering all callbacks registered via
-<code>when()</code>. In general, this function need not be manually called; it is
-automatically triggered by the embedder.</p>
-<div class="parameter_set">
-<div class="api_component">
-<div class="api_name">[ reason : <span class="datatype">string</span> ]</div>
-<p>An optional string describing the reason for unload; see <code>unload.when()</code>.</p>
+<p>A function that will be called when the module is unloaded. It is called
+with a single argument, one of the following strings describing the reason
+for unload: <code>"uninstall"</code>, <code>"disable"</code>, <code>"shutdown"</code>, <code>"upgrade"</code>, or
+<code>"downgrade"</code>. If a reason could not be determined, <code>undefined</code> will be
+passed instead.
+Note that if an add-on is unloaded with reason <code>"disable"</code>, it will not be
+notified about <code>"uninstall"</code> while it is disabled. See
+<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=571049">bug 571049</a>.</p>
 </div>
 
 </div>
@@ -244,6 +227,8 @@ automatically triggered by the embedder.</p>
 
 <a href="../../packages/api-utils/app-strings.html">app-strings</a>
 
+<a href="../../packages/api-utils/base64.html">base64</a>
+
 <a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
 
 <a href="../../packages/api-utils/collection.html">collection</a>
@@ -288,6 +273,8 @@ automatically triggered by the embedder.</p>
 
 <a href="../../packages/api-utils/list.html">list</a>
 
+<a href="../../packages/api-utils/loader.html">loader</a>
+
 <a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
 
 <a href="../../packages/api-utils/memory.html">memory</a>
@@ -312,13 +299,13 @@ automatically triggered by the embedder.</p>
 
 <a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
 
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
 <a href="../../packages/api-utils/text-streams.html">text-streams</a>
 
 <a href="../../packages/api-utils/traceback.html">traceback</a>
 
 <a href="../../packages/api-utils/traits.html">traits</a>
-
-<a href="../../packages/api-utils/unit-test.html">unit-test</a>
 
 <a href="../../packages/api-utils/unload.html">unload</a>
 
