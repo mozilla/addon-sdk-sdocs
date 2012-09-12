@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.9</div>
+    <div id="version">Version 1.10</div>
   </div>
 </div>
 
@@ -79,8 +79,10 @@ require("unload").when(function cleanup() {
 </code></pre>
 <p>This starts a server in background (assuming you're running this code in an 
 application that has an event loop, such as Firefox). The server listens at 
-http://localhost:port/ and serves files from the specified directory. You 
-can serve static content or use SJS scripts, as described in documentation 
+<code>http://localhost:port/</code> and serves files from the specified directory. You 
+can serve static content or use
+<a href="https://developer.mozilla.org/en/HTTP_server_for_unit_tests#SJS:_server-side_scripts">SJS scripts</a>,
+as described in documentation 
 on developer.mozilla.org.</p>
 <p>You can also use <code>nsHttpServer</code> to start the server manually:</p>
 <pre><code>var {nsHttpServer} = require("httpd");

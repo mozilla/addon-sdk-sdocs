@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.9</div>
+    <div id="version">Version 1.10</div>
   </div>
 </div>
 
@@ -67,23 +67,43 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<p>Module <code>xpcom</code> provides low level API for implementing and registering /
-unregistering various XCOM interfaces.</p>
-<h2>Implementing XPCOM interfaces</h2>
-<p>Module exports <code>Unknow</code> exemplar object, that may be extended to implement
-specific XCOM interface(s). For example [nsIObserver]
-(https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIObserver) may be
-implemented as follows:</p>
-<pre><code>const { Unknown } = require('api-utils/xpcom');
-const { Cc, Ci } = require('chrome')
-const observerService = Cc["@mozilla.org/observer-service;1"].
+<p><span class="aside">
+If all you need to do is use XPCOM objects that someone else has implemented,
+then you don't need to use this module. You can just use <code>require("chrome")</code>
+to get direct access to the
+<a href="https://developer.mozilla.org/en/Components_object"><code>Components</code></a>
+object, and
+<a href="../../dev-guide/guides/xul-migration.html#xpcom">access XPCOM objects from there</a>.
+</span></p>
+<p>The <code>xpcom</code> module makes it simpler to perform three main tasks:</p>
+<ul>
+<li><a href="../../packages/api-utils/xpcom.html#Implementing XPCOM Interfaces">Implement XPCOM object interfaces</a></li>
+<li><a href="../../packages/api-utils/xpcom.html#Implementing XPCOM Factories">Implement and register XPCOM factories</a></li>
+<li><a href="../../packages/api-utils/xpcom.html#Implementing XPCOM Services">Implement and register XPCOM services</a></li>
+</ul>
+<h2>Implementing XPCOM Interfaces</h2>
+<p><span class="aside">"<code>Unknown</code>" is named after the
+<a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms680509%28v=vs.85%29.aspx">"<code>IUnknown</code>"</a> interface in COM.</span></p>
+<p>This module exports a class called <code>Unknown</code> which implements the fundamental
+XPCOM interface
+<a href="https://developer.mozilla.org/docs/XPCOM_Interface_Reference/nsISupports"><code>nsISupports</code></a>.
+By subclassing <code>Unknown</code>, either using
+<a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Inheritance_Revisited">standard JavaScript inheritance</a>
+or using the SDK's <a href="../../packages/api-utils/heritage.html"><code>heritage</code></a>
+module, you can provide your own implementations of XPCOM interfaces.</p>
+<p>For example, the add-on below implements the
+<a href="https://developer.mozilla.org/docs/XPCOM_Interface_Reference/nsIObserver"><code>nsIObserver</code></a>
+interface to listen for and log all topic notifications:</p>
+<pre><code>var { Class } = require("api-utils/heritage");
+var { Unknown } = require('api-utils/xpcom');
+var { Cc, Ci } = require('chrome')
+var observerService = Cc["@mozilla.org/observer-service;1"].
                         getService(Ci.nsIObserverService);
 
-// Create my observer exemplar
-const SleepObserver = Unknown.extend({
-  interfaces: [ 'nsIObserver' ],    // Interfaces component implements
-  topic: 'sleep_notification',
-  initialize: function(fn) { this.fn = fn },
+var StarObserver = Class({
+  extends:  Unknown,
+  interfaces: [ 'nsIObserver' ],
+  topic: '*',
   register: function register() {
     observerService.addObserver(this, this.topic, false);
   },
@@ -91,172 +111,606 @@ const SleepObserver = Unknown.extend({
     addObserver.removeObserver(this, this.topic, false);
   },
   observe: function observe(subject, topic, data) {
-    this.fn({
-      subject: subject,
-      type: topic,
-      data: data
-    });
+    console.log("star observer:", subject, topic, data);
   }
 });
 
-// create instances of observers
-let observer = SleepObserver.new(function(event) {
-  console.log('Going to sleep!')
-});
-// register observer
-observer.register();
+var starobserver = StarObserver();
+starobserver.register();
 </code></pre>
-<h2>Implementing XCOM factories</h2>
-<p>Module exports <code>Factory</code> exemplar, object that may be used to create objects
-implementing
-<a href="https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIFactory">nsIFactory</a>
-interface:</p>
-<pre><code>const { Factory } = require('api-utils/xpcom');
-let Request = Unknown.extend({
-  interfaces: [ 'nsIRequest' ],
-  initialize: function initialize() {
-    this.pending = false;
-    // Do some initialization
-  },
-  isPending: function() { return this.pending },
-  resume: function() { /* Implementation */ },
-  suspend: function() { /* Implementation */ },
-  cancel: function() { /* Implementation */ },
-  initiate: function() {
-    this.pending = true;
-    /* Implementation */
-  }
-});
+<h2>Implementing XPCOM Factories</h2>
+<p>The <code>xpcom</code> module exports a class called <code>Factory</code> which implements the
+<a href="https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIFactory"><code>nsIFactory</code></a>
+interface. You can use this class to register factories for XPCOM
+components you have defined.</p>
+<p>For example, this add-on defines a subclass of <code>Unknown</code> called
+<code>HelloWorld</code> that implements a function called <code>hello</code>. By
+creating a <code>Factory</code> and passing it the
+<a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#Contract_ID">contract ID</a>
+for the <code>HelloWorld</code> component and the <code>HelloWorld</code> constructor, we enable
+XPCOM clients to access the <code>HelloWorld</code> component, given its contract ID.</p>
+<p><span class="aside">
+In this example the <code>HelloWorld</code> component is available to JavaScript only,
+so we use the technique documented under the "Using wrappedJSObject"
+section of
+<a href="https://developer.mozilla.org/en/How_to_Build_an_XPCOM_Component_in_Javascript">How to Build an XPCOM Component in JavaScript</a>.</span></p>
+<pre><code>var { Class } = require('api-utils/heritage');
+var { Unknown, Factory } = require('api-utils/xpcom');
+var { Cc, Ci } = require("chrome");
 
-let requestFactory = Factory.new({ component: Request });
-</code></pre>
-<p>Factories registered into a runtime may be accessed from the rest of the
-application via standard XPCOM API using factory's auto generated <code>id</code>
-(optionally you could specify specific <code>id</code> by passing it as an option):</p>
-<pre><code>let request = Components.classesByID[requestFactory.id].
-  createInstance(Ci.nsIRequest);
-request.isPending()     // =&gt; false
-</code></pre>
-<p>Be aware that traditional XPCOM API will always return a wrapped JS objects
-exposing only properties defined by a given interface (<code>nsIRequest</code>) in our
-case:</p>
-<pre><code>request.initiate()      // TypeError: request.initiate is not a function
-</code></pre>
-<p>You still can expose unwrapped JS object, by a special <code>wrappedJSObject</code>
-property of the component:</p>
-<pre><code>let Request = Unknown.extend({
+var contractId = '@me.org/helloworld';
+
+// Define a component
+var HelloWorld = Class({
+  extends: Unknown,
   get wrappedJSObject() this,
-  interfaces: [ 'nsIRequest' ],
-  initialize: function initialize() {
-    this.pending = false;
-    // Do some initialization
-  },
-  isPending: function() { return this.pending },
-  resume: function() { /* Implementation */ },
-  suspend: function() { /* Implementation */ },
-  cancel: function() { /* Implementation */ },
-  initiate: function() {
-    this.pending = true;
-    /* Implementation */
+  hello: function() {return "Hello World";}
+});
+
+// Create and register the factory
+var factory = Factory({
+  contract: contractId,
+  Component: HelloWorld
+});
+
+// XPCOM clients can retrieve and use this new
+// component in the normal way
+var wrapper = Cc[contractId].createInstance(Ci.nsISupports);
+var helloWorld = wrapper.wrappedJSObject;
+console.log(helloWorld.hello());
+</code></pre>
+<h3>Using class ID</h3>
+<p>You can specify a
+<a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#CID">class ID</a>
+for the factory by setting the <code>id</code> option in the factory's constructor.
+If you don't specify a class ID, then the factory will generate one.
+Either way, it will be accessible as the value of the factory's <code>id</code> property.</p>
+<p>XPCOM users can look up the factory using the class ID instead of the
+contract ID. Here's the example above, rewritten to use class ID
+instead of contract ID for lookup:</p>
+<pre><code>var { Class } = require('api-utils/heritage');
+var { Unknown, Factory } = require('api-utils/xpcom');
+var { Cc, Ci, components } = require("chrome");
+
+// Define a component
+var HelloWorld = Class({
+  extends: Unknown,
+  get wrappedJSObject() this,
+  hello: function() {return "Hello World";}
+});
+
+// Create and register the factory
+var factory = Factory({
+  Component: HelloWorld
+});
+
+var id = factory.id;
+
+// Retrieve the factory by class ID
+var wrapper = components.classesByID[id].createInstance(Ci.nsISupports);
+var helloWorld = wrapper.wrappedJSObject;
+console.log(helloWorld.hello());
+</code></pre>
+<h3>Replacing Factories</h3>
+<p>If the factory you create has the same contract ID as an existing registered
+factory, then your factory will replace the existing one. However, the
+<code>Components.classes</code> object commonly used to look up factories by contract ID
+will not be updated at run time. To access the replacement factory you need
+to do something like this:</p>
+<pre><code>var id = Components.manager.QueryInterface(Ci.nsIComponentRegistrar).
+  contractIDToCID('@me.org/helloworld');
+var wrapper = Components.classesByID[id].createInstance(Ci.nsISupports);
+</code></pre>
+<p>The <code>xpcom</code> module exports a function <code>factoryByContract</code> to simplify this
+technique:</p>
+<pre><code>var wrapper = xpcom.factoryByContract('@me.org/helloworld').createInstance(Ci.nsISupports);
+</code></pre>
+<h3>Registration</h3>
+<p>By default, factories are registered and unregistered automatically.
+To learn more about this, see
+<a href="../../packages/api-utils/xpcom.html#Registering and Unregistering">Registering and Unregistering</a>.</p>
+<h2>Implementing XPCOM Services</h2>
+<p>The <code>xpcom</code> module exports a class called <code>Service</code> which you can use to
+define
+<a href="https://developer.mozilla.org/en-US/docs/XUL_Tutorial/XPCOM_Interfaces#XPCOM_Services">XPCOM services</a>,
+making them available to all XPCOM users.</p>
+<p>This example implements a logging service that just appends a timestamp
+to all logged messages. The logger itself is implemented by subclassing
+the <code>Unknown</code> class, then we create a service which associates the logger's
+constructor with its
+<a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#Contract_ID">contract ID</a>.
+After this, XPCOM users can access the service using the <code>getService()</code> API:</p>
+<pre><code>var { Class } = require('api-utils/heritage');
+var { Unknown, Service } = require('api-utils/xpcom');
+var { Cc, Ci } = require("chrome");
+
+var contractId = '@me.org/timestampedlogger';
+
+// Implement the service by subclassing Unknown
+var TimeStampedLogger = Class({
+  extends: Unknown,
+  get wrappedJSObject() this,
+  log: function(message) {
+    console.log(new Date().getTime() + " : " + message);
   }
 });
 
-let requestFactory = Factory.new({ component: Request });
-let request = Components.classesByID[requestFactory.id].
-  createInstance(Ci.nsIRequest);
-request.isPending();     // =&gt; false
-request.wrappedJSObject.initiate();
-request.isPending();     // =&gt; true
-</code></pre>
-<p>Optionally <code>Factory.new</code> may be passed globally unique string in a format of:
-<code>'@domain.com/unique/identifier;1'</code> as a <code>contract</code> option in order to
-associate it with it:</p>
-<pre><code>let namedFactory = Factory.new({
-  contract: '@examples.com/request/factory;1',
-  component: Request
+// Register the service using the contract ID
+var service = Service({
+  contract: contractId,
+  Component: TimeStampedLogger
 });
+
+// Access the service using getService()
+var wrapper = Cc[contractId].getService(Ci.nsISupports);
+var logger = wrapper.wrappedJSObject;
+logger.log("a timestamped message");
 </code></pre>
-<p>Such factories when registered can be accessed form rest of the application by
-human readable <code>contract</code> strings:</p>
-<pre><code>let request = Components.classes['@examples.com/request/factory;1'].
-               createInstance(Components.interfaces.nsIRequest);
-</code></pre>
-<p>In addition factories associated with a given <code>contract</code> may be replaced at
-runtime:</p>
-<pre><code>let renewedFactory = Factory.new({
-  contract: '@examples.com/request/factory;1',
-  component: Unknown.extend({ /* Implementation */ })
-})
-</code></pre>
-<p>Unfortunately commonly used <code>Components.classes</code> won't get updated at runtime
-but there is an alternative, more verbose way to access last registered factory
-for a given <code>contract</code>:</p>
-<pre><code>let id = Components.manager.QueryInterface(Ci.nsIComponentRegistrar).
-  contractIDToCID('@examples.com/request/factory;1');
-Components.classesByID[requestFactory.id].
-  createInstance(Ci.nsISupports);
-</code></pre>
-<p>Module also exports <code>factoryByContract</code> function to simplify this:</p>
-<pre><code>factoryByContract('@examples.com/request/factory;1').
-  createInstance(Ci.nsISupports);
-</code></pre>
-<p>It's also recommended to construct factories with an optional <code>description</code>
-property, providing human readable description of it:</p>
-<pre><code>let factory = Factory.new({
-  contract: '@examples.com/request/factory;1',
-  description: 'Super duper request factory',
-  component: Request
-});
-</code></pre>
-<h2>Registering / Unregistering factories</h2>
-<p>All factories created using <code>Factory.new</code> get automatically registered into
-runtime unless explicitly specified otherwise by setting <code>register</code> option to
-<code>false</code>:</p>
-<pre><code>var factoryToRegister = Factory.new({
+<p>By default, services are registered and unregistered automatically.
+To learn more about this, see
+<a href="../../packages/api-utils/xpcom.html#Registering and Unregistering">Registering and Unregistering</a>.</p>
+<h2>Registering and Unregistering</h2>
+<p>By default, factories and services are registered with XPCOM automatically
+when they are created, and unregistered automatically when the add-on
+that created them is unloaded.</p>
+<p>You can override this behavior using the <code>register</code> and <code>unregister</code>
+options to the factory or service constructor:</p>
+<pre><code>var xpcom = require("api-utils/xpcom");
+
+var factory = xpcom.Factory({
+  contract: contractId,
+  Component: HelloWorld,
   register: false,
-  component: Unknown.extend({ /* Implementation */ })
-});
-</code></pre>
-<p>Such factories still may be registered manually using exported <code>register</code>
-function:</p>
-<pre><code>const { register } = require('api-utils/xpcom');
-register(factoryToRegister);
-</code></pre>
-<p>All factories created using <code>Factory.new</code> also get unregistered automatically
-when add-on is unloaded. This also can be disabled by setting <code>unregister</code>
-option to <code>false</code>.</p>
-<pre><code>var factoryToUnregister = Service.new({
   unregister: false,
-  component: Unknown.extend({ /* Implementation */ })
 });
 </code></pre>
-<p>All registered services may be unregistered at any time using exported
-<code>unregister</code> function:</p>
-<pre><code>unregister(factoryToUnregister);
+<p>If you disable automatic registration in this way, you can use the
+<code>register()</code> function to register factories and services:</p>
+<pre><code>xpcom.register(factory);
 </code></pre>
-<h2>Implementing XCOM services</h2>
-<p>Module exports <code>Service</code> exemplar object, that has exact same API as <code>Factory</code>
-and can be used to register services:</p>
-<pre><code>const { Service } = require('api-utils/xpcom');
-let service = Service.new({
-  contract: '@examples/demo/service;1',
-  description: 'My demo service',
-  component: Unknown.extend({
-    // Implementation
-    get wrappedJSObject() this
-  })
+<p>You can use the corresponding <code>unregister()</code> function to unregister them,
+whether or not you have disabled automatic unregistration:</p>
+<pre><code>xpcom.unregister(factory);
+</code></pre>
+<p>You can find out whether a factory or service has been registered by using the
+<code>isRegistered()</code> function:</p>
+<pre><code>if (xpcom.isRegistered(factory))
+  xpcom.unregister(factory);
+</code></pre>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Classes</h3>
+
+<div class="api_component">
+<h4 class="api_name">Unknown</h4>
+<p>This is the base class for all XPCOM objects. It is not intended to be used
+directly but you can subclass it,
+either using
+<a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Inheritance_Revisited">standard JavaScript inheritance</a>
+or using the SDK's <a href="../../packages/api-utils/heritage.html"><code>heritage</code></a>
+module, to create new
+implementations of XPCOM interfaces. For example, this subclass implements the
+<a href="https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/NsIRequest"><code>nsIRequest</code></a>
+interface:</p>
+<pre><code>var { Class } = require('api-utils/heritage');
+var { Unknown } = require('api-utils/xpcom');
+
+var Request = Class({
+  extends: Unknown,
+  interfaces: [ 'nsIRequest' ],
+  initialize: function initialize() {
+    this.pending = false;
+  },
+  isPending: function() { return this.pending; },
+  resume: function() { console.log("resuming..."); },
+  suspend: function() { console.log("suspending..."); },
+  cancel: function() { console.log("canceling..."); }
 });
 </code></pre>
-<p>Registered services can be accessed through the rest of the application via
-standard XPCOM API:</p>
-<pre><code>let s = Components.classes['@examples/demo/service;1'].
-  getService(Components.interfaces.nsISupports);
+<p>This component definition:</p>
+<p><span class="aside">Although <code>Request</code> also implements
+<code>nsISupports</code>, there is no need to add it here, because
+the base class <code>Unknown</code> declares support for <code>nsISupports</code> and this
+is accounted for when retrieving objects.</span></p>
+<ul>
+<li>specifies that we support <code>nsIRequest</code> using the <code>interfaces</code> property.</li>
+<li>initializes <code>pending</code> in <code>initialize()</code></li>
+<li>adds our implementation of the <code>nsIRequest</code> interface</li>
+</ul>
+<p>We can register a factory for this component by using the <code>Factory</code>
+class to associate its constructor with its contract ID:</p>
+<pre><code>var { Factory } = require('api-utils/xpcom');
+var { Cc, Ci } = require("chrome");
+var contractId = "@me.org/request"
+
+// Create and register the factory
+var factory = Factory({
+  contract: contractId,
+  Component: Request
+});
 </code></pre>
-<p>In contrast to factories, services do not create instances of enclosed
-components, they expose component itself. Also please note that idiomatic way
-to work with a service is via <code>getService</code> method:</p>
-<pre><code>s.wrappedJSObject === service.component // =&gt; true
+<p>Now XPCOM users can access our implementation in the normal way:</p>
+<pre><code>var request = Cc[contractId].createInstance(Ci.nsIRequest);
+request.resume();
 </code></pre>
+<div class="api_component_group">
+<h5 class="api_header">Methods</h5>
+
+<div class="api_component">
+<h6 class="api_name">QueryInterface(interface)</h6>
+<p>This method is called automatically by XPCOM, so usually you don't
+need to call it yourself. It is passed an interface identifier and
+searches for the identifier in the <code>interfaces</code> property of:</p>
+<ul>
+<li>this object</li>
+<li>any of this object's ancestors</li>
+<li>any classes in the <code>implements</code> array property of the instance
+(for example, any classes added to this object via the <code>implements</code>
+option defined in <a href="../../packages/api-utils/heritage.html"><code>heritage</code></a>).</li>
+</ul>
+<p>If it finds a match, it returns <code>this</code>, otherwise it throws
+<a href="https://developer.mozilla.org/en-US/docs/Table_Of_Errors"><code>Components.results.NS_ERROR_NO_INTERFACE</code></a>.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">interface : <span class="datatype">iid</span></div>
+<p>The interface to ask for. This is typically given as a property of the
+<a href="https://developer.mozilla.org/en-US/docs/Components.interfaces"><code>Components.interfaces</code></a>
+object.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">object</span><p>The object itself(<code>this</code>).</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Properties</h5>
+
+<div class="api_component">
+<h6 class="api_name">interfaces : <span class="datatype">array</span></h6>
+<p>The set of interfaces supported by this class. <code>Unknown</code> sets this to
+<a href="https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsISupports"><code>nsISupports</code></a>.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">Factory</h4>
+<p>Use this class to register an XPCOM factory. To register a factory for
+a component, construct a <code>Factory</code>, giving it:</p>
+<ul>
+<li>a constructor for the component</li>
+<li>a <a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#Contract_ID">contract ID</a>
+and/or a
+<a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#CID">class ID</a></li>
+</ul>
+<!-- -->
+
+<pre><code>// Create and register the factory
+var factory = Factory({
+  contract: "@me.org/myComponent",
+  Component: MyComponent
+});
+</code></pre>
+<ul>
+<li>The component constructor typically returns a descendant of <code>Unknown</code>,
+although it may return a custom object that satisfies the <code>nsISupports</code>
+interface.</li>
+<li>The contract ID and/or class ID may be used by XPCOM clients to retrieve
+the factory. If a class ID is not given, a new one will be generated. The
+contract ID and class ID are accessible as the values of the <code>contract</code> and
+<code>id</code> properties, respectively.</li>
+<li>By default, the factory is registered when it is created and
+unregistered when the add-on that created it is unloaded. To override this
+behavior, you can pass <code>register</code> and/or <code>unregister</code> options, set to <code>false</code>.
+If you do this, you can use the
+<a href="../../packages/api-utils/xpcom.html#register(factory)"><code>register()</code></a> and
+<a href="../../packages/api-utils/xpcom.html#unregister(factory)"><code>unregister()</code></a> functions
+to register and unregister.</li>
+</ul>
+<div class="api_component_group">
+<h5 class="api_header">Constructors</h5>
+
+<div class="api_component">
+<h6 class="api_name">Factory(options)</h6>
+
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">options : <span class="datatype">object</span></div>
+
+<div class="api_component">
+<div class="api_name">Component : <span class="datatype">constructor</span></div>
+<p>Constructor for the component this factory creates. This will typically
+return a descendant of <code>Unknown</code>, although it may return a custom object
+that satisfies the <code>nsISupports</code> interface.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ contract : <span class="datatype">string</span> ]</div>
+<p>A <a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#Contract_ID">contract ID</a>.
+Users of XPCOM can use this value to retrieve the factory from
+<a href="https://developer.mozilla.org/en-US/docs/Components.classes"><code>Components.classes</code></a>:</p>
+<pre><code>var factory = Components.classes["@me.org/request"]
+var component = factory.createInstance(Ci.nsIRequest);
+</code></pre>
+<p>This parameter is formally optional, but if you don't specify it, users
+won't be able to retrieve your factory using a contract ID. If specified,
+the contract ID is accessible as the value of the factory's <code>contract</code>
+property.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ id : <span class="datatype">string</span> ]</div>
+<p>A <a href="https://developer.mozilla.org/en-US/docs/Creating_XPCOM_Components/An_Overview_of_XPCOM#CID">class ID</a>.
+Users of XPCOM can use this value to retrieve the factory using
+<a href="https://developer.mozilla.org/en-US/docs/Components.classesByID"><code>Components.classesByID</code></a>:</p>
+<pre><code>var factory = components.classesByID[id];
+var component = factory.createInstance(Ci.nsIRequest);
+</code></pre>
+<p>This parameter is optional. If you don't supply it, the factory constructor
+will generate a fresh ID. Either way, it's accessible as the value of the
+factory's <code>id</code> property.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ register = true : <span class="datatype">boolean</span> ]</div>
+<p>By default, the factory is registered as soon as it is constructed.
+By including this option, set to <code>false</code>, the factory is not automatically
+registered and you must register it manually using the <code>register()</code> function.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ unregister = true : <span class="datatype">boolean</span> ]</div>
+<p>By default, the factory is unregistered as soon as the add-on which created it
+is unloaded. By including this option, set to <code>false</code>, the factory is not
+automatically unregistered and you must unregister it manually using
+the <code>unregister()</code> function.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Methods</h5>
+
+<div class="api_component">
+<h6 class="api_name">createInstance(outer, iid)</h6>
+<p>Creates an instance of the component associated with this factory.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">outer : <span class="datatype">null</span></div>
+<p>This argument must be <code>null</code>, or the function throws
+<code>Cr.NS_ERROR_NO_AGGREGATION</code>.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">iid : <span class="datatype">iid</span></div>
+<p>Interface identifier. These objects are usually accessed through
+the <code>Components.interfaces</code>, or <code>Ci</code>, object. The methods of this
+interface will be callable on the returned object.</p>
+<p>If the object implements an interface that's already defined in XPCOM, you
+can pass that in here:</p>
+<pre><code>var about = aboutFactory.createInstance(null, Ci.nsIAboutModule);
+// You can now access the nsIAboutModule interface of the 'about' object
+</code></pre>
+<p>If you will be getting the <code>wrappedJSObject</code> property from the returned
+object to access its JavaScript implementation, pass <code>Ci.nsISupports</code> here:</p>
+<pre><code>var custom = factory.createInstance(null, Ci.nsISupports).wrappedJSObject;
+// You can now access the interface defined for the 'custom' object
+</code></pre>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">object</span><p>The component created by the factory.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">lockFactory()</h6>
+<p>This method is required by the <code>nsIFactory</code> interface, but as in most
+implementations it does nothing interesting.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">QueryInterface()</h6>
+<p>See the documentation for
+<a href="../../packages/api-utils/xpcom.html#QueryInterface(interface)"><code>Unknown.QueryInterface()</code></a>.</p>
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Properties</h5>
+
+<div class="api_component">
+<h6 class="api_name">interfaces : <span class="datatype">array</span></h6>
+<p>The set of interfaces supported by this object. <code>Factory</code> sets this to
+<a href="https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsIFactory"><code>nsIFactory</code></a>.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">id : <span class="datatype">string</span></h6>
+<p>This factory's
+<a href="https://developer.mozilla.org/en-US/docs/Creating_XPCOM_Components/An_Overview_of_XPCOM#CID">class ID</a>.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">contract : <span class="datatype">string</span></h6>
+<p>This factory's
+<a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#Contract_ID">contract ID</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">Service</h4>
+<p>Use this class to register an XPCOM service. To register a service for
+a component, construct a <code>Service</code>, giving it:</p>
+<ul>
+<li>a constructor for the object implementing the service</li>
+<li>a <a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#Contract_ID">contract ID</a>
+and/or a
+<a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#CID">class ID</a></li>
+</ul>
+<!-- -->
+
+<pre><code>var service = Service({
+  contract: contractId,
+  Component: AlertService
+});
+</code></pre>
+<p>After this, XPCOM users can access the service implementation by
+supplying the contract ID:</p>
+<pre><code>var alertService = Cc[contractId].getService(Ci.nsIAlertsService);
+alertService.showAlertNotification(...);
+</code></pre>
+<p>The <code>Service</code> interface is identical to the
+<code>Factory</code> interface, so refer to the
+<a href="../../packages/api-utils/xpcom.html#Factory"><code>Factory</code> interface documentation</a>
+for details.</p>
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">register(factory)</h4>
+<p>Register the factory or service supplied. If the factory or service
+is already registered, this function throws
+<a href="https://developer.mozilla.org/en-US/docs/Table_Of_Errors"><code>Components.results.NS_ERROR_FACTORY_EXISTS</code></a>.</p>
+<p>By default, factories and services are registered automatically, so
+you should only call <code>register()</code> if you have overridden the default behavior.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">factory : <span class="datatype">object</span></div>
+<p>The factory or service to register.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">unregister(factory)</h4>
+<p>Unregister the factory or service supplied. If the factory or service
+is not registered, this function does nothing.</p>
+<p>By default, factories and services are unregistered automatically when the
+add-on that registered them is unloaded.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">factory : <span class="datatype">object</span></div>
+<p>The factory or service to unregister.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isRegistered(factory)</h4>
+<p>Find out whether a factory or service is registered.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">factory : <span class="datatype">object</span></div>
+
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>True if the factory or service is registered, false otherwise.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">autoRegister(path)</h4>
+<p>Register a component (.manifest) file or all component files in a directory.
+See <a href="https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsIComponentRegistrar#autoRegister%28%29"><code>nsIComponentRegistrar.autoRegister()</code></a>
+for details.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">path : <span class="datatype">string</span></div>
+<p>Path to a component file to be registered or a directory containing
+component files to be registered.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">factoryByID(id)</h4>
+<p>Given a
+<a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#CID">class ID</a>,
+this function returns the associated factory or service. If the factory or
+service isn't registered, this function returns <code>null</code>.</p>
+<p>This function wraps <a href="https://developer.mozilla.org/en-US/docs/Components.classesByID">Components.ClassesByID</a>.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">id : <span class="datatype">string</span></div>
+<p>A class ID.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">object</span><p>The factory or service identified by the class ID.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">factoryByContract(contract)</h4>
+<p>Given a <a href="https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM#Contract_ID">contract ID</a>
+this function returns the associated factory or service. If the factory
+or service isn't registered, this function throws
+<a href="https://developer.mozilla.org/en-US/docs/Table_Of_Errors"><code>Components.results.NS_ERROR_FACTORY_NOT_REGISTERED</code></a>.</p>
+<p>This function is similar to the standard <code>Components.classes[contractID]</code> with
+one significant difference: that <code>Components.classes</code> is not updated
+at runtime.</p>
+<p>So if a factory is registered with the contract ID "@me.org/myComponent",
+and another factory is already registered with that contract ID, then:</p>
+<pre><code>Components.classes["@me.org/myComponent"]
+</code></pre>
+<p>will return the old factory, while:</p>
+<pre><code>xpcom.factoryByContract("@me.org/myComponent")
+</code></pre>
+<p>will return the new one.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">contract : <span class="datatype">string</span></div>
+<p>Contract ID of the factory or service to retrieve.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">object</span><p>The factory or service identified by the contract ID.</p>
+</div>
+
+</div>
+
+</div>
+
 </div>
 
 </div>

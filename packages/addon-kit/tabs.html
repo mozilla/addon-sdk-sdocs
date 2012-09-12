@@ -50,7 +50,7 @@
     <h1>
       <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
     </h1>
-    <div id="version">Version 1.9</div>
+    <div id="version">Version 1.10</div>
   </div>
 </div>
 
@@ -179,6 +179,11 @@ This is an optional argument.</p>
 </div>
 
 <div class="api_component">
+<h6 class="api_name">getThumbnail()</h6>
+<p>Returns thumbnail data URI of the page currently loaded in this tab.</p>
+</div>
+
+<div class="api_component">
 <h6 class="api_name">attach(options)</h6>
 <p>Create a page mod and attach it to the document in the tab.</p>
 <p><strong>Example</strong></p>
@@ -233,7 +238,7 @@ to learn how to use the <code>Worker</code> object to communicate with the conte
 
 <div class="api_component">
 <h6 class="api_name">title : <span class="datatype">string</span></h6>
-<p>The title of the page currently loaded in the tab.
+<p>The title of the tab (usually the title of the page currently loaded in the tab)
 This property can be set to change the tab title.</p>
 </div>
 
@@ -250,6 +255,23 @@ This property is read-only.</p>
 </div>
 
 <div class="api_component">
+<h6 class="api_name">contentType : <span class="datatype">string</span></h6>
+<div class="experimental">
+<strong>
+  This is currently an experimental API, so we might change it in future releases.
+</strong>
+<p>
+Returns the MIME type that the document currently loaded in the tab is being
+rendered as.
+This may come from HTTP headers or other sources of MIME information,
+and might be affected by automatic type conversions performed by either the
+browser or extensions.
+This property is read-only.
+</p>
+</div>
+</div>
+
+<div class="api_component">
 <h6 class="api_name">index : <span class="datatype">integer</span></h6>
 <p>The index of the tab relative to other tabs in the application window.
 This property can be set to change its relative position.</p>
@@ -259,11 +281,6 @@ This property can be set to change its relative position.</p>
 <h6 class="api_name">isPinned : <span class="datatype">boolean</span></h6>
 <p>Whether or not tab is pinned as an <a href="http://support.mozilla.com/en-US/kb/what-are-app-tabs">app tab</a>.
 This property is read-only.</p>
-</div>
-
-<div class="api_component">
-<h6 class="api_name">getThumbnail : <span class="datatype">method</span></h6>
-<p>Returns thumbnail data URI of the page currently loaded in this tab.</p>
 </div>
 
 </div>
