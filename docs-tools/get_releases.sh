@@ -16,7 +16,7 @@ function get_release {
   source bin/activate
   cfx sdocs
   tar -xf addon-sdk-docs.tgz
-  mv addon-sdk/doc/static-files/base.html ../../../sdk/$1
+  mv doc/* ../../../sdk/$1
   cd ../../
 }
 
@@ -29,7 +29,8 @@ source bin/activate
 pos=$(expr $1 : '[0-9,\.]*')
 echo ${1:0:$pos}
 cfx sdocs --override-version=$1
-tar -xf addon-sdk-docs.tgz -C ../../../sdk/$1
+tar -xf addon-sdk-docs.tgz
+mv doc/* ../../../sdk/$1
 cd ../../
 
 # get the second release
