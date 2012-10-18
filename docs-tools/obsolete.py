@@ -4,14 +4,18 @@
 
 import sys, os
 
-OBSOLETE_NOTICE_INSERTION_POINT="<body>"
+NOTICE_INSERTION_POINT="<body>"
 CLOSING_DIV_INSERTION_POINT="    <div id=\"version\"></div>"
 
-OBSOLETE_NOTICE_PREAMBLE="<div id=\"obsolete-warning\" style=\"background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;\">\n \
+NOTICE_PREAMBLE="<div id=\"obsolete-warning\" style=\"background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;\">\n \
 <a style=\"display:block\" href=\""
 
 OBSOLETE_NOTICE_POSTAMBLE="\">\n \
 You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>\n \
+<div style=\"position:relative\">\n"
+
+REMOVED_NOTICE_POSTAMBLE="\">\n \
+You're looking at the docs for an old version of the SDK. This page doesn't exist in the latest docs, but click here to browse them anyway.</a></div>\n \
 <div style=\"position:relative\">\n"
 
 CLOSING_DIV="</div"
@@ -20,14 +24,14 @@ def insert_after(target, insertion_point_id, text_to_insert):
     insertion_point = target.find(insertion_point_id) + len(insertion_point_id)
     return target[:insertion_point] + text_to_insert + target[insertion_point:]
 
-def create_obsolete_notice(replacement_path_and_filename):
-    return OBSOLETE_NOTICE_PREAMBLE + replacement_path_and_filename + OBSOLETE_NOTICE_POSTAMBLE
+def create_notice(replacement_path_and_filename, postamble):
+    return NOTICE_PREAMBLE + replacement_path_and_filename + postamble
 
-def insert_obsolete_notice(path_and_filename, replacement_path_and_filename):
+def insert_notice(path_and_filename, replacement_path_and_filename, postamble):
     replacement_path_link = create_link_from_replacement_path(path_and_filename, replacement_path_and_filename)
-    obsolete_notice = create_obsolete_notice(replacement_path_link)
+    notice = create_notice(replacement_path_link, postamble)
     file_contents = open(os.sep.join([path_and_filename]), 'r').read()
-    file_contents = insert_after(file_contents, OBSOLETE_NOTICE_INSERTION_POINT, obsolete_notice)
+    file_contents = insert_after(file_contents, NOTICE_INSERTION_POINT, notice)
     file_contents = insert_after(file_contents, CLOSING_DIV_INSERTION_POINT, CLOSING_DIV)
     open(path_and_filename, "w").write(file_contents)
 
@@ -48,14 +52,14 @@ def obsolete(obsoleted, latest, mappings):
             # first, look for a replacement in mappings
             replacement_path_and_filename = mappings.get(path_and_filename, "")
             if replacement_path_and_filename:
-                insert_obsolete_notice(path_and_filename, replacement_path_and_filename)
+                insert_notice(path_and_filename, replacement_path_and_filename, OBSOLETE_NOTICE_POSTAMBLE)
                 continue
             # next, see if the same file exists in "latest"
             dirpieces = path_and_filename.split(os.sep)
             dirpieces[1] = latest
             replacement_path_and_filename = os.sep.join(dirpieces)
             if os.path.exists(replacement_path_and_filename):
-                insert_obsolete_notice(path_and_filename, replacement_path_and_filename)
+                insert_notice(path_and_filename, replacement_path_and_filename, OBSOLETE_NOTICE_POSTAMBLE)
                 continue
             # otherwise we can't update this file
             missing_files.append(path_and_filename)
