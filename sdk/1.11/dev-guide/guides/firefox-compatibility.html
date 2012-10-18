@@ -1,0 +1,423 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Firefox Compatibility - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+	<!-- Google CSE Search Box Begins  -->
+	<!-- Use of this code assumes agreement with the Google Custom Search Terms of Service. -->
+	<!-- The terms of service are available at http://www.google.com/cse/docs/tos.html -->
+      <form action="../../dev-guide/search.html" id="cse-search-box">
+        <div>
+          <input type="hidden" name="cx" value="017013284162333743052:rvlazd1zehe"/>
+          <input type="hidden" name="cof" value="FORID:10"/>
+          <input type="hidden" name="ie" value="UTF-8"/>
+          <input size="31" type="text" id="search-box" name="q"/>
+          <input type="submit" name="sa" value="Search"/>
+        </div>
+      </form>
+      <script src="http://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+    <!-- Google CSE Search Box Ends -->
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.11</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="search-results"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Firefox Compatibility</h1>
+<p>One of the promises the SDK makes is to maintain compatibility for its
+<a href="../../packages/addon-kit/index.html">"supported" or "high-level" APIs</a>:
+meaning that code written against them will not need to change as new
+versions of Firefox are released.</p>
+<p>This ties the SDK release cycle into the Firefox release cycle because
+the SDK must absorb any changes made to Firefox APIs. The SDK
+and Firefox both release every 6 weeks, and the releases are precisely
+staggered: so the SDK releases three weeks before Firefox. Each SDK
+release is tested against, and marked as compatible with, two
+versions of Firefox:</p>
+<ul>
+<li>the currently shipping Firefox version at the time the SDK is released</li>
+<li>the Beta Firefox version at the time the SDK is released - which,
+because SDK and Firefox releases are staggered, will become the
+currently shipping Firefox three week later</li>
+</ul>
+<p>Add-ons built using a particular version of the SDK are marked
+as being compatible with those two versions of Firefox, meaning
+that in the
+<a href="https://developer.mozilla.org/en/Install.rdf#targetApplication"><code>targetApplication</code> field of the add-on's install.rdf</a>:</p>
+<ul>
+<li>the <code>minVersion</code> is set to the currently shipping Firefox</li>
+<li>the <code>maxVersion</code> is set to the current Firefox Beta</li>
+</ul>
+<p>See the
+<a href="https://wiki.mozilla.org/Jetpack/SDK_2012_Release_Schedule">SDK Release Schedule</a>
+for the list of all SDK releases scheduled for 2012, along with the Firefox
+versions they are compatible with.</p>
+<h2>"Compatible By Default"</h2>
+<p><span class="aside">There are exceptions to the "compatible by default" rule:
+add-ons with binary XPCOM components, add-ons that have their compatibility
+set to less than Firefox 4, and add-ons that are repeatedly reported as
+incompatible, which are added to a compatibility override list.
+</span></p>
+<p>From Firefox 10 onwards, Firefox treats add-ons as
+"compatible by default": that is, even if the Firefox installing the
+add-on is not inside the range defined in <code>targetApplication</code>,
+Firefox will happily install it.</p>
+<p>For example, although an add-on developed using version 1.6 of the SDK will be
+marked as compatible with only versions 11 and 12 of Firefox, users of
+Firefox 10 will still be able to install it.</p>
+<p>But before version 10, Firefox assumed that add-ons were incompatible unless
+they were marked as compatible in the <code>targetApplication</code> field: so an add-on
+developed using SDK 1.6 will not install on Firefox 9.</p>
+<h2>Changing minVersion and maxVersion Values</h2>
+<p>The <code>minVersion</code> and <code>maxVersion</code> values that are written into add-ons
+generated with the SDK are taken from the template file found at:</p>
+<pre>
+python-lib/cuddlefish/app-extension/install.rdf
+</pre>
+
+<p>If you need to create add-ons which are compatible with a wider range of
+Firefox releases, you can edit this file to change the
+<code>minVersion...maxVersion</code> range.</p>
+<p>Obviously, you should be careful to test the resulting add-on on the extra
+versions of Firefox you are including, because the version of the SDK you
+are using will not have been tested against them.</p>
+<h2>Repacking Add-ons</h2>
+<p>Suppose you create an add-on using version 1.6 of the SDK, and upload it to
+<a href="https://addons.mozilla.org/">https://addons.mozilla.org/</a>. It's compatible
+with versions 11 and 12 of Firefox, and indicates that in its
+<code>minVersion...maxVersion</code> range.</p>
+<p>Now Firefox 13 is released. Suppose Firefox 13 does not change any of the
+APIs used by version 1.6 of the SDK. In this case the add-on will still
+work with Firefox 13.</p>
+<p>But if Firefox 13 makes some incompatible changes, then the add-on will
+no longer work. In this case, we'll notify developers, who will need to:</p>
+<ul>
+<li>download and install a new version of the SDK</li>
+<li>rebuild their add-on using this version of the SDK</li>
+<li>update their XPI on <a href="https://addons.mozilla.org/">https://addons.mozilla.org/</a>
+with the new version.</li>
+</ul>
+<p>If you created the add-on using the <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+rather than locally using the SDK, then it will be repacked automatically
+and you don't have to do this.</p>
+<h3>Future Plans</h3>
+<p>The reason add-ons need to be repacked when Firefox changes is that the
+SDK modules used by an add-on are packaged as part of the add-on, rather
+than part of Firefox. In the future we plan to start shipping SDK modules
+in Firefox, and repacking will not be needed any more.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../packages/addon-kit/request.html">request</a>
+
+<a href="../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../packages/addon-kit/self.html">self</a>
+
+<a href="../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../packages/api-utils/base64.html">base64</a>
+
+<a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../packages/api-utils/content.html">content</a>
+
+<a href="../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../packages/api-utils/deprecate.html">deprecate</a>
+
+<a href="../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../packages/api-utils/events.html">events</a>
+
+<a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../packages/api-utils/list.html">list</a>
+
+<a href="../../packages/api-utils/loader.html">loader</a>
+
+<a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
+<a href="../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../packages/api-utils/url.html">url</a>
+
+<a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../dev-guide/console.html">console</a>
+            <a href="../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

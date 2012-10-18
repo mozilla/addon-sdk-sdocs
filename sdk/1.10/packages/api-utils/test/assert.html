@@ -1,0 +1,708 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>assert - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../../sdk/1.11/packages/api-utils/test/assert.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.10</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content">
+<div id="assert_module_api_docs" class="module_api_docs">
+<h1>assert</h1>
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<p>The <code>assert</code> module implements the <code>assert</code> interface defined in
+the <a href="http://wiki.commonjs.org/wiki/Unit_Testing/1.1">CommonJS Unit Testing specification version 1.1</a>.</p>
+<p>To use the <code>assert</code> module, write a set of
+unit tests following the instructions in the
+<a href="../../../dev-guide/tutorials/unit-testing.html">unit testing tutorial</a>.
+Each test will be passed an <code>Assert</code> object when you run the tests using
+<a href="file:///Users/Work/mozilla/jetpack-sdk/doc/dev-guide/cfx-tool.html#cfx_test"><code>cfx test</code></a>.
+You can use this object to make assertions about your program's state.</p>
+<p>For example:</p>
+<pre><code>var a = 1;
+
+exports["test value of a"] = function(assert) {
+  assert.ok(a == 1, "test that a is 1");
+}
+
+require("test").run(exports);
+</code></pre>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Classes</h3>
+
+<div class="api_component">
+<h4 class="api_name">Assert</h4>
+<p>An object used to make assertions about a program's state in order
+to implement unit tests.</p>
+<p>The <code>Assert</code> object's interface is defined by the
+<a href="http://wiki.commonjs.org/wiki/Unit_Testing/1.1">CommonJS Unit Testing specification, version 1.1</a>.</p>
+<div class="api_component_group">
+<h5 class="api_header">Constructors</h5>
+
+<div class="api_component">
+<h6 class="api_name">Assert(logger)</h6>
+<p>Create a new Assert object. This function is only called by the
+unit test framework, and not by unit tests themselves.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">logger : <span class="datatype">object</span></div>
+<p>Object used to log the results of assertions.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Methods</h5>
+
+<div class="api_component">
+<h6 class="api_name">ok(guard, message)</h6>
+<p>Tests whether an expression evaluates to true.</p>
+<pre><code>assert.ok(a == 1, "test that a is equal to one");
+</code></pre>
+<p>This is equivalent to:</p>
+<pre><code>assert.equal(a == 1, true, "test that a is equal to one");
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">guard : <span class="datatype">expression</span></div>
+<p>The expression to evaluate.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">equal(actual, expected, message)</h6>
+<p>Tests shallow, coercive equality with <code>==</code>:</p>
+<pre><code>assert.equal(1, 1, "test that one is one");
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">notEqual(actual, expected, message)</h6>
+<p>Tests that two objects are not equal, using <code>!=</code>:</p>
+<pre><code>assert.notEqual(1, 2, "test that one is not two");
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">deepEqual(actual, expected, message)</h6>
+<p>Tests that two objects have a deep equality relation.
+  Deep equality is defined in the
+  <a href="http://wiki.commonjs.org/wiki/Unit_Testing/1.0#Assert">CommonJS specification for Assert</a>,
+  item 7, which is quoted here:</p>
+<div class="quote">
+<ol>
+<li>All identical values are equivalent, as determined by ===.</li>
+<li>If the expected value is a Date object, the actual value is equivalent
+if it is also a Date object that refers to the same time.</li>
+<li>Other pairs that do not both pass typeof value == "object", equivalence
+is determined by ==.</li>
+<li>For all other Object pairs, including Array objects, equivalence
+is determined by having the same number of owned properties (as verified
+with Object.prototype.hasOwnProperty.call), the same set of keys (although
+not necessarily the same order), equivalent values for every corresponding
+key, and an identical "prototype" property. Note: this accounts for both
+named and indexed properties on Arrays.</li>
+</div>
+
+<pre><code>assert.deepEqual({ a: "foo" }, { a: "foo" }, "equivalent objects");
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">notDeepEqual(actual, expected, message)</h6>
+<p>Tests that two objects do not have a deep equality relation, using
+  the negation of the test for deep equality:</p>
+<pre><code>assert.notDeepEqual({ a: "foo" }, Object.create({ a: "foo" }),
+                    "object's inherit from different prototypes");
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">strictEqual(actual, expected, message)</h6>
+<p>Tests that two objects are equal, using the strict equality operator <code>===</code>:</p>
+<pre><code>// This test will pass, because "==" will perform type conversion
+exports["test coercive equality"] = function(assert) {
+  assert.equal(1, "1", "test coercive equality between 1 and '1'");
+}
+
+// This test will fail, because the types are different
+exports["test strict equality"] = function(assert) {
+  assert.strictEqual(1, "1", "test strict equality between 1 and '1'");
+}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">notStrictEqual(actual, expected, message)</h6>
+<p>Tests that two objects are not equal, using the negation of the strict
+  equality operator <code>===</code>:</p>
+<pre><code>// This test will fail, because "==" will perform type conversion
+exports["test coercive equality"] = function(assert) {
+  assert.notEqual(1, "1", "test coercive equality between 1 and '1'");
+}
+
+// This test will pass, because the types are different
+exports["test strict equality"] = function(assert) {
+  assert.notStrictEqual(1, "1", "test strict equality between 1 and '1'");
+}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">actual : <span class="datatype">object</span></div>
+<p>The actual result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">expected : <span class="datatype">object</span></div>
+<p>The expected result.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">throws(block, error, message)</h6>
+<p>Assert that a block of code throws the expected exception.</p>
+<p>This method takes an optional <code>Error</code> argument:</p>
+<ul>
+<li>
+<p>to check that the exception thrown is of the expected type, pass
+  a constructor function: the exception thrown must be an
+  instance of the object returned by that function.</p>
+</li>
+<li>
+<p>to check that the exception thrown contains a specific message, pass
+  a regular expression here: the <code>message</code> property of the exception
+  thrown must match the regular expression</p>
+</li>
+</ul>
+<!--terminate Markdown list-->
+
+<p>For example, suppose we define two different custom exceptions:</p>
+<pre><code>function MyError(message) {  
+  this.name = "MyError";  
+  this.message = message || "Default Message";  
+}
+
+MyError.prototype = new Error();  
+MyError.prototype.constructor = MyError;
+
+function AnotherError(message) {
+  this.name = "AnotherError";  
+  this.message = message || "Default Message"; 
+    console.log(this.message); 
+}
+
+AnotherError.prototype = new Error();  
+AnotherError.prototype.constructor = AnotherError;
+</code></pre>
+<p>We can check the type of exception by passing a function as the <code>Error</code>
+  argument:</p>
+<pre><code>exports["test exception type 1 expected to pass"] = function(assert) {
+  assert.throws(function() {
+    throw new MyError("custom message");
+  },
+  MyError,
+  "test throwing a specific exception");
+}
+
+exports["test exception type 2 expected to fail"] = function(assert) {
+  assert.throws(function() {
+    throw new MyError("custom message");
+  },
+  AnotherError,
+  "test throwing a specific exception");
+}
+</code></pre>
+<p>We can check the message by passing a regular expression:</p>
+<pre><code>exports["test exception message 1 expected to pass"] = function(assert) {
+  assert.throws(function() {
+    throw new MyError("custom message");
+  },
+  /custom message/,
+  "test throwing a specific message");
+}
+
+exports["test exception message 2 expected to pass"] = function(assert) {
+  assert.throws(function() {
+    throw new AnotherError("custom message");
+  },
+  /custom message/,
+  "test throwing a specific exception");
+}
+
+exports["test exception message 3 expected to fail"] = function(assert) {
+  assert.throws(function() {
+    throw new MyError("another message");
+  },
+  /custom message/,
+  "test throwing a specific message");
+}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">block : <span class="datatype">block</span></div>
+<p>The block of code to test.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ error : <span class="datatype">function|RegExp</span> ]</div>
+<p>Either a constructor function returning the type of exception
+expected, or a regular expression expected to match the exception's
+<code>message</code> property. </p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ message : <span class="datatype">string</span> ]</div>
+<p>Optional message to log, providing extra information about the test.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../../packages/addon-kit/request.html">request</a>
+
+<a href="../../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../../packages/addon-kit/self.html">self</a>
+
+<a href="../../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../../packages/api-utils/base64.html">base64</a>
+
+<a href="../../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../../packages/api-utils/content.html">content</a>
+
+<a href="../../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../../packages/api-utils/events.html">events</a>
+
+<a href="../../../packages/api-utils/file.html">file</a>
+
+<a href="../../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../../packages/api-utils/list.html">list</a>
+
+<a href="../../../packages/api-utils/loader.html">loader</a>
+
+<a href="../../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../../packages/api-utils/test/assert.html">test/assert</a>
+
+<a href="../../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../../packages/api-utils/url.html">url</a>
+
+<a href="../../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

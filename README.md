@@ -1,6 +1,6 @@
-This repository contains two top-level directories:
-- `sdk`: the SDK documentation to be hosted at addons.mozilla.org
-- `doc-tools`: a collection of scripts used to build this documentation
+This repository contains:
+- the SDK documentation to be hosted at addons.mozilla.org
+- a collection of scripts used to build this documentation
 
 ## SDK documentation sets ##
 
@@ -22,9 +22,8 @@ When we release a new version of the SDK, the contents of the `sdk` directory mu
 
 ## Building the docs for a release ##
 
-To build the docs for a release use the top-level script `make_webdocs.sh`, which lives under `docs-tools`:
+To build the docs for a release use the top-level script `make_webdocs.sh`:
 
-    cd docs-tools
     bash make_webdocs.sh 1.11rc1 1.10 1.9 mappings
 
 `make_webdocs.sh` takes three mandatory parameters and one optional parameter:

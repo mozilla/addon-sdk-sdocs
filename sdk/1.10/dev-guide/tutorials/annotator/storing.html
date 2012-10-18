@@ -1,0 +1,655 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Storing Annotations - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../../sdk/1.11/dev-guide/tutorials/annotator/storing.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.10</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Storing Annotations</h1>
+<p>Now we are able to create annotations, let's store them using the
+<a href="../../../packages/addon-kit/simple-storage.html"><code>simple-storage</code></a> module. In
+this chapter we will cover three topics relating to persistent storage:</p>
+<ul>
+<li>using <code>simple-storage</code> to persist objects</li>
+<li>handling exhaustion of the storage quota allocated to you</li>
+<li>respecting Private Browsing</li>
+</ul>
+<h2>Storing New Annotations</h2>
+<p>In this section we are only touching the <code>main.js</code> file.</p>
+<p>First, import the <code>simple-storage</code> module with a declaration like:</p>
+<pre><code>var simpleStorage = require('simple-storage');
+</code></pre>
+<p>In the module scope, initialize an array which will contain the stored annotations:</p>
+<pre><code>if (!simpleStorage.storage.annotations)
+  simpleStorage.storage.annotations = [];
+</code></pre>
+<p>Now we'll add a function to the module scope which deals with a new
+annotation. The annotation is composed of the text the user entered and the
+"annotation anchor", which consists of the URL, element ID and element content:</p>
+<pre><code>function handleNewAnnotation(annotationText, anchor) {
+  var newAnnotation = new Annotation(annotationText, anchor);
+  simpleStorage.storage.annotations.push(newAnnotation);
+}
+</code></pre>
+<p>This function calls a constructor for an <code>Annotation</code> object, which we also
+need to supply:</p>
+<pre><code>function Annotation(annotationText, anchor) {
+  this.annotationText = annotationText;
+  this.url = anchor[0];
+  this.ancestorId = anchor[1];
+  this.anchorText = anchor[2];
+}
+</code></pre>
+<p>Now we need to link this code to the annotation editor, so that when the user
+presses the return key in the editor, we create and store the new annotation:</p>
+<pre><code>var annotationEditor = panels.Panel({
+  width: 220,
+  height: 220,
+  contentURL: data.url('editor/annotation-editor.html'),
+  contentScriptFile: data.url('editor/annotation-editor.js'),
+  onMessage: function(annotationText) {
+    if (annotationText)
+      handleNewAnnotation(annotationText, this.annotationAnchor);
+    annotationEditor.hide();
+  },
+  onShow: function() {
+    this.postMessage('focus');
+  }
+});
+</code></pre>
+<h2>Listing Stored Annotations</h2>
+<p>To prove that this works, let's implement the part of the add-on that displays
+all the previously entered annotations. This is implemented as a panel that's
+shown in response to the widget's <code>right-click</code> message.</p>
+<p>The panel has three new files associated with it:</p>
+<ul>
+<li>a content-script which builds the panel content</li>
+<li>a simple HTML file used as a template for the panel's content</li>
+<li>a simple CSS file to provide some basic styling.</li>
+</ul>
+<p>These three files can all go in a new subdirectory of <code>data</code> which we will call <code>list</code>.</p>
+<h3>Annotation List Content Script</h3>
+<p>Here's the annotation list's content script:</p>
+<pre><code>self.on("message", function onMessage(storedAnnotations) {
+  var annotationList = $('#annotation-list');
+  annotationList.empty();
+  storedAnnotations.forEach(
+    function(storedAnnotation) {
+      var annotationHtml = $('#template .annotation-details').clone();
+      annotationHtml.find('.url').text(storedAnnotation.url)
+                                 .attr('href', storedAnnotation.url);
+      annotationHtml.find('.url').bind('click', function(event) {
+        event.stopPropagation();
+        event.preventDefault();
+        self.postMessage(storedAnnotation.url);
+      });
+      annotationHtml.find('.selection-text')
+                    .text(storedAnnotation.anchorText);
+      annotationHtml.find('.annotation-text')
+                    .text(storedAnnotation.annotationText);
+      annotationList.append(annotationHtml);
+    });
+});
+</code></pre>
+<p>It builds the DOM for the panel from the array of annotations it is given.</p>
+<p>The user will be able to click links in the panel, but we want to open them in
+the main browser window rather than the panel. So the content script binds a
+click handler to the links which will send the URL to the add-on.</p>
+<p>Save this file in <code>data/list</code> as <code>annotation-list.js</code>.</p>
+<h3>Annotation List HTML and CSS</h3>
+<p>Here's the HTML for the annotation list:</p>
+<pre class="brush: html">
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta http-equiv="Content-type" content="text/html; charset=utf-8" /&gt;
+  &lt;title&gt;Saved annotations&lt;/title&gt;
+  &lt;link rel="stylesheet" type="text/css" href="annotation-list.css" /&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+&lt;div id="annotation-list"&gt;
+&lt;/div&gt;
+
+&lt;div id="template"&gt;
+  &lt;div class="annotation-details"&gt;
+    &lt;a class="url"&gt;&lt;/a&gt;
+    &lt;div class="selection-text"&gt;&lt;/div&gt;
+    &lt;div class="annotation-text"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/body&gt;
+
+&lt;/html&gt;
+
+</pre>
+
+<p>Here's the corresponding CSS:</p>
+<script type="syntaxhighlighter" class="brush: css"><![CDATA[
+#annotation-list .annotation-details
+  {
+  padding: 10px;
+  margin: 10px;
+  border: solid 3px #EEE;
+  background-color: white;
+  }
+
+#annotation-list .url, .selection-text, .annotation-text
+  {
+  padding: 5px;
+  margin: 5px;
+  }
+
+#annotation-list .selection-text,#annotation-list .annotation-text
+  {
+  border: solid 1px #EEE;
+  }
+
+#annotation-list .annotation-text
+  {
+  font-style: italic;
+  }
+
+body
+  {
+  background-color: #F5F5F5;
+  font: 100% arial, helvetica, sans-serif;
+  }
+
+h1
+  {
+  font-family: georgia,serif;
+  font-size: 1.5em;
+  text-align:center;
+  }
+]]>
+</script>
+
+<p>Save these in <code>data/list</code> as <code>annotation-list.html</code> and <code>annotation-list.css</code>
+respectively.</p>
+<h3>Updating main.js</h3>
+<p>Here's the code to create the panel, which can go in the <code>main</code> function.</p>
+<pre><code>var annotationList = panels.Panel({
+  width: 420,
+  height: 200,
+  contentURL: data.url('list/annotation-list.html'),
+  contentScriptFile: [data.url('jquery-1.4.2.min.js'),
+                      data.url('list/annotation-list.js')],
+  contentScriptWhen: 'ready',
+  onShow: function() {
+    this.postMessage(simpleStorage.storage.annotations);
+  },
+  onMessage: function(message) {
+    require('tabs').open(message);
+  }
+});
+</code></pre>
+<p>Since this panel's content script uses jQuery we will pass that in too: again,
+make sure the name of it matches the version of jQuery you downloaded.</p>
+<p>When the panel is shown we send it the array of stored annotations. When the
+panel sends us a URL we use the <code>tabs</code> module to open it in a new tab.</p>
+<p>Finally we need to connect this to the widget's <code>right-click</code> message:</p>
+<pre><code>var widget = widgets.Widget({
+  id: 'toggle-switch',
+  label: 'Annotator',
+  contentURL: data.url('widget/pencil-off.png'),
+  contentScriptWhen: 'ready',
+  contentScriptFile: data.url('widget/widget.js')
+});
+
+widget.port.on('left-click', function() {
+  console.log('activate/deactivate');
+  widget.contentURL = toggleActivation() ?
+            data.url('widget/pencil-on.png') :
+            data.url('widget/pencil-off.png');
+});
+
+widget.port.on('right-click', function() {
+    console.log('show annotation list');
+    annotationList.show();
+});
+</code></pre>
+<p>This time execute <code>cfx xpi</code> to build the XPI for the add-on, and install it in
+Firefox. Activate the add-on, add an annotation, and then right-click the
+widget. You should see something like this:</p>
+<p><img src="../../../static-files/media/annotator/annotation-list.png" alt="Annotation List" class="image-center">
+<br></p>
+<p><span class="aside">
+Until now we've always run <code>cfx run</code> rather than building an XPI and installing
+the add-on in Firefox. If the annotation does not reappear when you restart
+Firefox, double check you installed the add-on and didn't just use <code>cfx run</code>
+again.</span></p>
+<p>Restart Firefox, right-click the widget again, and check that the annotation
+is still there.</p>
+<h2>Responding To OverQuota events</h2>
+<p>Add-ons have a limited quota of storage space. If the add-on exits while
+it is over quota, any data stored since the last time it was in quota will not
+be persisted.</p>
+<p>So we want to listen to the <code>OverQuota</code> event emitted by <code>simple-storage</code> and
+respond to it. Add the following to your add-on's <code>main</code> function:</p>
+<pre><code>simpleStorage.on("OverQuota", function () {
+  notifications.notify({
+    title: 'Storage space exceeded',
+    text: 'Removing recent annotations'});
+  while (simpleStorage.quotaUsage &gt; 1)
+    simpleStorage.storage.annotations.pop();
+});
+</code></pre>
+<p>Because we use a notification to alert the user, we need to import the
+<code>notifications</code> module:</p>
+<pre><code>var notifications = require("notifications");
+</code></pre>
+<p>(It should be obvious that this is an incredibly unhelpful way to deal with the
+problem. A real add-on should give the user a chance to choose which data to
+keep, and prevent the user from adding any more data until the add-on is back
+under quota.)</p>
+<h2>Respecting Private Browsing</h2>
+<p>Since annotations record the user's browsing history we should prevent the user
+from creating annotations while the browser is in
+<a href="http://support.mozilla.com/en-US/kb/Private%20Browsing">Private Browsing</a> mode.</p>
+<p>First let's import the <code>private-browsing</code> module into <code>main.js</code>:</p>
+<pre><code>var privateBrowsing = require('private-browsing');
+</code></pre>
+<p>We already have a variable <code>annotatorIsOn</code> that we use to indicate whether the
+user can enter annotations. But we don't want to use that here, because we want
+to remember the underlying state so that when they exit Private Browsing the
+annotator is back in whichever state it was in before.</p>
+<p>So we'll implement a function defining that to enter annotations, the annotator
+must be active <em>and</em> Private Browsing must be off:</p>
+<pre><code>function canEnterAnnotations() {
+  return (annotatorIsOn &amp;&amp; !privateBrowsing.isActive);
+}
+</code></pre>
+<p>Next, everywhere we previously used <code>annotatorIsOn</code> directly, we'll call this
+function instead:</p>
+<pre><code>function activateSelectors() {
+  selectors.forEach(
+    function (selector) {
+      selector.postMessage(canEnterAnnotations());
+  });
+}
+</code></pre>
+<br>
+
+<pre><code>function toggleActivation() {
+  annotatorIsOn = !annotatorIsOn;
+  activateSelectors();
+  return canEnterAnnotations();
+}
+</code></pre>
+<br>
+
+<pre><code>var selector = pageMod.PageMod({
+  include: ['*'],
+  contentScriptWhen: 'ready',
+  contentScriptFile: [data.url('jquery-1.4.2.min.js'),
+                      data.url('selector.js')],
+  onAttach: function(worker) {
+    worker.postMessage(canEnterAnnotations());
+    selectors.push(worker);
+    worker.port.on('show', function(data) {
+      annotationEditor.annotationAnchor = data;
+      annotationEditor.show();
+    });
+    worker.on('detach', function () {
+      detachWorker(this, selectors);
+    });
+  }
+});
+</code></pre>
+<p>We want to stop the user changing the underlying activation state when in
+Private Browsing mode, so we'll edit <code>toggleActivation</code> again:</p>
+<pre><code>function toggleActivation() {
+  if (privateBrowsing.isActive) {
+    return false;
+  }
+  annotatorIsOn = !annotatorIsOn;
+  activateSelectors();
+  return canEnterAnnotations();
+}
+</code></pre>
+<p>Finally, inside the <code>main</code> function, we'll add the following code to handle
+changes in Private Browsing state by changing the icon and notifying the
+selectors:</p>
+<pre><code>privateBrowsing.on('start', function() {
+  widget.contentURL = data.url('widget/pencil-off.png');
+  activateSelectors();
+});
+
+privateBrowsing.on('stop', function() {
+  if (canEnterAnnotations()) {
+    widget.contentURL = data.url('widget/pencil-on.png');
+    activateSelectors();
+  }
+});
+</code></pre>
+<p>Try it: execute <code>cfx run</code>, and experiment with switching the annotator on and
+off while in and out of Private Browsing mode.</p>
+<p>Now we can create and store annotations, the last piece is to
+<a href="../../../dev-guide/tutorials/annotator/displaying.html">display them when the user loads the
+page</a>.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../../packages/addon-kit/request.html">request</a>
+
+<a href="../../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../../packages/addon-kit/self.html">self</a>
+
+<a href="../../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../../packages/api-utils/base64.html">base64</a>
+
+<a href="../../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../../packages/api-utils/content.html">content</a>
+
+<a href="../../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../../packages/api-utils/events.html">events</a>
+
+<a href="../../../packages/api-utils/file.html">file</a>
+
+<a href="../../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../../packages/api-utils/list.html">list</a>
+
+<a href="../../../packages/api-utils/loader.html">loader</a>
+
+<a href="../../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../../packages/api-utils/test/assert.html">test/assert</a>
+
+<a href="../../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../../packages/api-utils/url.html">url</a>
+
+<a href="../../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Chrome Authority - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+	<!-- Google CSE Search Box Begins  -->
+	<!-- Use of this code assumes agreement with the Google Custom Search Terms of Service. -->
+	<!-- The terms of service are available at http://www.google.com/cse/docs/tos.html -->
+      <form action="../../dev-guide/search.html" id="cse-search-box">
+        <div>
+          <input type="hidden" name="cx" value="017013284162333743052:rvlazd1zehe"/>
+          <input type="hidden" name="cof" value="FORID:10"/>
+          <input type="hidden" name="ie" value="UTF-8"/>
+          <input size="31" type="text" id="search-box" name="q"/>
+          <input type="submit" name="sa" value="Search"/>
+        </div>
+      </form>
+      <script src="http://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+    <!-- Google CSE Search Box Ends -->
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.11</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="search-results"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<div class="warning">The API used to gain Chrome access is currently an
+experimental feature of the SDK, and may change in future releases.</div>
+
+<h1>Chrome Authority</h1>
+<h2>Using Chrome Authority</h2>
+<p>The most powerful low-level modules are run with "chrome privileges",
+which gives them access to the infamous <code>Components</code> object, which
+grants unfettered access to the host system. From this, the module can do
+pretty much anything the browser is capable of. To obtain these privileges,
+the module must declare its intent with a statement like the following:</p>
+<pre><code>var {Cc, Ci} = require("chrome");
+</code></pre>
+<p>The object returned by <code>require("chrome")</code>, when unpacked with the
+"destructuring assignment" feature available in the Mozilla JS environment,
+will provide the usual <code>Components.*</code> aliases:</p>
+<p><code><strong>Cc</strong></code></p>
+<p>An alias for <code>Components.classes</code>.</p>
+<p><code><strong>Ci</strong></code></p>
+<p>An alias for <code>Components.interfaces</code>.</p>
+<p><code><strong>Cu</strong></code></p>
+<p>An alias for <code>Components.utils</code>.</p>
+<p><code><strong>Cr</strong></code></p>
+<p>An alias for <code>Components.results</code>.</p>
+<p><code><strong>Cm</strong></code></p>
+<p>An alias for <code>Components.manager</code>.</p>
+<p><code><strong>components</strong></code></p>
+<p>An alias for <code>Components</code> itself (note the lower-case). From this you can
+access less-frequently-used properties like <code>Components.stack</code> and
+<code>Components.isSuccessCode</code>.</p>
+<p>Note: the <code>require("chrome")</code> statement is the <strong>only</strong> way to access chrome
+functionality and the <code>Components</code> API. The <code>Components</code> object should
+<strong>not</strong> be accessed from modules. The SDK tools will emit a warning
+if it sees module code which references <code>Components</code> directly.</p>
+<p>Your modules should refrain from using chrome privileges unless they are
+absolutely necessary. Chrome-authority-using modules must receive extra
+security review, and most bugs in these modules are security-critical.</p>
+<h2>Manifest Generation</h2>
+<p>The <strong>manifest</strong> is a list, included in the generated XPI, which
+specifies which modules have requested <code>require()</code> access to which other
+modules. It also records which modules have requested chrome access. This
+list is generated by scanning all included modules for <code>require(XYZ)</code>
+statements and recording the particular "XYZ" strings that they reference.</p>
+<p>When the manifest implementation is complete the runtime loader will actually
+prevent modules from <code>require()</code>ing modules that are not listed in the
+manifest. Likewise, it will prevent modules from getting chrome authority
+unless the manifest indicates that they have asked for it. This will ensure
+that reviewers see the same authority restrictions that are enforced upon the
+running code, increasing the effectiveness of the time spent reviewing the
+add-on. (until this work is complete, modules may be able to sneak around these
+restrictions).</p>
+<p>The manifest is built with a simple regexp-based scanner, not a full
+Javascript parser. Developers should stick to simple <code>require</code> statements,
+with a single static string, one per line of code. If the scanner fails to
+see a <code>require</code> entry, the manifest will not include that entry, and (once
+the implementation is complete) the runtime code will get an exception.</p>
+<p>For example, none of the following code will be matched by the manifest
+scanner, leading to exceptions at runtime, when the <code>require()</code> call is
+prohibited from importing the named modules:</p>
+<pre><code>// all of these will fail!
+var xhr = require("x"+"hr");
+var modname = "xpcom";
+var xpcom = require(modname);
+var one = require("one"); var two = require("two");
+</code></pre>
+<p>The intention is that developers use <code>require()</code> statements for two purposes:
+to declare (to security reviewers) what sorts of powers the module wants to
+use, and to control how those powers are mapped into the module's local
+namespace. Their statements must therefore be clear and easy to parse. A
+future manifest format may move the declaration portion out to a separate
+file, to allow for more fine-grained expression of authority.</p>
+<p>Commands that build a manifest, like "<code>cfx xpi</code>" or "<code>cfx run</code>", will scan
+all included modules for use of <code>Cc</code>/<code>Ci</code> aliases (or the expanded
+<code>Components.classes</code> forms). It will emit a warning if it sees the expanded
+forms, or if it sees a use of e.g. "<code>Cc</code>" without a corresponding entry in
+the <code>require("chrome")</code> statement. These warnings will serve to guide
+developers to use the correct pattern. All module developers should heed the
+warnings and correct their code until the warnings go away.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../packages/addon-kit/request.html">request</a>
+
+<a href="../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../packages/addon-kit/self.html">self</a>
+
+<a href="../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../packages/api-utils/base64.html">base64</a>
+
+<a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../packages/api-utils/content.html">content</a>
+
+<a href="../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../packages/api-utils/deprecate.html">deprecate</a>
+
+<a href="../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../packages/api-utils/events.html">events</a>
+
+<a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../packages/api-utils/list.html">list</a>
+
+<a href="../../packages/api-utils/loader.html">loader</a>
+
+<a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
+<a href="../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../packages/api-utils/url.html">url</a>
+
+<a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../dev-guide/console.html">console</a>
+            <a href="../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

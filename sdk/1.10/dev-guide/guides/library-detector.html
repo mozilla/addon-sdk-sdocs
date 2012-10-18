@@ -1,0 +1,519 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Porting the Library Detector - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../sdk/1.11/dev-guide/guides/library-detector.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.10</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Porting the Library Detector</h1>
+<p>This example walks through the process of porting a XUL-based add-on to the
+SDK. It's a very simple add-on and a good candidate for porting because
+there are suitable SDK APIs for all its features.</p>
+<img src="../../static-files/media/librarydetector/library-detector.png" alt="Library Detector Screenshot" class="image-right"/>
+
+<p>The add-on is Paul Bakaus's
+<a href="https://addons.mozilla.org/en-US/firefox/addon/library-detector/">Library Detector</a>.</p>
+<p>The Library Detector tells you which JavaScript frameworks the current
+web page is using. It does this by checking whether particular objects
+that those libraries add to the global window object are defined.
+For example, if <code>window.jQuery</code> is defined, then the page has loaded
+<a href="http://jquery.com/">jQuery</a>.</p>
+<p>For each library that it finds, the library detector adds an icon
+representing that library to the status bar. It adds a tooltip to each
+icon, which contains the library name and version.</p>
+<p>You can browse and run the ported version in the SDK's <code>examples</code> directory.</p>
+<h3>How the Library Detector Works</h3>
+<p>All the work is done inside a single file,
+<a href="http://code.google.com/p/librarydetector/source/browse/trunk/chrome/content/librarydetector.xul"><code>librarydetector.xul</code></a>
+This contains:</p>
+<ul>
+    <li>a XUL overlay</li>
+    <li>a script</li>
+</ul>
+
+<p>The XUL overlay adds a <code>box</code> element to the browser's status bar:</p>
+<script type="syntaxhighlighter" class="brush: html"><![CDATA[
+  &lt;statusbar id="status-bar"&gt; &lt;box orient="horizontal" id="librarydetector"&gt; &lt;/box&gt; &lt;/statusbar&gt;
+]]>
+</script>
+
+<p>The script does everything else.</p>
+<p>The bulk of the script is an array of test objects, one for each library.
+Each test object contains a function called <code>test()</code>: if the
+function finds the library, it defines various additional properties for
+the test object, such as a <code>version</code> property containing the library version.
+Each test also contains a <code>chrome://</code> URL pointing to the icon associated with
+its library.</p>
+<p>The script listens to <a href="https://developer.mozilla.org/en/Code_snippets/Tabbed_browser">gBrowser</a>'s
+<code>DOMContentLoaded</code> event. When this is triggered, the <code>testLibraries()</code>
+function builds an array of libraries by iterating through the tests and
+adding an entry for each library which passes.</p>
+<p>Once the list is built, the <code>switchLibraries()</code> function constructs a XUL
+<code>statusbarpanel</code> element for each library it found, populates it with the
+icon at the corresponding <code>chrome://</code> URL, and adds it to the box.</p>
+<p>Finally, it listens to gBrowser's <code>TabSelect</code> event, to update the contents
+of the box for that window.</p>
+<h3>Content Script Separation</h3>
+<p>The test objects in the original script need access to the DOM window object,
+so in the SDK port, they need to run in a content script. In fact, they need
+access to the un-proxied DOM window, so they can see the objects added by
+libraries, so we’ll need to use the experimental <a href="../../dev-guide/guides/content-scripts/accessing-the-dom.html#unsafeWindow">unsafeWindow</a></p>
+<p>The main add-on script, <code>main.js</code>, will use a
+<a href="../../packages/addon-kit/page-mod.html"><code>page-mod</code></a>
+to inject the content script into every new page.</p>
+<p>The content script, which we'll call <code>library-detector.js</code>, will keep most of
+the logic of the <code>test</code> functions intact. However, instead of maintaining its
+own state by listening for <code>gBrowser</code> events and updating the
+user interface, the content script will just run when it's loaded, collect
+the array of library names, and post it back to <code>main.js</code>:</p>
+<pre><code>function testLibraries() {
+  var win = unsafeWindow;
+  var libraryList = [];
+  for(var i in LD_tests) {
+    var passed = LD_tests[i].test(win);
+    if (passed) {
+      var libraryInfo = {
+        name: i,
+        version: passed.version
+      };
+      libraryList.push(libraryInfo);
+    }
+  }
+  self.postMessage(libraryList);
+}
+
+testLibraries();
+</code></pre>
+<p><code>main.js</code> responds to that message by fetching the tab
+corresponding to that worker using
+<a href="../../packages/api-utils/content/worker.html#tab"><code>worker.tab</code></a>, and adding
+the array of library names to that tab's <code>libraries</code> property:</p>
+<pre><code>pageMod.PageMod({
+  include: "*",
+  contentScriptWhen: 'end',
+  contentScriptFile: (data.url('library-detector.js')),
+  onAttach: function(worker) {
+    worker.on('message', function(libraryList) {
+      if (!worker.tab.libraries) {
+        worker.tab.libraries = [];
+      }
+      libraryList.forEach(function(library) {
+        if (worker.tab.libraries.indexOf(library) == -1) {
+          worker.tab.libraries.push(library);
+        }
+      });
+      if (worker.tab == tabs.activeTab) {
+        updateWidgetView(worker.tab);
+      }
+    });
+  }
+});
+</code></pre>
+<p>The content script is executed once for every <code>window.onload</code> event, so
+it will run multiple times when a single page containing multiple iframes
+is loaded. So <code>main.js</code> needs to filter out any duplicates, in case
+a page contains more than one iframe, and those iframes use the same library.</p>
+<h3>Implementing the User Interface</h3>
+<h4>Showing the Library Array</h4>
+<p>The <a href="../../packages/addon-kit/widget.html"><code>widget</code></a> module is a natural fit
+for displaying the library list. We'll specify its content using HTML, so we
+can display an array of icons. The widget must be able to display different
+content for different windows, so we'll use the
+<a href="../../packages/addon-kit/widget.html"><code>WidgetView</code></a> object.</p>
+<p><code>main.js</code> will create an array of icons corresponding to the array of library
+names, and use that to build the widget's HTML content dynamically:</p>
+<pre><code>function buildWidgetViewContent(libraryList) {
+  widgetContent = htmlContentPreamble;
+  libraryList.forEach(function(library) {
+      widgetContent += buildIconHtml(icons[library.name],
+        library.name + "&lt;br&gt;Version: " + library.version);
+  });
+  widgetContent += htmlContentPostamble;
+  return widgetContent;
+}
+
+function updateWidgetView(tab) {
+  var widgetView = widget.getView(tab.window);
+  if (!tab.libraries) {
+    tab.libraries = [];
+  }
+  widgetView.content = buildWidgetViewContent(tab.libraries);
+  widgetView.width = tab.libraries.length * ICON_WIDTH;
+}
+</code></pre>
+<p><code>main.js</code> will
+use the <a href="../../packages/addon-kit/tabs.html"><code>tabs</code></a> module to update the
+widget's content when necessary (for example, when the user switches between
+tabs):</p>
+<pre><code>tabs.on('activate', function(tab) {
+  updateWidgetView(tab);
+});
+
+tabs.on('ready', function(tab) {
+  tab.libraries = [];
+});
+</code></pre>
+<h4>Showing the Library Detail</h4>
+<p>The XUL library detector displayed the detailed information about each
+library on mouseover in a tooltip: we can't do this using a widget, so
+instead will use a panel. This means we'll need two additional content
+scripts:</p>
+<ul>
+<li>one in the widget's context, which listens for icon mouseover events
+and sends a message to <code>main.js</code> containing the name of the corresponding
+library:</li>
+</ul>
+<pre><code>
+function setLibraryInfo(element) {
+  self.port.emit('setLibraryInfo', element.target.title);
+}
+
+var elements = document.getElementsByTagName('img');
+
+for (var i = 0; i &lt; elements.length; i++) {
+  elements[i].addEventListener('mouseover', setLibraryInfo, false);
+}
+</code></pre>
+
+<ul>
+<li>one in the panel, which updates the panel's content with the library
+information:</li>
+</ul>
+<pre><code>
+self.on("message", function(libraryInfo) {
+  window.document.body.innerHTML = libraryInfo;
+});
+</code></pre>
+
+<p>Finally <code>main.js</code> relays the library information from the widget to the panel:</p>
+<pre><code>
+widget.port.on('setLibraryInfo', function(libraryInfo) {
+  widget.panel.postMessage(libraryInfo);
+});
+</code></pre>
+
+<img src="../../static-files/media/librarydetector/panel-content.png" alt="Updating panel content" class="image-center"/></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../packages/addon-kit/request.html">request</a>
+
+<a href="../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../packages/addon-kit/self.html">self</a>
+
+<a href="../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../packages/api-utils/base64.html">base64</a>
+
+<a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../packages/api-utils/content.html">content</a>
+
+<a href="../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../packages/api-utils/events.html">events</a>
+
+<a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../packages/api-utils/list.html">list</a>
+
+<a href="../../packages/api-utils/loader.html">loader</a>
+
+<a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
+<a href="../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../packages/api-utils/url.html">url</a>
+
+<a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../dev-guide/console.html">console</a>
+            <a href="../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,541 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Communicating With Other Scripts - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../../sdk/1.11/dev-guide/guides/content-scripts/communicating-with-other-scripts.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.10</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Communicating With Other Scripts</h1>
+<p>This section of the guide explains how content scripts can
+communicate with:</p>
+<ul>
+<li><a href="../../../dev-guide/guides/content-scripts/communicating-with-other-scripts.html#main.js">your <code>main.js</code> file</a>,
+or any other modules in your add-on</li>
+<li><a href="../../../dev-guide/guides/content-scripts/communicating-with-other-scripts.html#Content Scripts">other content scripts loaded by your add-on</a></li>
+<li><a href="../../../dev-guide/guides/content-scripts/communicating-with-other-scripts.html#Page Scripts">page scripts</a> (that is, scripts embedded in the web page or
+included using <code>&lt;script&gt;</code> tags) </li>
+</ul>
+<h2>main.js</h2>
+<p>Your content scripts can communicate with your add-on's "main.js"
+(or any other modules you're written for your add-on) by sending it messages,
+using either the <code>port.emit()</code> API or the <code>postMessage()</code> API. See the
+articles on
+<a href="../../../dev-guide/guides/content-scripts/using-postmessage.html">using <code>postMessage()</code></a>
+and
+<a href="../../../dev-guide/guides/content-scripts//using-port.html">using <code>port</code></a> for details.</p>
+<h2>Content Scripts</h2>
+<p>Content scripts loaded into the same document can interact
+with each other directly as well as with the web content itself. However,
+content scripts which have been loaded into different documents
+cannot interact with each other.</p>
+<p>For example:</p>
+<ul>
+<li>if an add-on creates a single <code>panel</code> object and loads several content
+scripts into the panel, then they can interact with each other</li>
+<li>if an add-on creates two <code>panel</code> objects and loads a script into each
+one, they can't interact with each other.</li>
+<li>if an add-on creates a single <code>page-mod</code> object and loads several content
+scripts into the page mod, then only content scripts associated with the
+same page can interact with each other: if two different matching pages are
+loaded, content scripts attached to page A cannot interact with those attached
+to page B.</li>
+</ul>
+<p>The web content has no access to objects created by the content script, unless
+the content script explicitly makes them available.</p>
+<h2>Page Scripts</h2>
+<p>If a page includes its own scripts using <code>&lt;script&gt;</code> tags,
+either embedded in the page or linked to it using the <code>src</code> attribute, there
+are a couple of ways a content script can communicate with it:</p>
+<ul>
+<li>using the <a href="../../../dev-guide/guides/content-scripts/communicating-with-other-scripts.html#Using the DOM postMessage API">DOM <code>postMessage()</code> API</a></li>
+<li>using <a href="../../../dev-guide/guides/content-scripts/communicating-with-other-scripts.html#Using Custom DOM Events">custom DOM events</a></li>
+</ul>
+<h3>Using the DOM postMessage API</h3>
+<p>You can communicate between the content script and page scripts using
+<a href="https://developer.mozilla.org/en/DOM/window.postMessage"><code>window.postMessage()</code></a>,
+but there's a twist: in early versions of the SDK, the global <code>postMessage()</code>
+function in content scripts was used for communicating between the content
+script and the main add-on code. Although this has been
+<a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes/1.0b5#Major_Changes">deprecated in favor of <code>self.postMessage</code></a>,
+the old globals are still supported, so you can't currently use
+<code>window.postMessage()</code>. You must use <code>document.defaultView.postMessage()</code>
+instead.</p>
+<h4>Messaging From Content Script To Page Script</h4>
+<p>Suppose we have a page called "listen.html" hosted at "my-domain.org", and we want to send messages
+from the add-on to a script embedded in that page.</p>
+<p>In the main add-on code, we have a
+<a href="../../../packages/addon-kit/page-mod.html"><code>page-mod</code></a> that attaches the content script
+"talk.js" to the right page:</p>
+<pre><code>var data = require("self").data;
+
+var pageMod = require("page-mod");
+pageMod.PageMod({
+  include: "http://my-domain.org/listen.html",
+  contentScriptFile: data.url("talk.js")
+});
+</code></pre>
+<p>The "talk.js" content script uses <code>document.defaultView.postMessage()</code> to send
+the message to the page:</p>
+<pre><code>document.defaultView.postMessage("Message from content script", "http://my-domain.org/");
+</code></pre>
+<p>The second argument may be '*' which will allow communication with any domain.</p>
+<p>Finally, "listen.html" uses <code>window.addEventListener()</code> to listen for
+messages from the content script:</p>
+<script type="syntaxhighlighter" class="brush: html"><![CDATA[
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;script&gt;
+      window.addEventListener('message', function(event) {
+        window.alert(event.data);
+      }, false);
+    &lt;/script&gt;
+  &lt;/body&gt;
+
+&lt;/html&gt;
+]]>
+</script>
+
+<h4>Messaging From Page Script To Content Script</h4>
+<p>Sending messages from the page script to the content script is just
+the same, but in reverse.</p>
+<p>Here "main.js" creates a <a href="../../../packages/addon-kit/page-mod.html"><code>page-mod</code></a>
+that attaches "listen.js" to the web page:</p>
+<pre><code>var data = require("self").data;
+
+var pageMod = require("page-mod");
+pageMod.PageMod({
+  include: "http://my-domain.org/talk.html",
+  contentScriptFile: data.url("listen.js")
+});
+</code></pre>
+<p>The web page "talk.html" embeds a script that uses <code>window.postMessage()</code>
+to send the content script a message when the user clicks a button:</p>
+<script type="syntaxhighlighter" class="brush: html"><![CDATA[
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;script&gt;
+      function sendMessage() {
+        window.postMessage("Message from page script", "http://my-domain.org/");
+      }
+    &lt;/script&gt;
+    &lt;button onclick="sendMessage()"&gt;Send Message&lt;/button&gt;
+  &lt;/body&gt;
+
+&lt;/html&gt;
+</script>
+
+<p>Finally, the content script "listen.js" uses
+<code>document.defaultView.addEventListener()</code> to listen for messages from the page
+script:</p>
+<pre><code>document.defaultView.addEventListener('message', function(event) {
+  console.log(event.data);
+  console.log(event.origin);
+}, false);
+</code></pre>
+<h3>Using Custom DOM Events</h3>
+<p>As an alternative to using <code>postMessage()</code> you can use
+<a href="https://developer.mozilla.org/en/DOM/CustomEvent">custom DOM events</a>
+to communicate between page scripts and content scripts.</p>
+<h4>Messaging From Content Script To Page Script</h4>
+<p>Here's an example showing how to use custom DOM events to send a message
+from a content script to a page script.</p>
+<p>First, "main.js" will create a <a href="../../../packages/addon-kit/page-mod.html"><code>page-mod</code></a>
+that will attach "talk.js" to the target web page:</p>
+<pre><code>var data = require("self").data;
+
+var pageMod = require("page-mod");
+pageMod.PageMod({
+  include: "http://my-domain.org/listen.html",
+  contentScriptFile: data.url("talk.js")
+});
+</code></pre>
+<p>Next, "talk.js" creates and dispatches a custom event, passing the payload
+in the <code>detail</code> parameter to <code>initCustomEvent()</code>:</p>
+<!-- This comment is used to terminate the Markdown list above -->
+
+<pre><code>var event = document.createEvent('CustomEvent');
+event.initCustomEvent("addon-message", true, true, { hello: 'world' });
+document.documentElement.dispatchEvent(event);
+</code></pre>
+<p>Finally "listen.html" listens for the new event and examines its
+<code>detail</code> attribute to retrieve the payload:</p>
+<script type="syntaxhighlighter" class="brush: html"><![CDATA[
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;script&gt;
+      document.documentElement.addEventListener("addon-message", function(event) {
+        window.alert(JSON.stringify(event.detail))
+      }, false);
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</script>
+
+<h4>Messaging From Page Script to Content Script</h4>
+<p>Sending messages using custom DOM events from the page script
+to the content script is just the same, but in reverse.</p>
+<p>Again, "main.js" creates a <a href="../../../packages/addon-kit/page-mod.html"><code>page-mod</code></a>
+to target the page we are interested in:</p>
+<pre><code>var data = require("self").data;
+
+var pageMod = require("page-mod");
+pageMod.PageMod({
+  include: "http://my-domain.org/talk.html",
+  contentScriptFile: data.url("listen.js")
+});
+</code></pre>
+<p>The web page "talk.html" creates and dispatches a custom DOM event,
+using <code>initCustomEvent()</code>'s <code>detail</code> parameter to supply the payload:</p>
+<script type="syntaxhighlighter" class="brush: html"><![CDATA[
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;script&gt;
+      function sendMessage() {
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent("addon-message", true, true, { hello: 'world' });
+        document.documentElement.dispatchEvent(event);
+      }
+    &lt;/script&gt;
+    &lt;button onclick="sendMessage()"&gt;Send Message&lt;/button&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</script>
+
+<p>Finally, the content script "listen.js" listens for the new event
+and retrieves the payload from its <code>detail</code> attribute:</p>
+<pre><code>document.documentElement.addEventListener("addon-message", function(event) {
+  console.log(JSON.stringify(event.detail));
+}, false);
+</code></pre></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../../packages/addon-kit/request.html">request</a>
+
+<a href="../../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../../packages/addon-kit/self.html">self</a>
+
+<a href="../../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../../packages/api-utils/base64.html">base64</a>
+
+<a href="../../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../../packages/api-utils/content.html">content</a>
+
+<a href="../../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../../packages/api-utils/events.html">events</a>
+
+<a href="../../../packages/api-utils/file.html">file</a>
+
+<a href="../../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../../packages/api-utils/list.html">list</a>
+
+<a href="../../../packages/api-utils/loader.html">loader</a>
+
+<a href="../../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../../packages/api-utils/test/assert.html">test/assert</a>
+
+<a href="../../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../../packages/api-utils/url.html">url</a>
+
+<a href="../../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

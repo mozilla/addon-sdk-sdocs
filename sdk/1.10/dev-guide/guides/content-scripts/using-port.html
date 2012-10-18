@@ -1,0 +1,486 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Communicating using "port" - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../../sdk/1.11/dev-guide/guides/content-scripts/using-port.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.10</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Communicating using "port"</h1>
+<p>To enable add-on scripts and content scripts to communicate with each other,
+each end of the conversation has access to a <code>port</code> object which defines two
+functions:</p>
+<p><strong><code>emit()</code></strong> is used to emit an event. It may be called with any number of
+parameters, but is most likely to be called with a name for the event and
+an optional payload. The payload can be any value that is
+<a href="../../../dev-guide/guides/content-scripts/using-port.html#json_serializable">serializable to JSON</a></p>
+<pre><code>port.emit("myEvent", myEventPayload);
+</code></pre>
+<p><strong><code>on()</code></strong> takes two parameters: the name of the event and a function to handle it:</p>
+<pre><code>port.on("myEvent", function handleMyEvent(myEventPayload) {
+  // Handle the event
+});
+</code></pre>
+<p>Here's  simple add-on that sends a message to a content script using <code>port</code>:</p>
+<pre><code>var tabs = require("tabs");
+
+var alertContentScript = "self.port.on('alert', function(message) {" +
+                         "  window.alert(message);" +
+                         "})";
+
+tabs.on("ready", function(tab) {
+  worker = tab.attach({
+    contentScript: alertContentScript
+  });
+  worker.port.emit("alert", "Message from the add-on");
+});
+
+tabs.open("http://www.mozilla.org");
+</code></pre>
+<p>We could depict the interface between add-on code and content script code like
+this:</p>
+<img src="../../../static-files/media/content-scripting-events.png" alt="Content script events" class="image-center">
+
+<p>Events are asynchronous: that is, the sender does not wait for a reply from
+the recipient but just emits the event and continues processing.</p>
+<h2>Accessing <code>port</code> in the Content Script</h2>
+<p><span class="aside">Note that the global <code>self</code> object is completely
+different from the <a href="../../../packages/addon-kit/self.html"><code>self</code> module</a>, which
+provides an API for an add-on to access its data files and ID.</span></p>
+<p>In the content script the <code>port</code> object is available as a property of the
+global <code>self</code> object. Thus, to emit an event from a content script:</p>
+<pre><code>self.port.emit("myContentScriptEvent", myContentScriptEventPayload);
+</code></pre>
+<p>To receive an event from the add-on code:</p>
+<pre><code>self.port.on("myAddonEvent", function(myAddonEventPayload) {
+  // Handle the event
+});
+</code></pre>
+<p>Compare this to the technique used to receive <em>built-in</em> events in the
+content script. For example, to receive the <code>context</code> event in a content script
+associated with a <a href="../../../packages/addon-kit/context-menu.html">context menu</a>
+object, you would call the <code>on</code> function attached to the global <code>self</code> object:</p>
+<pre><code>self.on("context", function() {
+  // Handle the event
+});
+</code></pre>
+<p>So the <code>port</code> property is essentially used here as a namespace for
+user-defined events.</p>
+<h2>Accessing <code>port</code> in the Add-on Script</h2>
+<p>In the add-on code, the channel of communication between the add-on and a
+particular content script context is encapsulated by the <code>worker</code> object. Thus
+the <code>port</code> object for communicating with a content script is a property of the
+corresponding <code>worker</code> object.</p>
+<p>However, the worker is not exposed to add-on code in quite the same way
+in all modules. The <code>panel</code> and <code>page-worker</code> objects integrate the
+worker API directly. So to receive events from a content script associated
+with a panel you use <code>panel.port.on()</code>:</p>
+<pre><code>var panel = require("panel").Panel({
+  contentScript: "self.port.emit('showing', 'panel is showing');"
+});
+
+panel.port.on("showing", function(text) {
+  console.log(text);
+});
+
+panel.show();
+</code></pre>
+<p>Conversely, to emit user-defined events from your add-on you can just call
+<code>panel.port.emit()</code>:</p>
+<pre><code>var panel = require("panel").Panel({
+  contentScript: "self.port.on('alert', function(text) {" +
+                 "  console.log(text);" +
+                 "});"
+});
+
+panel.show();
+panel.port.emit("alert", "panel is showing");
+</code></pre>
+<p>The <code>panel</code> and <code>page-worker</code> objects only host a single page at a time,
+so each distinct page object only needs a single channel of communication
+to its content scripts. But some modules, such as <code>page-mod</code>, might need to
+handle multiple pages, each with its own context in which the content scripts
+are executing, so it needs a separate channel (worker) for each page.</p>
+<p>So <code>page-mod</code> does not integrate the worker API directly: instead, each time a
+content script is attached to a page, the worker associated with the page is
+supplied to the page-mod in its <code>onAttach</code> function. By supplying a target for
+this function in the page-mod's constructor you can register to receive
+events from the content script, and take a reference to the worker so as to
+emit events to it.</p>
+<pre><code>var pageModScript = "window.addEventListener('click', function(event) {" +
+                    "  self.port.emit('click', event.target.toString());" +
+                    "  event.stopPropagation();" +
+                    "  event.preventDefault();" +
+                    "}, false);" +
+                    "self.port.on('warning', function(message) {" +
+                    "window.alert(message);" +
+                    "});"
+
+var pageMod = require('page-mod').PageMod({
+  include: ['*'],
+  contentScript: pageModScript,
+  onAttach: function(worker) {
+    worker.port.on('click', function(html) {
+      worker.port.emit('warning', 'Do not click this again');
+    });
+  }
+});
+</code></pre>
+<p>In the add-on above there are two user-defined events:</p>
+<ul>
+<li><code>click</code> is sent from the page-mod to the add-on, when the user clicks an
+element in the page</li>
+<li><code>warning</code> sends a silly string back to the page-mod</li>
+</ul>
+<h2><a name="json_serializable">JSON-Serializable Values</a></h2>
+<p>The payload for an event can be any JSON-serializable value. When events are
+sent their payloads are automatically serialized, and when events are received
+their payloads are automatically deserialized, so you don't need to worry
+about serialization.</p>
+<p>However, you <em>do</em> have to ensure that the payload can be serialized to JSON.
+This means that it needs to be a string, number, boolean, null, array of
+JSON-serializable values, or an object whose property values are themselves
+JSON-serializable. This means you can't send functions, and if the object
+contains methods they won't be encoded.</p>
+<p>For example, to include an array of strings in the payload:</p>
+<pre><code>var pageModScript = "self.port.emit('loaded'," +
+                    "  [" +
+                    "  document.location.toString()," +
+                    "  document.title" +
+                    "  ]" +
+                    ");"
+
+var pageMod = require('page-mod').PageMod({
+  include: ['*'],
+  contentScript: pageModScript,
+  onAttach: function(worker) {
+    worker.port.on('loaded', function(pageInfo) {
+      console.log(pageInfo[0]);
+      console.log(pageInfo[1]);
+    });
+  }
+});
+</code></pre></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../../packages/addon-kit/request.html">request</a>
+
+<a href="../../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../../packages/addon-kit/self.html">self</a>
+
+<a href="../../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../../packages/api-utils/base64.html">base64</a>
+
+<a href="../../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../../packages/api-utils/content.html">content</a>
+
+<a href="../../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../../packages/api-utils/events.html">events</a>
+
+<a href="../../../packages/api-utils/file.html">file</a>
+
+<a href="../../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../../packages/api-utils/list.html">list</a>
+
+<a href="../../../packages/api-utils/loader.html">loader</a>
+
+<a href="../../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../../packages/api-utils/test/assert.html">test/assert</a>
+
+<a href="../../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../../packages/api-utils/url.html">url</a>
+
+<a href="../../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Modifying the Page Hosted by a Tab - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../sdk/1.11/dev-guide/tutorials/modifying-web-pages-tab.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.10</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Modifying the Page Hosted by a Tab</h1>
+<p><span class="aside">
+To follow this tutorial you'll need to have
+<a href="../../dev-guide/tutorials/installation.html">installed the SDK</a>
+and learned the
+<a href="../../dev-guide/tutorials/getting-started-with-cfx.html">basics of <code>cfx</code></a>.
+</span></p>
+<p>To modify the page hosted by a particular tab, load a script into it
+using the <code>attach()</code> method of the
+<a href="../../packages/addon-kit/tabs.html">tab</a> object. Because their job is
+to interact with web content, these scripts are called <em>content scripts</em>.</p>
+<p>Here's a simple example:</p>
+<pre><code>var widgets = require("widget");
+var tabs = require("tabs");
+
+var widget = widgets.Widget({
+  id: "mozilla-link",
+  label: "Mozilla website",
+  contentURL: "http://www.mozilla.org/favicon.ico",
+  onClick: function() {
+    tabs.activeTab.attach({
+      contentScript:
+        'document.body.style.border = "5px solid red";'
+      })
+    }
+});
+</code></pre>
+<p>This add-on creates a widget which contains the Mozilla favicon as an icon.
+It has a click handler which fetches the active tab and loads a
+script into the page hosted by the active tab. The script is specified using
+<code>contentScript</code> option, and just draws
+a red border around the page. Try it out:</p>
+<ul>
+<li>create a new directory and navigate to it</li>
+<li>run <code>cfx init</code></li>
+<li>open the <code>lib/main.js</code> file, and add the code above</li>
+<li>run <code>cfx run</code>, then run <code>cfx run</code> again</li>
+</ul>
+<p>You should see the Mozilla icon appear in the bottom-right corner of the
+browser:</p>
+<img src="../../static-files/media/screenshots/widget-mozilla.png" alt="Mozilla icon widget" class="image-center"/>
+
+<p>Then open any web page in the browser window that opens, and click the
+Mozilla icon. You should see a red border appear around the page, like this:</p>
+<img src="../../static-files/media/screenshots/tabattach-bbc.png" alt="bbc.co.uk modded by tab.attach" class="image-center"/>
+
+<h2>Keeping the Content Script in a Separate File</h2>
+<p>In the example above we've passed in the content script as a string. Unless
+the script is extremely simple, you should instead maintain the script as a
+separate file. This makes the code easier to maintain, debug, and review.</p>
+<p>For example, if we save the script above under the add-on's <code>data</code> directory
+in a file called <code>my-script.js</code>:</p>
+<pre><code>document.body.style.border = "5px solid red";
+</code></pre>
+<p>We can load this script by changing the add-on code like this:</p>
+<pre><code>var widgets = require("widget");
+var tabs = require("tabs");
+var self = require("self");
+
+var widget = widgets.Widget({
+  id: "mozilla-link",
+  label: "Mozilla website",
+  contentURL: "http://www.mozilla.org/favicon.ico",
+  onClick: function() {
+    tabs.activeTab.attach({
+      contentScriptFile: self.data.url("my-script.js")
+    });
+  }
+});
+</code></pre>
+<p>You can load more than one script, and the scripts can interact
+directly with each other. So you can load <a href="http://jquery.com/">jQuery</a>,
+and then your content script can use that.</p>
+<h2>Communicating With the Content Script</h2>
+<p>Your add-on script and the content script can't directly
+access each other's variables or call each other's functions, but they
+can send each other messages.</p>
+<p>To send a
+message from one side to the other, the sender calls <code>port.emit()</code> and
+the receiver listens using <code>port.on()</code>.</p>
+<ul>
+<li>In the content script, <code>port</code> is a property of the global <code>self</code> object.</li>
+<li>In the add-on script, <code>tab-attach()</code> returns an object containing the
+<code>port</code> property you use to send messages to the content script.</li>
+</ul>
+<p>Let's rewrite the example above to pass a message from the add-on to
+the content script. The content script now needs to look like this:</p>
+<pre><code>// "self" is a global object in content scripts
+// Listen for a "drawBorder"
+self.port.on("drawBorder", function(color) {
+  document.body.style.border = "5px solid " + color;
+});
+</code></pre>
+<p>In the add-on script, we'll send the content script a "drawBorder" message
+using the object returned from <code>attach()</code>:</p>
+<pre><code>var widgets = require("widget");
+var tabs = require("tabs");
+var self = require("self");
+
+var widget = widgets.Widget({
+  id: "mozilla-link",
+  label: "Mozilla website",
+  contentURL: "http://www.mozilla.org/favicon.ico",
+  onClick: function() {
+    worker = tabs.activeTab.attach({
+      contentScriptFile: self.data.url("my-script.js")
+    });
+    worker.port.emit("drawBorder", "red");
+  }
+});
+</code></pre>
+<p>The <code>drawBorder</code> message isn't a built-in message, it's one that this
+add-on defines in the <code>port.emit()</code> call.</p>
+<h2>Injecting CSS</h2>
+<p>Unlike the <a href="../../dev-guide/tutorials/modifying-web-pages-url.html"><code>page-mod</code></a> API,
+<code>tab.attach()</code> doesn't enable you to inject CSS directly into a page.</p>
+<p>To modify the style of a page you have to use JavaScript, as in
+the example above.</p>
+<h2>Learning More</h2>
+<p>To learn more about working with tabs in the SDK, see the
+<a href="../../dev-guide/tutorials/open-a-web-page.html">Open a Web Page</a>
+tutorial, the
+<a href="../../dev-guide/tutorials/list-open-tabs.html">List Open Tabs</a>
+tutorial, and the <a href="../../packages/addon-kit/tabs.html"><code>tabs</code> API reference</a>.</p>
+<p>To learn more about content scripts, see the
+<a href="../../dev-guide/guides/content-scripts/index.html">content scripts guide</a>.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../packages/addon-kit/request.html">request</a>
+
+<a href="../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../packages/addon-kit/self.html">self</a>
+
+<a href="../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../packages/api-utils/base64.html">base64</a>
+
+<a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../packages/api-utils/content.html">content</a>
+
+<a href="../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../packages/api-utils/events.html">events</a>
+
+<a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../packages/api-utils/list.html">list</a>
+
+<a href="../../packages/api-utils/loader.html">loader</a>
+
+<a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../packages/api-utils/test/assert.html">test/assert</a>
+
+<a href="../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../packages/api-utils/url.html">url</a>
+
+<a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../dev-guide/console.html">console</a>
+            <a href="../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

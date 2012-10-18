@@ -1,0 +1,585 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>proxy - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../../sdk/1.11/packages/api-utils/content/proxy.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.9</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content">
+<div id="proxy_module_api_docs" class="module_api_docs">
+<h1>proxy</h1>
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<!-- contributed by Alexandre Poirot [apoirot@mozilla.com]  -->
+
+<p>Content scripts need access to the DOM of the pages they are attached to.
+However, those pages should be considered to be hostile environments: we
+have no control over any other scripts loaded by the web page that may be
+executing in the same context. If the content scripts and scripts loaded
+by the web page were to access the same DOM objects, there are two possible
+security problems:</p>
+<p>First, a malicious page might redefine functions and properties of DOM
+objects so they don't do what the add-on expects. For example, if a
+content script calls <code>document.getElementById()</code> to retrieve a DOM
+element, then a malicious page could redefine its behavior to return
+something unexpected:</p>
+<pre><code>
+// If the web document contains the following script:
+document.getElementById = function (str) {
+  // Overload indexOf method of all string instances
+  str.__proto__.indexOf = function () {return -1;};
+  // Overload toString method of all object instances
+  str.__proto__.__proto__.toString = function () {return "evil";};
+};
+// After the following line, the content script will be compromised:
+var node = document.getElementById("element");
+// Then your content script is totally out of control.
+</code></pre>
+
+<p>Second, changes the content script made to the DOM objects would be visible
+to the page, leaking information to it.</p>
+<p>The general approach to fixing these problems is to wrap DOM objects in
+<a href="https://developer.mozilla.org/en/XPCNativeWrapper"><code>XrayWrappers</code></a>
+(also know as <code>XPCNativeWrapper</code>). This guarantees that:</p>
+<ul>
+<li>when the content script accesses DOM properties and functions it gets the
+original native version of them, ignoring any modifications made by the web
+page</li>
+<li>changes to the DOM made by the content script are not visible to scripts
+running in the page.</li>
+</ul>
+<p>However, <code>XrayWrapper</code> has some limitations and bugs, which break many
+popular web frameworks. In particular, you can't:</p>
+<ul>
+<li>define attributes like <code>onclick</code>: you have to use <code>addEventListener</code> syntax</li>
+<li>overload native methods on DOM objects, like this:
+<pre><code>
+proxy.addEventListener = function () {};
+</code></pre></li>
+<li>access named elements using properties like <code>window[framename]</code> or
+<code>document[formname]</code></li>
+<li>use some other features that have bugs in the <code>XrayWrapper</code>
+implementation, like <code>mozMatchesSelector</code></li>
+</ul>
+<p>The <code>proxy</code> module uses <code>XrayWrapper</code> in combination with the
+experimental
+<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Proxy">Proxy API</a>
+to address both the security vulnerabilities of content scripts and the
+limitations of <code>XrayWrapper</code>.</p>
+<pre>
+  /--------------------\                           /------------------------\
+  |    Web document    |                           | Content script sandbox |
+  | http://mozilla.org |                           |     data/worker.js     |
+  |                    | require('content-proxy'). |                        |
+  | window >-----------|-     create(window)      -|-> window               |
+  \--------------------/                           \------------------------/
+</pre>
+
+<h2>The Big Picture</h2>
+<p>The implementation defines two different kinds of proxy:</p>
+<ol>
+<li>Content script proxies that wrap DOM objects that are exposed to
+     content scripts as described above.</li>
+<li>XrayWrapper proxies that wrap objects from content scripts before handing
+     them over to XrayWrapper functions. These proxies are internal
+     and are not exposed to content scripts or document content.</li>
+</ol>
+<pre>
+  /--------------------\                           /------------------------\
+  |    Web document    |                           | Content script sandbox |
+  | http://mozilla.org |                           |     data/worker.js     |
+  |                    |                   /-------|-> myObject = {}        |
+  |                    |  /----------------v--\    |                        |
+  |                    |  | XrayWrapper Proxy |    | - document             |
+  |                    |  \---------v---------/    \----^-------------------/
+  |                    |            v                   |
+  |                    |  /-------------\  /----------\ |
+  | - document >-------|->| XrayWrapper |<-| CS proxy |-/
+  \--------------------/  \-------------/  \----------/
+</pre>
+
+<p>Everything begins with a single call to the <code>create</code> function exported by the
+content-proxy module:</p>
+<pre><code>// Retrieve the unwrapped reference to the current web page window object
+var win = gBrowser.contentDocument.defaultView.wrappedJSObject;
+// Or in addon sdk style
+var win = require("tab-browser").activeTab.linkedBrowser.contentWindow.wrappedJSObject;
+// Now create a content script proxy for the window object
+var windowProxy = require("api-utils/content/content-proxy").create(win);
+
+// We finally use this window object as sandbox prototype,
+// so that all web page globals are accessible in CS too:
+var contentScriptSandbox = new Cu.Sandbox(win, {
+  sandboxPrototype: windowProxy
+});
+</code></pre>
+<p>Then all other proxies are created from this one. Attempts to access DOM
+attributes of this proxy are trapped, and the proxy constructs and returns
+content script proxies for those attributes:</p>
+<pre><code>// For example, if you simply do this:
+var document = window.document;
+// accessing the `document` attribute will be trapped by the `window` content script
+// proxy, and that proxy will that create another content script proxy for `document`
+</code></pre>
+<p>So the main responsibility of the content script proxy implementation is to
+ensure that we always return content script proxies to the content script.</p>
+<h2>Internal Implementation</h2>
+<p>Each content script proxy keeps a reference to the <code>XrayWrapper</code> that enables
+it to be sure of calling native DOM methods.</p>
+<p>There are two internal functions to convert between content script proxy
+values and <code>XrayWrapper</code> values.</p>
+<ol>
+<li><strong><code>wrap</code></strong> takes an XrayWrapper value and wraps it in a content script
+proxy if needed.
+  This method is called when:<ul>
+<li>a content script accesses an attribute of a content script proxy.</li>
+<li>XrayWrapper code calls a callback function defined in the content
+script, so that arguments passed into the function by the XrayWrapper are
+converted into content script proxies. For example, if a content script
+calls <code>addEventListener</code>, then the listener function will expect any arguments
+to be content script proxies.
+<br/><br/></li>
+</ul>
+</li>
+<li><strong><code>unwrap</code></strong> takes an object coming from the content script context and:<ul>
+<li>if the object is a content script proxy, unwraps it back to an
+XrayWrapper reference</li>
+<li>
+<p>if the object is not a content script proxy, wraps it in an XrayWrapper
+proxy.
+<br/><br/>
+This means we can call a XrayWrapper method either with:</p>
+<ul>
+<li>
+<p>a raw XrayWrapper object.</p>
+<pre><code>// The following line doesn't work if child is a content script proxy,
+// it has to be a raw XrayWrapper reference
+xrayWrapper.appendChild(child)
+</code></pre>
+</li>
+<li>
+<p>an XrayWrapper proxy when you pass a custom object from the content
+script context.</p>
+<pre><code>var myListener = {
+  handleEvent: function(event) {
+    // `event` should be a content script proxy
+  }
+};
+// `myListener` has to be another kind of Proxy: XrayWrapper proxy,
+// that aims to catch the call to `handleEvent` in order to wrap its
+// arguments in a content script proxy.
+xrayWrapper.addEventListener("click", myListener, false);
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2>Stack Traces</h2>
+<p>The following code:</p>
+<pre><code>function listener(event) {
+
+}
+csProxy.addEventListener("message", listener, false);
+</code></pre>
+<p>generates the following internal calls:</p>
+<pre><code>-&gt; CS Proxy:: get("addEventListener")
+  -&gt; wrap(xrayWrapper.addEventListener)
+    -&gt; NativeFunctionWrapper(xrayWrapper.addEventListener)
+      // NativeFunctionWrapper generates:
+      function ("message", listener, false) {
+        return xraywrapper.addEventListener("message", unwrap(listener), false);
+      }
+      -&gt; unwrap(listener)
+        -&gt; ContentScriptFunctionWrapper(listener)
+        // ContentScriptFunctionWrapper generates:
+        function (event) {
+          return listener(wrap(event));
+        }
+</code></pre>
+<br>
+
+<pre><code>// First, create an object from content script context
+var myListener = {
+  handleEvent: function (event) {
+
+  }
+};
+// Then, pass this object as an argument to a CS proxy method
+window.addEventListener("message", myListener, false);
+
+// Generates the following internal calls:
+-&gt; CS Proxy:: get("addEventListener")
+  -&gt; wrap(xrayWrapper.addEventListener)
+    -&gt; NativeFunctionWrapper(xrayWrapper.addEventListener)
+       // Generate the following function:
+       function ("message", myListener, false) {
+          return xraywrapper.addEventListener("message", unwrap(myListener), false);
+       }
+       -&gt; unwrap(myListener)
+         -&gt; ContentScriptObjectWrapper(myListener)
+            // Generate an XrayWrapper proxy and give it to xrayWrapper method.
+            // Then when native code fires an event, the proxy will catch it:
+            -&gt; XrayWrapper Proxy:: get("handleEvent")
+              -&gt; unwrap(myListener.handleEvent)
+                -&gt; ContentScriptFunctionWrapper(myListener.handleEvent)
+                   // Generate following function:
+                   function (event) {
+                     return myListener.handleEvent(wrap(event));
+                   }
+</code></pre>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">create(object)</h4>
+<p>Create a content script proxy. <br/>
+Doesn't create a proxy if we are not able to create a XrayWrapper for
+this object: for example, if the object comes from system principal.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">object : <span class="datatype">Object</span></div>
+<p>The object to proxify.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">Object</span><p>A content script proxy that wraps <code>object</code>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../../packages/addon-kit/request.html">request</a>
+
+<a href="../../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../../packages/addon-kit/self.html">self</a>
+
+<a href="../../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../../packages/api-utils/base64.html">base64</a>
+
+<a href="../../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../../packages/api-utils/content.html">content</a>
+
+<a href="../../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../../packages/api-utils/events.html">events</a>
+
+<a href="../../../packages/api-utils/file.html">file</a>
+
+<a href="../../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../../packages/api-utils/list.html">list</a>
+
+<a href="../../../packages/api-utils/loader.html">loader</a>
+
+<a href="../../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../../packages/api-utils/test/assert.html">test/assert</a>
+
+<a href="../../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../../packages/api-utils/url.html">url</a>
+
+<a href="../../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>
