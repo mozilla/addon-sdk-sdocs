@@ -48,7 +48,6 @@ def obsolete(obsoleted, latest, mappings):
             if not filename.endswith(".html"):
                 continue
             path_and_filename = os.sep.join([dirpath, filename])
-            print path_and_filename
             # first, look for a replacement in mappings
             replacement_path_and_filename = mappings.get(path_and_filename, "")
             if replacement_path_and_filename:
@@ -61,12 +60,12 @@ def obsolete(obsoleted, latest, mappings):
             if os.path.exists(replacement_path_and_filename):
                 insert_notice(path_and_filename, replacement_path_and_filename, OBSOLETE_NOTICE_POSTAMBLE)
                 continue
-            # otherwise consider this file is missing, and point to index.html
+            # otherwise consider this file is removed, and point to index.html
             latest_index = "/".join(["sdk", latest, "index.html"])
-            insert_obsolete_notice(path_and_filename, latest_index)
+            insert_notice(path_and_filename, latest_index, REMOVED_NOTICE_POSTAMBLE)
             missing_files.append(path_and_filename)
 
-    print "\n\nCould not find a replacement for the following files:"
+    print "Could not find a replacement for the following files:"
     for missing_file in sorted(missing_files):
         print " "+ missing_file
 
@@ -82,6 +81,5 @@ if __name__ == "__main__":
         mappings = read_mappings(sys.argv[3])
     else:
         mappings = {}
-    #mappings = {"sdk/1.10/packages/api-utils/message-manager.html":"sdk/1.11rc1/index.html"}
     obsolete(sys.argv[1], sys.argv[2], mappings)
 

@@ -1,40 +1,21 @@
-mkdir sdk/$1
-mkdir sdk/$2
-mkdir sdk/$3
+# prepare git for a fresh set of docs
+#bash git_prepare_commit.sh
 
-mkdir working
-cd working
-mkdir $1
-mkdir $2
-mkdir $3
-
-function get_release {
-  cd $1
-  curl -O https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/addon-sdk-$1.tar.gz
-  tar -xf addon-sdk-$1.tar.gz
-  cd addon-sdk-$1
-  source bin/activate
-  cfx sdocs
-  tar -xf addon-sdk-docs.tgz
-  mv addon-sdk/doc/static-files/base.html ../../../sdk/$1
-  cd ../../
-}
-
-# get the latest release
-cd $1
-git clone https://github.com/mozilla/addon-sdk.git
-cd addon-sdk
-git checkout $1
-source bin/activate
 pos=$(expr $1 : '[0-9,\.]*')
-echo ${1:0:$pos}
-cfx sdocs --override-version=$1
-tar -xf addon-sdk-docs.tgz -C ../../../sdk/$1
-cd ../../
+latest_version=${1:0:$pos}
 
-# get the second release
-get_release $2
-get_release $3
+# get the releases and generate docs for them
+latest_version_tag=$1
+old_version1=$2
+old_version2=$3
+bash get_releases.sh $latest_version_tag $old_version1 $old_version2
 
-#obsolete $2
-#obsolete $3
+# obsolete old versions
+pos=$(expr $latest_version_tag : '[0-9,\.]*')
+latest_version=${1:0:$pos}
+
+python obsolete.py $old_version1 $latest_version $4
+python obsolete.py $old_version2 $latest_version $4
+
+# make the commit
+#bash git_commit.sh
