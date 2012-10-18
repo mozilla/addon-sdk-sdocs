@@ -2,7 +2,7 @@ This repository contains two top-level directories:
 - `sdk`: the SDK documentation to be hosted at addons.mozilla.org
 - `doc-tools`: a collection of scripts used to build this documentation
 
-## SDK Documentation ##
+## SDK documentation sets ##
 
 There are three sets of SDK docs: one for the current release, and one for each of the two previous releases. The old releases contain "obsolete" notices at the top of each page that point to the corresponding page in the current release (or to the top-level page if there isn't a corresponding page).
 
