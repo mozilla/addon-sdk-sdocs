@@ -61,14 +61,27 @@ def obsolete(obsoleted, latest, mappings):
             if os.path.exists(replacement_path_and_filename):
                 insert_notice(path_and_filename, replacement_path_and_filename, OBSOLETE_NOTICE_POSTAMBLE)
                 continue
-            # otherwise we can't update this file
+            # otherwise consider this file is missing, and point to index.html
+            latest_index = "/".join(["sdk", latest, "index.html"])
+            insert_obsolete_notice(path_and_filename, latest_index)
             missing_files.append(path_and_filename)
 
     print "\n\nCould not find a replacement for the following files:"
     for missing_file in sorted(missing_files):
         print " "+ missing_file
 
+def read_mappings(mappings_file):
+    mappings = {}
+    for line in open(mappings_file):
+        (key, val) = line.split()
+        mappings[key] = val
+    return mappings
+
 if __name__ == "__main__":
-    mappings = {"sdk/1.10/packages/api-utils/message-manager.html":"sdk/1.11rc1/index.html"}
+    if len(sys.argv) == 4:
+        mappings = read_mappings(sys.argv[3])
+    else:
+        mappings = {}
+    #mappings = {"sdk/1.10/packages/api-utils/message-manager.html":"sdk/1.11rc1/index.html"}
     obsolete(sys.argv[1], sys.argv[2], mappings)
 
