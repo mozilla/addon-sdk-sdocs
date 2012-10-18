@@ -18,4 +18,4 @@ python obsolete.py $old_version1 $latest_version $4
 python obsolete.py $old_version2 $latest_version $4
 
 # make the commit
-#bash git_commit.sh
+bash git_commit.sh $1
