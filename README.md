@@ -49,9 +49,9 @@ As you see, you can specify mapping for both obsolete releases in the same mappi
 `make_webdocs.sh` does the following:
 
 1. prepares to make a new commit of the docs, by deleting everything under `sdk/`
-2 fetches the latest docs from GitHub, and the two obsolete releases from `https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/`
+2. fetches the latest docs from GitHub, and the two obsolete releases from `https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/`
 3. generates and extracts the static docs, for all three releases and copies them all under `sdk/`
-4 inserts the obsolete notice in every HTML file in the obsolete releases. The logic of this is as follows: for each file in the obsolete release:
+4. inserts the obsolete notice in every HTML file in the obsolete releases. The logic of this is as follows: for each file in the obsolete release:
     * if a mapping exists in the mappings file, make the obsolete notice point at the file identified in the mapping.
     * otherwise, if a file with the same name exists in the `latest` release tree, at the same relative path from the root, make the obsolete notice point at that file. For example, `"sdk/1.9/packages/addon-kit/page-mod.html"` -> `"sdk/1.11/packages/addon-kit/page-mod.html"`.
     * otherwise, make the obsolete notice point at the root file in `latest`, for example: `"sdk/1.9/packages/api-utils/message-manager.html"` -> `"sdk/1.11/"`. In this case, different wording is used to indicate that the file is missing in `latest`, and the file is listed in the console output: this is intended to help you realise if you forgot to include a mapping for a file that was moved.
