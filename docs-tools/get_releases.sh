@@ -33,9 +33,12 @@ tar -xf addon-sdk-docs.tgz
 mv doc/* ../../../sdk/$1
 cd ../../
 
-# get the second release
 get_release $2
 get_release $3
 
-#obsolete $2
-#obsolete $3
+rm -rf *
+rm -rf .DS_Store
+cd ..
+rmdir working
+
+
