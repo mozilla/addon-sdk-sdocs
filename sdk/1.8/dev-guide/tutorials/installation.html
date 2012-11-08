@@ -1,0 +1,449 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Installation - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../sdk/1.11/dev-guide/tutorials/installation.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.8.2</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Installation</h1>
+<h2>Prerequisites</h2>
+<p>To develop with the Add-on SDK, you'll need:</p>
+<ul>
+<li>
+<p><a href="http://www.python.org/">Python</a> 2.5 or 2.6. Note that versions 3.0 and 3.1
+  of Python are not supported. Make sure that Python is in your path.</p>
+</li>
+<li>
+<p>A <a href="../../dev-guide/guides/firefox-compatibility.html">compatible version of Firefox</a>.
+That's either: the version of Firefox shipping at the time the SDK shipped,
+or the Beta version of Firefox at the time the SDK shipped. See the
+<a href="https://wiki.mozilla.org/Jetpack/SDK_2012_Release_Schedule">SDK Release Schedule</a>
+to map SDK releases to Firefox releases.</p>
+</li>
+<li>
+<p>The SDK itself: you can obtain the latest stable version of the SDK as a
+<a href="https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.tar.gz">tarball</a>
+or a <a href="https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.zip">zip file</a>.
+Alternatively, you can get the latest development version from its
+<a href="https://github.com/mozilla/addon-sdk">GitHub repository</a>.</p>
+</li>
+</ul>
+<h2>Installation on Mac OS X / Linux</h2>
+<p>Extract the file contents wherever you choose, and navigate to the root
+directory of the SDK with a shell/command prompt. For example:</p>
+<pre>
+tar -xf addon-sdk.tar.gz
+cd addon-sdk
+</pre>
+
+<p>Then run:</p>
+<pre>
+source bin/activate
+</pre>
+
+<p>Your command prompt should now have a new prefix containing the name of the
+SDK's root directory:</p>
+<pre>
+(addon-sdk)~/mozilla/addon-sdk >
+</pre>
+
+<h2>Installation on Windows</h2>
+<p>Extract the file contents wherever you choose, and navigate to the root
+directory of the SDK with a shell/command prompt. For example:</p>
+<pre>
+7z.exe x addon-sdk.zip
+cd addon-sdk
+</pre>
+
+<p>Then run:</p>
+<pre>
+bin\activate
+</pre>
+
+<p>Your command prompt should now have a new prefix containing the full path to
+the SDK's root directory:</p>
+<pre>
+(C:\Users\mozilla\sdk\addon-sdk) C:\Users\Work\sdk\addon-sdk>
+</pre>
+
+<h2>SDK Virtual Environment</h2>
+<p>The new prefix to your command prompt indicates that your shell has entered
+a virtual environment that gives you access to the Add-on SDK's command-line
+tools.</p>
+<p>At any time, you can leave a virtual environment by running <code>deactivate</code>.</p>
+<p>The virtual environment is specific to this particular command prompt. If you
+close this command prompt, it is deactivated and you need to type
+<code>source bin/activate</code> or <code>bin\activate</code> in a new command prompt to reactivate
+it. If you open a new command prompt, the SDK will not be active in the new
+prompt.</p>
+<p>You can have multiple copies of the SDK in different locations on disk and
+switch between them, or even have them both activated in different command
+prompts at the same time.</p>
+<h3>Making <code>activate</code> Permanent</h3>
+<p>All <code>activate</code> does is to set a number of environment variables for the
+current command prompt, using a script located in the top-level <code>bin</code>
+directory. By setting these variables permanently in your environment so
+every new command prompt reads them, you can make activation permanent. Then
+you don't need to type <code>activate</code> every time you open up a new command prompt.</p>
+<p>Because the exact set of variables may change with new releases of the SDK,
+it's best to refer to the activation scripts to determine which variables need
+to be set. Activation uses different scripts and sets different variables for
+bash environments (Linux and Mac OS X) and for Windows environments.</p>
+<h4>Windows</h4>
+<p>On Windows, <code>bin\activate</code> uses <code>activate.bat</code>, and you can make activation
+permanent using the command line <code>setx</code> tool or the Control Panel.</p>
+<h4>Linux/Mac OS X</h4>
+<p>On Linux and Mac OS X, <code>source bin/activate</code> uses the <code>activate</code> bash
+script, and you can make activation permanent using your <code>~/.bashrc</code>
+(on Linux) or <code>~/.bashprofile</code> (on Mac OS X).</p>
+<p>As an alternative to this, you can create a symbolic link to the <code>cfx</code>
+program in your <code>~/bin</code> directory:</p>
+<pre>
+ln -s PATH_TO_SDK/bin/cfx ~/bin/cfx
+</pre>
+
+<h2>Sanity Check</h2>
+<p>Run this at your shell prompt:</p>
+<pre>
+cfx
+</pre>
+
+<p>It should produce output whose first line looks something like this, followed by
+many lines of usage information:</p>
+<pre>
+Usage: cfx [options] [command]
+</pre>
+
+<p>This is the <code>cfx</code> command-line program.  It's your primary interface to the
+Add-on SDK.  You use it to launch Firefox and test your add-on, package your
+add-on for distribution, view documentation, and run unit tests.</p>
+<h2>cfx docs</h2>
+<p>If you're reading these documents online, try running <code>cfx docs</code>. This will
+build the documentation for the SDK and display it in a browser.</p>
+<h2>Problems?</h2>
+<p>Try the <a href="../../dev-guide/tutorials/troubleshooting.html">Troubleshooting</a>
+page.</p>
+<h2>Next Steps</h2>
+<p>Next, take a look at the
+<a href="../../dev-guide/tutorials/getting-started-with-cfx.html">Getting Started With cfx</a>
+tutorial, which explains how to create add-ons using the <code>cfx</code> tool.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../packages/addon-kit/request.html">request</a>
+
+<a href="../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../packages/addon-kit/self.html">self</a>
+
+<a href="../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../packages/api-utils/content.html">content</a>
+
+<a href="../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../packages/api-utils/events.html">events</a>
+
+<a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../packages/api-utils/list.html">list</a>
+
+<a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../packages/api-utils/unit-test.html">unit-test</a>
+
+<a href="../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../packages/api-utils/url.html">url</a>
+
+<a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../dev-guide/console.html">console</a>
+            <a href="../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

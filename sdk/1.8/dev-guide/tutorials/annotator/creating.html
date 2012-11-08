@@ -1,0 +1,623 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Creating Annotations - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../../sdk/1.11/dev-guide/tutorials/annotator/creating.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.8.2</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Creating Annotations</h1>
+<p>We'll use two objects to create annotations: a page-mod to find page elements
+that the user can annotate, and a panel for the user to enter the annotation
+text itself.</p>
+<h2>Selector page-mod</h2>
+<h3>Selector Content Scripts</h3>
+<p>The content script for the selector page-mod uses <a href="http://jquery.com/">jQuery</a>
+to examine and manipulate the DOM.</p>
+<p>Its main job is to maintain a "matched element": this is the page element that
+is the current candidate for an annotation. The matched element is highlighted
+and has a click handler bound to it which sends a message to the main add-on
+code.</p>
+<p>The selector page mod can be switched on and off using a message from the
+main add-on code. It is initially off:</p>
+<pre><code>var matchedElement = null;
+var originalBgColor = null;
+var active = false;
+
+function resetMatchedElement() {
+  if (matchedElement) {
+    $(matchedElement).css('background-color', originalBgColor);
+    $(matchedElement).unbind('click.annotator');
+  }
+}
+
+self.on('message', function onMessage(activation) {
+  active = activation;
+  if (!active) {
+    resetMatchedElement();
+  }
+});
+</code></pre>
+<p>This selector listens for occurrences of the
+<a href="http://api.jquery.com/mouseenter/">jQuery mouseenter</a> event.</p>
+<p>When a mouseenter event is triggered the selector checks whether the element
+is eligible for annotation. An element is eligible if it, or one of its
+ancestors in the DOM tree, has an attribute named <code>"id"</code>. The idea here is to
+make it more likely that the annotator will be able to identify annotated
+elements correctly later on.</p>
+<p>If the page element is eligible for annotation, then the selector highlights
+that element and binds a click handler to it. The click handler sends a message
+called <code>show</code> back to the main add-on code. The <code>show</code> message contains: the URL
+for the page, the ID attribute value, and the text content of the page element.</p>
+<pre><code>$('*').mouseenter(function() {
+  if (!active || $(this).hasClass('annotated')) {
+    return;
+  }
+  resetMatchedElement();
+  ancestor = $(this).closest("[id]");
+  matchedElement = $(this).first();
+  originalBgColor = $(matchedElement).css('background-color');
+  $(matchedElement).css('background-color', 'yellow');
+  $(matchedElement).bind('click.annotator', function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    self.port.emit('show',
+      [
+        document.location.toString(),
+        $(ancestor).attr("id"),
+        $(matchedElement).text()
+      ]
+   );
+  });
+});
+</code></pre>
+<p>Conversely, the add-on resets the matched element on
+<a href="http://api.jquery.com/mouseout/">mouseout</a>:</p>
+<pre><code>$('*').mouseout(function() {
+  resetMatchedElement();
+});
+</code></pre>
+<p>Save this code in a new file called <code>selector.js</code> in your add-on's <code>data</code>
+directory.</p>
+<p>Because this code uses jQuery, you'll need to
+<a href="http://docs.jquery.com/Downloading_jQuery">download</a> that as well, and save it in
+<code>data</code>.</p>
+<h3>Updating main.js</h3>
+<p>Go back to <code>main.js</code> and add the code to create the selector into the <code>main</code>
+function:</p>
+<pre><code>var selector = pageMod.PageMod({
+  include: ['*'],
+  contentScriptWhen: 'ready',
+  contentScriptFile: [data.url('jquery-1.4.2.min.js'),
+                      data.url('selector.js')],
+  onAttach: function(worker) {
+    worker.postMessage(annotatorIsOn);
+    selectors.push(worker);
+    worker.port.on('show', function(data) {
+      console.log(data);
+    });
+    worker.on('detach', function () {
+      detachWorker(this, selectors);
+    });
+  }
+});
+</code></pre>
+<p>Make sure the name you use to load jQuery matches the name of the jQuery
+version you downloaded.</p>
+<p>The page-mod matches all pages, so each time the user loads a page the page-mod
+emits the <code>attach</code> event, which will call the listener function we've assigned
+to <code>onAttach</code>. The handler is passed a
+<a href="../../../packages/api-utils/content/worker.html">worker</a> object. Each worker
+represents a channel of communication between the add-on code and any content
+scripts running in that particular page context. For a more detailed discussion
+of the way <code>page-mod</code> uses workers, see the
+<a href="../../../packages/addon-kit/page-mod.html">page-mod documentation</a>.</p>
+<p>In the attach handler we do three things:</p>
+<ul>
+<li>send the content script a message with the current activation status</li>
+<li>add the worker to an array called <code>selectors</code> so we can send it messages
+later on</li>
+<li>assign a message handler for messages from this worker. If the message is
+<code>show</code> we will just log the content for the time being. If the message is
+<code>detach</code> we remove the worker from the <code>selectors</code> array.</li>
+</ul>
+<p>At the top of the file import the <code>page-mod</code> module and declare an array for
+the workers:</p>
+<pre><code>var pageMod = require('page-mod');
+var selectors = [];
+</code></pre>
+<p>Add <code>detachWorker</code>:</p>
+<pre><code>function detachWorker(worker, workerArray) {
+  var index = workerArray.indexOf(worker);
+  if(index != -1) {
+    workerArray.splice(index, 1);
+  }
+}
+</code></pre>
+<p>Edit <code>toggleActivation</code> to notify the workers of a change in activation state:</p>
+<pre><code>function activateSelectors() {
+  selectors.forEach(
+    function (selector) {
+      selector.postMessage(annotatorIsOn);
+  });
+}
+
+function toggleActivation() {
+  annotatorIsOn = !annotatorIsOn;
+  activateSelectors();
+  return annotatorIsOn;
+}
+</code></pre>
+<p><span class="aside">We'll be using this URL in all our screenshots. Because
+<code>cfx run</code> doesn't preserve browsing history, if you want to play along it's
+worth taking a note of the URL.</span></p>
+<p>Save the file and execute <code>cfx run</code> again. Activate the annotator by clicking
+the widget and load a page: the screenshot below uses
+<a href="http://blog.mozilla.com/addons/2011/02/04/overview-amo-review-process/">http://blog.mozilla.com/addons/2011/02/04/
+overview-amo-review-process/</a>.
+You should see the highlight appearing when you move the mouse over certain elements:</p>
+<img src="../../../static-files/media/annotator/highlight.png" alt="Annotator Highlighting" class="image-center">
+
+<p>Click on the highlight and you should see something like this in the console
+output:</p>
+<pre>
+  info: show
+  info: http://blog.mozilla.com/addons/2011/02/04/overview-amo-review-process/,
+  post-2249,When you submit a new add-on, you will have to choose between 2
+  review tracks: Full Review and Preliminary Review.
+</pre>
+
+<h2>Annotation Editor Panel</h2>
+<p>So far we have a page-mod that can highlight elements and send information
+about them to the main add-on code. Next we will create the editor panel,
+which enables the user to enter an annotation associated with the selected
+element.</p>
+<p>We will supply the panel's content as an HTML file, and will also supply a
+content script to execute in the panel's context.</p>
+<p>So create a subdirectory under <code>data</code> called <code>editor</code>. This will contain
+two files: the HTML content, and the content script.</p>
+<h3>Annotation Editor HTML</h3>
+<p>The HTML is very simple:</p>
+<script type="syntaxhighlighter" class="brush: html"><![CDATA[
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Annotation</title>
+  <style media="all" type="text/css">
+  body {
+    font: 100% arial, helvetica, sans-serif;
+    background-color: #F5F5F5;
+  }
+  textarea {
+    width: 180px;
+    height: 180px;
+    margin: 10px;
+    padding: 0px;
+  }
+  </style>
+
+</head>
+
+<body>
+
+<textarea rows="10" cols="20" id="annotation-box">
+</textarea>
+
+</body>
+
+</html>
+
+]]>
+</script>
+
+<p>Save this inside <code>data/editor</code> as <code>annotation-editor.html</code>.</p>
+<h3>Annotation Editor Content Script</h3>
+<p>In the corresponding content script we do two things:</p>
+<ul>
+<li>handle a message from the add-on code by giving the text area focus</li>
+<li>listen for the return key and when it is pressed, send the contents of the
+text area to the add-on.</li>
+</ul>
+<p>Here's the code:</p>
+<pre><code>var textArea = document.getElementById('annotation-box');
+
+textArea.onkeyup = function(event) {
+  if (event.keyCode == 13) {
+    self.postMessage(textArea.value);
+    textArea.value = '';
+  }
+};
+
+self.on('message', function() {
+  var textArea = document.getElementById('annotation-box');
+  textArea.value = '';
+  textArea.focus();
+});
+</code></pre>
+<p>Save this inside <code>data/editor</code> as <code>annotation-editor.js</code>.</p>
+<h3>Updating main.js Again</h3>
+<p>Now we'll update <code>main.js</code> again to create the editor and use it.</p>
+<p>First, import the <code>panel</code> module:</p>
+<pre><code>var panels = require('panel');
+</code></pre>
+<p>Then add the following code to the <code>main</code> function:</p>
+<pre><code>var annotationEditor = panels.Panel({
+  width: 220,
+  height: 220,
+  contentURL: data.url('editor/annotation-editor.html'),
+  contentScriptFile: data.url('editor/annotation-editor.js'),
+  onMessage: function(annotationText) {
+    if (annotationText) {
+      console.log(this.annotationAnchor);
+      console.log(annotationText);
+    }
+    annotationEditor.hide();
+  },
+  onShow: function() {
+    this.postMessage('focus');
+  }
+});
+</code></pre>
+<p>We create the editor panel but don't show it.
+We will send the editor panel the <code>focus</code> message when it is shown, so it will
+give the text area focus. When the editor panel sends us its message we log the
+message and hide the panel.</p>
+<p>The only thing left is to link the editor to the selector. So edit the message
+handler assigned to the selector so that on receiving the <code>show</code> message we
+assign the content of the message to the panel using a new property
+"annotationAnchor", and show the panel:</p>
+<pre><code>var selector = pageMod.PageMod({
+  include: ['*'],
+  contentScriptWhen: 'ready',
+  contentScriptFile: [data.url('jquery-1.4.2.min.js'),
+                      data.url('selector.js')],
+  onAttach: function(worker) {
+    worker.postMessage(annotatorIsOn);
+    selectors.push(worker);
+    worker.port.on('show', function(data) {
+      annotationEditor.annotationAnchor = data;
+      annotationEditor.show();
+    });
+    worker.on('detach', function () {
+      detachWorker(this, selectors);
+    });
+  }
+});
+</code></pre>
+<p>Execute <code>cfx run</code> again, activate the annotator, move your mouse over an
+element and click the element when it is highlighted. You should see a panel
+with a text area for a note:</p>
+<p><img src="../../../static-files/media/annotator/editor-panel.png" alt="Annotator Editor Panel" class="image-center">
+<br></p>
+<p>Enter the note and press the return key: you should see console output like
+this:</p>
+<pre>
+  info: http://blog.mozilla.com/addons/2011/02/04/overview-amo-review-process/,
+  post-2249,When you submit a new add-on, you will have to choose between 2
+  review tracks: Full Review and Preliminary Review.
+  info: We should ask for Full Review if possible.
+</pre>
+
+<p>That's a complete annotation, and in the next section we'll deal with
+<a href="../../../dev-guide/tutorials/annotator/storing.html">storing it</a>.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../../packages/addon-kit/addon-page.html">addon-page</a>
+
+<a href="../../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../../packages/addon-kit/l10n.html">l10n</a>
+
+<a href="../../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../../packages/addon-kit/request.html">request</a>
+
+<a href="../../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../../packages/addon-kit/self.html">self</a>
+
+<a href="../../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../../packages/api-utils/content.html">content</a>
+
+<a href="../../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../../packages/api-utils/event/core.html">event/core</a>
+
+<a href="../../../packages/api-utils/event/target.html">event/target</a>
+
+<a href="../../../packages/api-utils/events.html">events</a>
+
+<a href="../../../packages/api-utils/file.html">file</a>
+
+<a href="../../../packages/api-utils/frame/utils.html">frame/utils</a>
+
+<a href="../../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../../packages/api-utils/heritage.html">heritage</a>
+
+<a href="../../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../../packages/api-utils/list.html">list</a>
+
+<a href="../../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../../packages/api-utils/promise.html">promise</a>
+
+<a href="../../../packages/api-utils/querystring.html">querystring</a>
+
+<a href="../../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../../packages/api-utils/unit-test.html">unit-test</a>
+
+<a href="../../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../../packages/api-utils/url.html">url</a>
+
+<a href="../../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../../packages/api-utils/window/utils.html">window/utils</a>
+
+<a href="../../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,589 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>XUL Migration Guide - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../sdk/1.11/dev-guide/guides/xul-migration.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.6.1</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>XUL Migration Guide</h1>
+<p>This guide aims to help you migrate a XUL-based add-on to the SDK.</p>
+<p>First we'll outline how to decide whether
+<a href="../../dev-guide/guides/xul-migration.html#should-you-migrate">
+your add-on is a good candidate for migration</a> via a
+<a href="../../dev-guide/guides/sdk-vs-xul.html">comparison of the benefits and limitations of the SDK versus XUL development</a>.</p>
+<p>Next, we'll look at some of the main tasks involved in migrating:</p>
+<ul>
+<li><a href="../../dev-guide/guides/xul-migration.html#content-scripts">
+working with content scripts</a></li>
+<li><a href="../../dev-guide/guides/xul-migration.html#supported-apis">
+using the SDK's supported APIs</a></li>
+<li>how to
+go beyond the supported APIs when necessary, by:<ul>
+<li><a href="../../dev-guide/guides/xul-migration.html#third-party-packages">
+using third party modules</a></li>
+<li><a href="../../dev-guide/guides/xul-migration.html#low-level-apis">
+using the SDK's low-level APIs</a></li>
+<li><a href="../../dev-guide/guides/xul-migration.html#xpcom">
+getting direct access to XPCOM</a></li>
+</ul>
+</li>
+</ul>
+<p>Finally, we'll walk through a
+<a href="../../dev-guide/guides/xul-migration.html#library-detector">
+simple example</a>.</p>
+<h2><a name="should-you-migrate">Should You Migrate?</a></h2>
+<p>See this <a href="../../dev-guide/guides/sdk-vs-xul.html">comparison of the benefits and limitations of SDK development
+and XUL development</a>.</p>
+<p>Whether you should migrate a particular add-on is largely a matter of
+how well the SDK's
+<a href="../../dev-guide/guides/xul-migration.html#supported-apis">
+supported APIs</a> meet its needs.</p>
+<ul>
+<li>
+<p>If your add-on can accomplish everything it needs using only the
+supported APIs, it's a good candidate for migration.</p>
+</li>
+<li>
+<p>If your add-on needs a lot of help from third party packages, low-level
+APIs, or XPCOM, then the cost of migrating is high, and may not be worth
+it at this point.</p>
+</li>
+<li>
+<p>If your add-on only needs a little help from those techniques, and can
+accomplish most of what it needs using the supported APIs, then it might
+still be worth migrating: we'll add more supported APIs in future releases
+to meet important use cases.</p>
+</li>
+</ul>
+<h2><a name="content-scripts">Content Scripts</a></h2>
+<p>In a XUL-based add-on, code that uses XPCOM objects, code that manipulates
+the browser chrome, and code that interacts with web pages all runs in the
+same context. But the SDK makes a distinction between:</p>
+<ul>
+<li><strong>add-on scripts</strong>, which can use the SDK APIs, but are not able to interact
+with web pages</li>
+<li><strong>content scripts</strong>, which can access web pages, but do not have access to
+the SDK's APIs</li>
+</ul>
+<p>Content scripts and add-on scripts communicate by sending each other JSON
+messages: in fact, the ability to communicate with the add-on scripts is the
+only extra privilege a content script is granted over a normal remote web
+page script.</p>
+<p>A XUL-based add-on will need to be reorganized to respect this distinction.</p>
+<p>Suppose an add-on wants to make a cross-domain XMLHttpRequest based on some
+data extracted from a web page. In a XUL-based extension you would implement
+all this in a single script. An SDK-based equivalent would need to be
+structured like this:</p>
+<ul>
+<li>the main add-on code (1) attaches a content script to the page, and (2)
+registers a listener function for messages from the content script</li>
+<li>the content script (3) extracts the data from the page and (4) sends
+it to the main add-on code in a message</li>
+<li>the main add-on code (5) receives the message and (6) sends the request,
+using the SDK's <a href="../../packages/addon-kit/request.html"><code>request</code></a> API</li>
+</ul>
+<img src="../../static-files/media/xul-migration-cs.png" alt="Content script organization" class="image-center">
+
+<p>There are two related reasons for this design. The first is security: it
+reduces the risk that a malicious web page will be able to access privileged
+APIs. The second is the need to be compatible with the multi-process architecture
+planned for Firefox: after this is implemented in Firefox, all add-ons will
+need to use a similar pattern, so it's likely that a XUL-based add-on will
+need to be rewritten anyway.</p>
+<p>There's much more information on content scripts in the
+<a href="../../dev-guide/guides/content-scripts/index.html">Working With Content Scripts</a> guide.</p>
+<h2><a name="supported-apis">Using the Supported APIs</a></h2>
+<p>The SDK provides a set of high level APIs providing some basic user
+interface components and functionality commonly required by add-ons.
+These are collected together in the
+<a href="../../packages/addon-kit/index.html"><code>addon-kit</code></a>
+package. Because we expect to keep these APIs compatible as new versions
+of Firefox are released, we call them the "supported" APIs.</p>
+<p>See the <a href="../../dev-guide/tutorials/index.html">tutorials</a>
+and the "High-Level API" reference in the "Developer Guide" sidebar.
+If the supported APIs do what you need, they're the best option: you get the
+benefits of compatibility across Firefox releases and of the SDK's security
+model.</p>
+<p>APIs like <a href="../../packages/addon-kit/widget.html"><code>widget</code></a> and
+<a href="../../packages/addon-kit/panel.html"><code>panel</code></a> are very generic and with the
+right content can be used to replace many specific XUL elements. But there are
+some notable limitations in the SDK APIs and even a fairly simple UI may need
+some degree of redesign to work with them.</p>
+<p>Some limitations are the result of intentional design choices. For example,
+widgets always appear by default in the
+<a href="https://developer.mozilla.org/en/The_add-on_bar">add-on bar</a> (although users
+may relocate them by
+<a href="http://support.mozilla.com/en-US/kb/how-do-i-customize-toolbars">toolbar customization</a>)
+because it makes for a better user experience for add-ons to expose their
+interfaces in a consistent way. In such cases it's worth considering
+changing your user interface to align with the SDK APIs.</p>
+<p>Some limitations only exist because we haven't yet implemented the relevant
+APIs: for example, there's currently no way to add items to the browser's main
+menus using the SDK's supported APIs.</p>
+<p>Many add-ons will need to make some changes to their user interfaces if they
+are to use only the SDK's supported APIs, and add-ons which make drastic
+changes to the browser chrome will very probably need more than the SDK's
+supported APIs can offer.</p>
+<p>Similarly, the supported APIs expose only a small fraction of the full range
+of XPCOM functionality.</p>
+<h2><a name="third-party-packages">Using Third Party Packages</a></h2>
+<p>The SDK is extensible by design: developers can create new modules filling gaps
+in the SDK, and package them for distribution and reuse. Add-on developers can
+install these packages and use the new modules.</p>
+<p>If you can find a third party package that does what you want, this is a great
+way to use features not supported in the SDK without having to use the
+low-level APIs.</p>
+<p>See the
+<a href="../../dev-guide/tutorials/adding-menus.html">guide to adding Firefox menu items</a>.
+Some useful third party packages are
+<a href="https://wiki.mozilla.org/Jetpack/Modules">collected in the Jetpack Wiki</a>.</p>
+<p>Note, though, that by using third party packages you're likely to lose the
+security and compatibility benefits of using the SDK.</p>
+<h2><a name="low-level-apis">Using the Low-level APIs</a></h2>
+<p><span class="aside">
+But note that unlike the supported APIs, low-level APIs do not come with a
+compatibility guarantee, so we do not expect code using them will necessarily
+continue to work as new versions of Firefox are released.
+</span></p>
+<p>In addition to the High-Level APIs, the SDK includes a number of
+Low-Level APIs some of which, such
+as <a href="../../packages/api-utils/tab-browser.html"><code>tab-browser</code></a>, <a href="../../packages/api-utils/xhr.html"><code>xhr</code></a>, and
+<a href="../../packages/api-utils/window-utils.html"><code>window-utils</code></a>, expose powerful
+browser capabilities.</p>
+<p>In this section we'll use low-level modules how to:</p>
+<ul>
+<li>modify the browser chrome using dynamic manipulation of the DOM</li>
+<li>directly access the <a href="https://developer.mozilla.org/en/XUL/tabbrowser">tabbrowser</a>
+object</li>
+</ul>
+<h3><a name="browser-chrome">Modifying the Browser Chrome</a></h3>
+<p>The <a href="../../packages/api-utils/window-utils.html"><code>window-utils</code></a> module gives
+you direct access to chrome windows, including the browser's chrome window.
+Here's a really simple example add-on that modifies the browser chrome using
+<code>window-utils</code>:</p>
+<pre><code>var windowUtils = require("window-utils");
+
+windowUtils = new windowUtils.WindowTracker({
+  onTrack: function (window) {
+    if ("chrome://browser/content/browser.xul" != window.location) return;
+    var forward = window.document.getElementById('forward-button');
+    var parent = window.document.getElementById('unified-back-forward-button');
+    parent.removeChild(forward);
+  }
+});
+</code></pre>
+<p>This example just removes the 'forward' button from the browser. It constructs
+a <code>WindowTracker</code> object and assigns a function to the constructor's <code>onTrack</code>
+option. This function will be called whenever a window is opened. The function
+checks whether the window is the browser's chrome window, and if it is, uses
+DOM manipulation functions to modify it.</p>
+<p>There are more useful examples of this technique in the Jetpack Wiki's
+collection of <a href="https://wiki.mozilla.org/Jetpack/Modules">third party modules</a>.</p>
+<h3><a name="accessing-tabbrowser">Accessing <a href="https://developer.mozilla.org/en/XUL/tabbrowser">tabbrowser</a></h3>
+<p>The <a href="../../packages/api-utils/tab-browser.html"><code>tab-browser</code></a> module gives
+you direct access to the
+<a href="https://developer.mozilla.org/en/XUL/tabbrowser">tabbrowser</a> object. This
+simple example modifies the selected tab's CSS to enable the user to highlight
+the selected tab:</p>
+<pre><code>var widgets = require("widget");
+var tabbrowser = require("tab-browser");
+var self = require("self");
+
+function highlightTab(tab) {
+  if (tab.style.getPropertyValue('background-color')) {
+    tab.style.setProperty('background-color','','important');
+  }
+  else {
+    tab.style.setProperty('background-color','rgb(255,255,100)','important');
+  }
+}
+
+var widget = widgets.Widget({
+  id: "tab highlighter",
+  label: "Highlight tabs",
+  contentURL: self.data.url("highlight.png"),
+  onClick: function() {
+    highlightTab(tabbrowser.activeTab);
+  }
+});
+</code></pre>
+<h3>Security Implications</h3>
+<p>The SDK implements a security model in which an add-on only gets to access the
+APIs it explicitly imports via <code>require()</code>. This is useful, because it means
+that if a malicious web page is able to inject code into your add-on's
+context, it is only able to use the APIs you have imported. For example, if
+you have only imported the
+<a href="../../packages/addon-kit/notifications.html"><code>notifications</code></a> module, then
+even if a malicious web page manages to inject code into your add-on, it
+can't use the SDK's <a href="../../packages/api-utils/file.html"><code>file</code></a> module to
+access the user's data.</p>
+<p>But this means that the more powerful modules you <code>require()</code>, the greater
+is your exposure if your add-on is compromised. Low-level modules like <code>xhr</code>,
+<code>tab-browser</code> and <code>window-utils</code> are much more powerful than the modules in
+<code>addon-kit</code>, so your add-on needs correspondingly more rigorous security
+design and review.</p>
+<h2><a name="xpcom">Using XPCOM</a></h2>
+<p>Finally, if none of the above techniques work for you, you can use the
+<code>require("chrome")</code> statement to get direct access to the
+<a href="https://developer.mozilla.org/en/Components_object"><code>Components</code></a> object,
+which you can then use to load and access any XPCOM object.</p>
+<p>The following complete add-on uses
+<a href="https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIPromptService"><code>nsIPromptService</code></a>
+to display an alert dialog:</p>
+<pre><code>var {Cc, Ci} = require("chrome");
+
+var promptSvc = Cc["@mozilla.org/embedcomp/prompt-service;1"].
+                getService(Ci.nsIPromptService);
+
+var widget = require("widget").Widget({
+  id: "xpcom example",
+  label: "Mozilla website",
+  contentURL: "http://www.mozilla.org/favicon.ico",
+  onClick: function() {
+    promptSvc.alert(null, "My Add-on", "Hello from XPCOM");
+  }
+});
+</code></pre>
+<p>It's good practice to encapsulate code which uses XPCOM by
+<a href="../../dev-guide/tutorials/reusable-modules.html">packaging it in its own module</a>.
+For example, we could package the alert feature implemented above using a
+script like:</p>
+<pre><code>var {Cc, Ci} = require("chrome");
+
+var promptSvc = Cc["@mozilla.org/embedcomp/prompt-service;1"].
+            getService(Ci.nsIPromptService);
+
+exports.alert = function(title, text) {
+    promptSvc.alert(null, title, text);
+};
+</code></pre>
+<p>If we save this as "alert.js" in our add-on's <code>lib</code> directory, we can rewrite
+<code>main.js</code> to use it as follows:</p>
+<pre><code>var widget = require("widget").Widget({
+  id: "xpcom example",
+  label: "Mozilla website",
+  contentURL: "http://www.mozilla.org/favicon.ico",
+  onClick: function() {
+    require("alert").alert("My Add-on", "Hello from XPCOM");
+  }
+});
+</code></pre>
+<p>One of the benefits of this is that we can control which parts of the add-on
+are granted chrome privileges, making it easier to review and secure the code.</p>
+<h3>Security Implications</h3>
+<p>We saw above that using powerful low-level modules like <code>tab-browser</code>
+increases the damage that a malicious web page could do if it were able to
+inject code into your add-ons context. This applies with even greater force
+to <code>require("chrome")</code>, since this gives full access to the browser's
+capabilities.</p>
+<h2><a name="library-detector">Example: Porting the Library Detector</a></h2>
+<p><a href="../../dev-guide/guides/library-detector.html">Porting the Library Detector</a>
+walks through the process of porting a XUL-based add-on to the
+SDK. It's a very simple add-on and a good candidate for porting because
+there are suitable SDK APIs for all its features.</p>
+<p>Even so, we have to change its user interface slightly if we are to use only
+the supported APIs.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-packages-subsection">
+          <a href="../../dev-guide/third-party-apis.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-package-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/high-level-apis.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/addon-kit/index.html">addon-kit</a>
+</h4>
+
+<a href="../../packages/addon-kit/clipboard.html">clipboard</a>
+
+<a href="../../packages/addon-kit/context-menu.html">context-menu</a>
+
+<a href="../../packages/addon-kit/hotkeys.html">hotkeys</a>
+
+<a href="../../packages/addon-kit/notifications.html">notifications</a>
+
+<a href="../../packages/addon-kit/page-mod.html">page-mod</a>
+
+<a href="../../packages/addon-kit/page-worker.html">page-worker</a>
+
+<a href="../../packages/addon-kit/panel.html">panel</a>
+
+<a href="../../packages/addon-kit/passwords.html">passwords</a>
+
+<a href="../../packages/addon-kit/private-browsing.html">private-browsing</a>
+
+<a href="../../packages/addon-kit/request.html">request</a>
+
+<a href="../../packages/addon-kit/selection.html">selection</a>
+
+<a href="../../packages/addon-kit/self.html">self</a>
+
+<a href="../../packages/addon-kit/simple-prefs.html">simple-prefs</a>
+
+<a href="../../packages/addon-kit/simple-storage.html">simple-storage</a>
+
+<a href="../../packages/addon-kit/tabs.html">tabs</a>
+
+<a href="../../packages/addon-kit/timers.html">timers</a>
+
+<a href="../../packages/addon-kit/widget.html">widget</a>
+
+<a href="../../packages/addon-kit/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../dev-guide/low-level-apis.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-package-summaries">
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/api-utils/index.html">api-utils</a>
+</h4>
+
+<a href="../../packages/api-utils/api-utils.html">api-utils</a>
+
+<a href="../../packages/api-utils/app-strings.html">app-strings</a>
+
+<a href="../../packages/api-utils/base.html">base</a>
+
+<a href="../../packages/api-utils/byte-streams.html">byte-streams</a>
+
+<a href="../../packages/api-utils/collection.html">collection</a>
+
+<a href="../../packages/api-utils/content.html">content</a>
+
+<a href="../../packages/api-utils/content/loader.html">content/loader</a>
+
+<a href="../../packages/api-utils/content/proxy.html">content/proxy</a>
+
+<a href="../../packages/api-utils/content/symbiont.html">content/symbiont</a>
+
+<a href="../../packages/api-utils/content/worker.html">content/worker</a>
+
+<a href="../../packages/api-utils/cortex.html">cortex</a>
+
+<a href="../../packages/api-utils/cuddlefish.html">cuddlefish</a>
+
+<a href="../../packages/api-utils/environment.html">environment</a>
+
+<a href="../../packages/api-utils/errors.html">errors</a>
+
+<a href="../../packages/api-utils/events.html">events</a>
+
+<a href="../../packages/api-utils/file.html">file</a>
+
+<a href="../../packages/api-utils/globals.html">globals</a>
+
+<a href="../../packages/api-utils/hidden-frame.html">hidden-frame</a>
+
+<a href="../../packages/api-utils/httpd.html">httpd</a>
+
+<a href="../../packages/api-utils/light-traits.html">light-traits</a>
+
+<a href="../../packages/api-utils/list.html">list</a>
+
+<a href="../../packages/api-utils/match-pattern.html">match-pattern</a>
+
+<a href="../../packages/api-utils/memory.html">memory</a>
+
+<a href="../../packages/api-utils/message-manager.html">message-manager</a>
+
+<a href="../../packages/api-utils/namespace.html">namespace</a>
+
+<a href="../../packages/api-utils/observer-service.html">observer-service</a>
+
+<a href="../../packages/api-utils/plain-text-console.html">plain-text-console</a>
+
+<a href="../../packages/api-utils/preferences-service.html">preferences-service</a>
+
+<a href="../../packages/api-utils/runtime.html">runtime</a>
+
+<a href="../../packages/api-utils/sandbox.html">sandbox</a>
+
+<a href="../../packages/api-utils/tab-browser.html">tab-browser</a>
+
+<a href="../../packages/api-utils/text-streams.html">text-streams</a>
+
+<a href="../../packages/api-utils/traceback.html">traceback</a>
+
+<a href="../../packages/api-utils/traits.html">traits</a>
+
+<a href="../../packages/api-utils/unit-test.html">unit-test</a>
+
+<a href="../../packages/api-utils/unload.html">unload</a>
+
+<a href="../../packages/api-utils/url.html">url</a>
+
+<a href="../../packages/api-utils/uuid.html">uuid</a>
+
+<a href="../../packages/api-utils/window-utils.html">window-utils</a>
+
+<a href="../../packages/api-utils/xhr.html">xhr</a>
+
+<a href="../../packages/api-utils/xpcom.html">xpcom</a>
+
+<a href="../../packages/api-utils/xul-app.html">xul-app</a>
+</li>
+
+<li style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/test-harness/index.html">test-harness</a>
+</h4>
+
+<a href="../../packages/test-harness/harness.html">harness</a>
+
+<a href="../../packages/test-harness/run-tests.html">run-tests</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../dev-guide/console.html">console</a>
+            <a href="../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

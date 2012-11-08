@@ -1,0 +1,594 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Two Types of Scripts - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../sdk/1.11/dev-guide/guides/two-types-of-scripts.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<header id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+  </div>
+</header>
+
+
+<header id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../dev-guide/welcome.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.5</div>
+  </div>
+</header>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Two Types of Scripts</h1>
+<p>On the web, JavaScript executes in the context of a web page, and has access to
+that page's DOM content. This enables you to call functions like:</p>
+<pre><code>window.alert("Hello there");
+</code></pre>
+<p>In an add-on's main scripts you can't do that, because the add-on code does
+not execute in the context of a page, and the DOM is therefore not available.
+If you need to access the DOM of a particular page, you need to use a
+content script.</p>
+<p>So there are two distinct sorts of JavaScript scripts you might include
+in your add-on and they have access to different sets of APIs. In the SDK
+documentation we call one sort "add-on code" and the other sort "content
+scripts".</p>
+<h2>Add-on Code</h2>
+<p>This is the place where the main logic of your add-on is implemented.</p>
+<p>Your add-on is implemented as a collection of one or more
+<a href="../../dev-guide/addon-development/commonjs.html">CommonJS modules</a>. Each module
+is supplied as a script stored under the <code>lib</code> directory under your add-on's
+root directory.</p>
+<p>Minimally you'll have a single module implemented by a script called
+"main.js", but you can include additional modules in <code>lib</code>, and import them
+using the <code>require()</code> function. To learn how to implement and import your own
+modules, see the tutorial on
+<a href="../../dev-guide/addon-development/implementing-reusable-module.html">Implementing Reusable Modules</a>.</p>
+<h2>Content Scripts</h2>
+<p>While your add-on will always have a "main.js" module, you will only need
+to write content scripts if your add-on needs to manipulate web content.
+Content scripts are injected into web pages using APIs defined by some of the
+SDK's modules such as <code>page-mod</code>, <code>panel</code> and <code>widget</code>.</p>
+<p>Content scripts may be supplied as literal strings or maintained in separate
+files and referenced by filename. If they are stored in separate files you
+should store them under the <code>data</code> directory under your add-on's root.</p>
+<p>To learn all about content scripts read the
+<a href="../../dev-guide/addon-development/web-content.html">Working with Content Scripts</a>
+guide.</p>
+<h2>API Access for Add-on Code and Content Scripts</h2>
+<p>The table below summarizes the APIs that are available to each type of
+script.</p>
+<table>
+  <colgroup>
+    <col width="70%">
+    <col width="15%">
+    <col width="15%">
+  </colgroup>
+  <tr>
+    <th>API</th>
+    <th>Add-on code</th>
+    <th>Content script</th>
+  </tr>
+
+<tr>
+    <td>The global objects defined in the core JavaScript language, such as
+<code>Math</code>, <code>Array</code>, and <code>JSON</code>. See the
+<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects">reference at MDN</a>.
+    </td>
+    <td class="check">✔</td>
+    <td class="check">✔</td>
+  </tr>
+
+<tr>
+    <td><p>The <code>require()</code> and <code>exports</code> globals defined
+by version 1.0 of the
+<a href="http://wiki.commonjs.org/wiki/Modules/1.0">CommonJS Module Specification</a>.
+You use <code>require()</code> to import functionality from another module,
+and <code>exports</code> to export functionality from your module.</p>
+If <code>require()</code> is available, then so are the modules supplied in the
+SDK. See this
+<a href="../../dev-guide/addon-development/api-modules.html">quick overview</a>
+of some of the most commonly used modules.
+    </td>
+    <td class="check">✔</td>
+    <td class="cross">✘</td>
+  </tr>
+
+<tr>
+    <td>The <a href="../../dev-guide/addon-development/console.html">console</a>
+global supplied by the SDK.
+    </td>
+    <td class="check">✔</td>
+    <td class="check">✔</td>
+  </tr>
+
+<tr>
+    <td>Globals defined by the
+<a href="http://dev.w3.org/html5/spec/Overview.html">HTML5</a> specification,
+such as <code>window</code>, <code>document</code>, and
+<code>localStorage</code>.
+    </td>
+    <td class="cross">✘</td>
+    <td class="check">✔</td>
+  </tr>
+
+<tr>
+    <td>The <code>self</code> global, used for communicating between content
+scripts and add-on code. See the guide to
+<a href="../../dev-guide/addon-development/content-scripts/using-port.html">communicating with content scripts</a>
+for more details.
+    </td>
+    <td class="cross">✘</td>
+    <td class="check">✔</td>
+  </tr>
+
+</table></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <h2 class="sidebar-section-header"><a href="../../dev-guide/addon-development/about.html">Developer Guide</a></h2>
+      <div class="sidebar-section-contents" id="default-section-contents">
+
+        <div class="sidebar-subsection">
+          <h3><a href="../../dev-guide/addon-development/installation.html">Installation</a></h3>
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="../../dev-guide/addon-development/tutorials.html">Tutorials</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li><h4><a href="../../dev-guide/addon-development/getting-started.html">Getting Started</a></h4>
+            <ul>
+              <li><a href="../../dev-guide/addon-development/implementing-simple-addon.html">A Simple Add-on</a></li>
+              <li><a href="../../dev-guide/addon-development/commonjs.html">CommonJS</a></li>
+              <li><a href="../../dev-guide/addon-development/implementing-reusable-module.html">Reusable Modules</a></li>
+              <li><a href="../../dev-guide/addon-development/troubleshooting.html">Troubleshooting</a></li>
+            </ul></li>
+            <li><h4><a href="../../dev-guide/addon-development/api-intro.html">Introducing the APIs</a></h4>
+            <ul>
+              <li><a href="../../dev-guide/addon-development/api-idioms.html">Common Idioms</a></li>
+              <li><a href="../../dev-guide/addon-development/api-modules.html">API Overview</a></li>
+            </ul></li>
+            <li><h4><a href="../../dev-guide/addon-development/annotator/annotator.html">Example: Annotator</a></h4>
+            <ul>
+              <li><a href="../../dev-guide/addon-development/annotator/overview.html">Design Overview</a></li>
+              <li><a href="../../dev-guide/addon-development/annotator/widget.html">Implementing the Widget</a></li>
+              <li><a href="../../dev-guide/addon-development/annotator/creating.html">Creating Annotations</a></li>
+              <li><a href="../../dev-guide/addon-development/annotator/storing.html">Storing Annotations</a></li>
+              <li><a href="../../dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
+            </ul></li>
+            <li><h4><a href="../../dev-guide/addon-development/third-party-packages.html">Using Third Party Packages</a></h4></li>
+            <li><h4><a href="../../dev-guide/addon-development/l10n.html">Localization</a></h4></li>
+            <li><h4><a href="../../dev-guide/addon-development/mobile.html">Mobile Development</a></h4>
+            <li><h4><a href="../../dev-guide/addon-development/xul-migration.html">XUL Migration Guide</a></h4>
+            <ul>
+              <li><a href="../../dev-guide/addon-development/sdk-vs-xul.html">XUL Versus the SDK</a></li>
+            </ul>
+            <ul>
+              <li><a href="../../dev-guide/addon-development/library-detector.html">Porting Example</a></li>
+            </ul></li>
+          </div>
+        </div>
+
+        <div class="sidebar-subsection">
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="../../dev-guide/addon-development/guides.html">Programming Guides</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li><h4><a href="../../dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
+            <li><h4><a href="../../dev-guide/addon-development/events.html">Working With Events</a></h4></li>
+            <li><h4><a href="../../dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
+              <ul>
+                <li><a href="../../dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
+                <li><a href="../../dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
+                <li><a href="../../dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
+                <li><a href="../../dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
+                <li><a href="../../dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
+              </ul></li>
+            <li><h4><a href="../../dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
+            <li><h4><a href="../../dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
+          </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-subsection">
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="../../dev-guide/addon-development/reference.html">Reference</a></h3>
+          <div class="sidebar-subsection-contents always-show">
+          <ul>
+            <li id="high-level-package-summaries">
+<div style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/addon-kit/addon-kit.html">addon-kit</a>
+</h4>
+
+<ul class="modules">
+<li class="module">
+<a href="../../packages/addon-kit/docs/clipboard.html">clipboard</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/context-menu.html">context-menu</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/hotkeys.html">hotkeys</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/notifications.html">notifications</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/page-mod.html">page-mod</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/page-worker.html">page-worker</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/panel.html">panel</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/passwords.html">passwords</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/private-browsing.html">private-browsing</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/request.html">request</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/selection.html">selection</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/self.html">self</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/simple-storage.html">simple-storage</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/tabs.html">tabs</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/timers.html">timers</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/widget.html">widget</a>
+</li>
+
+<li class="module">
+<a href="../../packages/addon-kit/docs/windows.html">windows</a>
+</li>
+</ul>
+</div>
+</li>
+            <li><h4><a href="../../dev-guide/addon-development/console.html">console</a></h4></li>
+            <li><h4><a href="../../dev-guide/addon-development/cfx-tool.html">cfx</a></h4></li>
+            <li><h4><a href="../../dev-guide/addon-development/package-spec.html">Package Specification</a></h4></li>
+          </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="sidebar-section" id="module-development">
+      <h2 class="sidebar-section-header"><a href="../../dev-guide/module-development/about.html">Internals Guide</a></h2>
+      <div class="sidebar-section-contents">
+
+        <div class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header"><a href="../../dev-guide/module-development/guides.html">Programming Guides</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li><h4><a href="../../dev-guide/module-development/best-practices.html">Low-Level Module Best Practices</a></h4>
+            <li><h4><a href="../../dev-guide/module-development/chrome.html">Chrome Authority</a></h4>
+            <li><h4><a href="../../dev-guide/module-development/xpi.html">XPI Generation</a></h4>
+          </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-subsection">
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="../../dev-guide/module-development/reference.html">Reference</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li id="low-level-package-summaries">
+<div style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/api-utils/api-utils.html">api-utils</a>
+</h4>
+
+<ul class="modules">
+<li class="module">
+<a href="../../packages/api-utils/docs/api-utils.html">api-utils</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/app-strings.html">app-strings</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/base.html">base</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/byte-streams.html">byte-streams</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/collection.html">collection</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/content.html">content</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/content/loader.html">content/loader</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/content/worker.html">content/worker</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/cortex.html">cortex</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/cuddlefish.html">cuddlefish</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/environment.html">environment</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/errors.html">errors</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/events.html">events</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/file.html">file</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/hidden-frame.html">hidden-frame</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/httpd.html">httpd</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/light-traits.html">light-traits</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/list.html">list</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/match-pattern.html">match-pattern</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/memory.html">memory</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/message-manager.html">message-manager</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/namespace.html">namespace</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/observer-service.html">observer-service</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/plain-text-console.html">plain-text-console</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/preferences-service.html">preferences-service</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/runtime.html">runtime</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/sandbox.html">sandbox</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/tab-browser.html">tab-browser</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/text-streams.html">text-streams</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/traceback.html">traceback</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/traits.html">traits</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/unit-test.html">unit-test</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/unload.html">unload</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/url.html">url</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/window-utils.html">window-utils</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/xhr.html">xhr</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/xpcom.html">xpcom</a>
+</li>
+
+<li class="module">
+<a href="../../packages/api-utils/docs/xul-app.html">xul-app</a>
+</li>
+</ul>
+</div>
+
+<div style="display: block;" class="package-summary">
+<h4>
+<a href="../../packages/test-harness/test-harness.html">test-harness</a>
+</h4>
+
+<ul class="modules">
+<li class="module">
+<a href="../../packages/test-harness/docs/harness.html">harness</a>
+</li>
+
+<li class="module">
+<a href="../../packages/test-harness/docs/run-tests.html">run-tests</a>
+</li>
+</ul>
+</div>
+</li>
+            <li><h4><a href="../../dev-guide/module-development/globals.html">Globals</a></h4></li>
+          </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section" id="appendices">
+        <h3><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes">Release Notes</a></h3>
+          <div class="divider"></div>
+        <h3><a href="https://wiki.mozilla.org/Labs/Jetpack">Jetpack Wiki</a></h3>
+          <div class="divider"></div>
+        <h3><a href="../../dev-guide/appendices/glossary.html">Glossary</a></h3>
+          <div class="divider"></div>
+        <h3><a href="../../dev-guide/appendices/credits.html">Credits</a></h3>
+
+    </div>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div role="contentinfo" id="footer">
+  <div class="section">
+    <img src="../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> |
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> |
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    |<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>

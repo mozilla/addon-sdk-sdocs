@@ -1,0 +1,775 @@
+<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>traits - Add-on SDK Documentation</title>
+</head>
+<body><div id="obsolete-warning" style="background-color: rgb(251, 237, 237); border: 1px solid rgb(172,98,98); padding:5px 5px 5px 25px;">
+ <a style="display:block" href="../../../../../sdk/1.11/packages/api-utils/traits.html">
+ You're looking at the docs for an old version of the SDK. Click here to read the latest version.</a></div>
+ <div style="position:relative">
+
+
+<header id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+      <p>
+        <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
+      </p>
+      <p>
+        <a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a>
+      </p>
+  </div>
+</header>
+
+
+<header id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/welcome.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.5</div>
+  </div>
+</header>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="main-content">
+<div id="traits_module_api_docs" class="module_api_docs">
+<h1>traits</h1>
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<!-- contributed by Irakli Gozalishvil [gozala@mozilla.com]  -->
+
+<p>The <code>traits</code> module provides base building blocks for secure object
+composition. It exports base trait / constructor function that
+constructs an instance of <code>Trait</code>.</p>
+<p><a href="http://en.wikipedia.org/wiki/Trait_%28computer_science%29">Traits</a> are a
+simple composition mechanism for structuring object-oriented programs. Traits
+are similar to
+<a href="http://en.wikipedia.org/wiki/Interface_%28object-oriented_programming%29">interfaces</a>,
+except that they often define only a part of an object's data and behavior and
+are intended to be used in conjunction with other traits to completely define
+the object.</p>
+<p>Traits are also considered to be a more robust alternative to
+<a href="http://en.wikipedia.org/wiki/Mixins">mixins</a> because, name conflicts have to
+be resolved explicitly by composer  because trait composition is
+order-independent (hence more declarative).</p>
+<p>There are some other implementations of traits in JavaScript  some ideas /
+APIs are borrowed from them:</p>
+<ul>
+<li><a href="http://www.traitsjs.org/">traitsjs</a></li>
+<li><a href="http://code.google.com/p/joose-js/">joose</a></li>
+</ul>
+<h2>Object-capability security model</h2>
+<p>Implementation uses an
+<a href="http://en.wikipedia.org/wiki/Object-capability_model">object-capability security model</a>
+to allow protection of private APIs. At the same private APIs can be shared
+between among trait composition parties. To put it simply: All the properties
+whose names start with <code>"_"</code> are considered to be <strong>private</strong>, and are
+unaccessible from anywhere except other <strong>public</strong> methods / accessors of the
+instance that had been defined during composition.</p>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Classes</h3>
+
+<div class="api_component">
+<h4 class="api_name">Trait</h4>
+
+<div class="api_component_group">
+<h5 class="api_header">Constructors</h5>
+
+<div class="api_component">
+<h6 class="api_name">Trait()</h6>
+<p>Creates an instance of Trait and returns it if it has no <code>constructor</code> method
+defined. If instance has <code>constructor</code> method, then it is called with all the
+arguments passed to this function and returned value is returned instead,
+unless it's <code>undefined</code>. In that case instance is returned.</p>
+<p><code>Trait</code> function represents a base trait. As with any other trait it represents
+a constructor function for creating instances of its own  a placeholder
+for a trait compositions functions.</p>
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Methods</h5>
+
+<div class="api_component">
+<h6 class="api_name">compose(trait1, trait2, ...)</h6>
+<p>Composes new trait out of itself and traits / property maps passed as an
+arguments. If two or more traits / property maps have properties with the same
+name, the new trait will contain a "conflict" property for that name (see
+examples in Examples section to find out more about "conflict" properties).
+This is a commutative and associative operation, and the order of its
+arguments is not significant.</p>
+<p><strong>Examples:</strong></p>
+<p>Let's say we want to define a reusable piece of code for a lists of elements.</p>
+<pre><code>var { Trait } = require('traits');
+var List = Trait.compose({
+  // private API:
+  _list: null,
+  // public API
+  constructor: function List() {
+    this._list = [];
+  },
+  get length() this._list.length,
+  add: function add(item) this._list.push(item),
+  remove: function remove(item) {
+    let list = this._list;
+    let index = list.indexOf(item);
+    if (0 = index) list.splice(index, 1);
+  }
+});
+</code></pre>
+<p>Instances of <code>List</code> can be created by calling <code>List</code> function with or without
+<code>new</code> keyword.</p>
+<pre><code>let l1 = List();
+l1 instanceof List;      // true
+let l2 = new List();
+l2 instanceof List;      // true
+</code></pre>
+<p>As you can see <code>add</code> and <code>remove</code> functions are capable of accessing private
+<code>_list</code> property, but thats about it, there's nothing else that will be able
+to access this property:</p>
+<pre><code>'_list' in l1;              // false
+'_list' in l2;              // false
+'_list' in List.protoype;   // false
+l1.has = function(name) name in this
+l1.has('_list');            // false
+l1.length;                  // 0
+l1.add('test')
+l1.length                   // 1
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">trait1 : <span class="datatype">Object|Function</span></div>
+<p>Trait or property map to compose new trait from.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">trait2 : <span class="datatype">Object|Function</span></div>
+<p>Trait or property map to compose new trait from.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">... : <span class="datatype">Object|Function</span></div>
+<p>Traits or property maps to compose new trait from.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">Function</span><p>New trait containing the combined properties of all the traits.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">resolve(resolutions)</h6>
+<p>Composes a new trait that has all the same properties
+as the trait on which it is called, except that each property listed
+in the <code>resolutions</code> argument will be renamed from the name
+of the  property in the <code>resolutions</code> argument to its value.
+And if its value is <code>null</code>, the property will become required.</p>
+<p><strong>Example:</strong></p>
+<pre><code>var Range = List.resolve({
+  constructor: null,
+  add: '_add',
+}).compose({
+  min: null,
+  max: null,
+  get list() this._list.slice(0),
+  constructor: function Range(min, max) {
+    this.min = min;
+    this.max = max;
+    this._list = [];
+  },
+  add: function(item) {
+    if (item = this.max  item = this.min)
+      this._add(item)
+  }
+});
+
+let r = Range(0, 10);
+r.min;                      // 0
+r.max;                      // 10
+r.length;                   // 0;
+r.add(5);
+r.length;                   // 1
+r.add(12);
+r.length;                   // 1 (12 was not in a range)
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">resolutions : <span class="datatype">Object</span></div>
+
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">Function</span><p>New resolved trait.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">override(trait1, trait2, ...)</h6>
+<p>Composes a new trait with all of the combined properties of <code>this</code> and the
+argument traits. In contrast to <code>compose</code>, <code>override</code> immediately resolves
+all conflicts resulting from this composition by overriding the properties of
+later traits. Trait priority is from left to right. I.e. the properties of
+the leftmost trait are never overridden.</p>
+<p><strong>Example:</strong></p>
+<pre><code>// will compose trait with conflict property 'constructor'
+var ConstructableList = List.compose({
+  constructor: function List() this._list = Array.slice(arguments)
+});
+// throws error with message 'Remaining conflicting property: constructor'
+ConstructableList(1, 2, 3);
+
+var ConstructableList = List.override({
+  constructor: function List() this._list = Array.slice(arguments)
+});
+ConstructableList(1, 2, 3).length       // 3
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">trait1 : <span class="datatype">Object|Function</span></div>
+<p>Trait or property map to compose new trait from.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">trait2 : <span class="datatype">Object|Function</span></div>
+<p>Trait or property map to compose new trait from.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">... : <span class="datatype">Object|Function</span></div>
+<p>Traits or property maps to compose new trait from.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">Function</span><p>New trait containing the combined properties of all the traits.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">toString()</h6>
+<p>Textual representation of an object. All the traits will return:
+<code>'[object Trait]'</code> string, unless they have <code>constructor</code> property, in that
+case string <code>'Trait'</code> is replaced with the name of <code>constructor</code> property.</p>
+<p><strong>Example:</strong></p>
+<pre><code>var MyTrait = Trait.compose({
+  constructor: function MyTrait() {
+    // do your initialization here
+  }
+});
+MyTrait().toString();     // [object MyTrait]
+</code></pre>
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Properties</h5>
+
+<div class="api_component">
+<h6 class="api_name">required : <span class="datatype">Object</span></h6>
+<p>Singleton, used during trait composition to define "required" properties.</p>
+<p><strong>Example:</strong></p>
+<pre><code>var Enumerable = Trait.compose({
+  list: Trait.required,
+  forEach: function forEach(consumer) {
+    return this.list.forEach(consumer);
+  }
+});
+
+let c1 = Enumerable();      // Error: Missing required property: list
+
+var EnumerableList = List.compose({
+  get list() this._list.slice(0)
+}, Enumerable);
+
+let c2 = EnumerableList();
+c2.add('test')
+c2.length                   // 1
+c2.list[0]                  // 'test'
+c2.forEach(console.log)     //  info: 'test 0 test'
+</code></pre>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">_public : <span class="datatype">Object</span></h6>
+<p>Internal property of instance representing public API that is exposed to the
+consumers of an instance.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <h2 class="sidebar-section-header"><a href="../../../dev-guide/addon-development/about.html">Developer Guide</a></h2>
+      <div class="sidebar-section-contents" id="default-section-contents">
+
+        <div class="sidebar-subsection">
+          <h3><a href="../../../dev-guide/addon-development/installation.html">Installation</a></h3>
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/addon-development/tutorials.html">Tutorials</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li><h4><a href="../../../dev-guide/addon-development/getting-started.html">Getting Started</a></h4>
+            <ul>
+              <li><a href="../../../dev-guide/addon-development/implementing-simple-addon.html">A Simple Add-on</a></li>
+              <li><a href="../../../dev-guide/addon-development/commonjs.html">CommonJS</a></li>
+              <li><a href="../../../dev-guide/addon-development/implementing-reusable-module.html">Reusable Modules</a></li>
+              <li><a href="../../../dev-guide/addon-development/troubleshooting.html">Troubleshooting</a></li>
+            </ul></li>
+            <li><h4><a href="../../../dev-guide/addon-development/api-intro.html">Introducing the APIs</a></h4>
+            <ul>
+              <li><a href="../../../dev-guide/addon-development/api-idioms.html">Common Idioms</a></li>
+              <li><a href="../../../dev-guide/addon-development/api-modules.html">API Overview</a></li>
+            </ul></li>
+            <li><h4><a href="../../../dev-guide/addon-development/annotator/annotator.html">Example: Annotator</a></h4>
+            <ul>
+              <li><a href="../../../dev-guide/addon-development/annotator/overview.html">Design Overview</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/widget.html">Implementing the Widget</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/creating.html">Creating Annotations</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/storing.html">Storing Annotations</a></li>
+              <li><a href="../../../dev-guide/addon-development/annotator/displaying.html">Displaying Annotations</a></li>
+            </ul></li>
+            <li><h4><a href="../../../dev-guide/addon-development/third-party-packages.html">Using Third Party Packages</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/l10n.html">Localization</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/mobile.html">Mobile Development</a></h4>
+            <li><h4><a href="../../../dev-guide/addon-development/xul-migration.html">XUL Migration Guide</a></h4>
+            <ul>
+              <li><a href="../../../dev-guide/addon-development/sdk-vs-xul.html">XUL Versus the SDK</a></li>
+            </ul>
+            <ul>
+              <li><a href="../../../dev-guide/addon-development/library-detector.html">Porting Example</a></li>
+            </ul></li>
+          </div>
+        </div>
+
+        <div class="sidebar-subsection">
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/addon-development/guides.html">Programming Guides</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li><h4><a href="../../../dev-guide/addon-development/two-types-of-scripts.html">Two Types of Scripts</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/events.html">Working With Events</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/web-content.html">Content Scripts</a></h4>
+              <ul>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/loading.html">Loading Content Scripts</a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/access.html">Content Script Access</a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/using-port.html">Using <code>port</code></a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/using-postmessage.html">Using <code>postMessage</code></a></li>
+                <li><a href="../../../dev-guide/addon-development/content-scripts/reddit-example.html">Example</a></li>
+              </ul></li>
+            <li><h4><a href="../../../dev-guide/addon-development/program-id.html">The Program ID</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/module-search.html">Module Search</a></h4></li>
+          </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-subsection">
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/addon-development/reference.html">Reference</a></h3>
+          <div class="sidebar-subsection-contents always-show">
+          <ul>
+            <li id="high-level-package-summaries">
+<div style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/addon-kit/addon-kit.html">addon-kit</a>
+</h4>
+
+<ul class="modules">
+<li class="module">
+<a href="../../../packages/addon-kit/docs/clipboard.html">clipboard</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/context-menu.html">context-menu</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/hotkeys.html">hotkeys</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/notifications.html">notifications</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/page-mod.html">page-mod</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/page-worker.html">page-worker</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/panel.html">panel</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/passwords.html">passwords</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/private-browsing.html">private-browsing</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/request.html">request</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/selection.html">selection</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/self.html">self</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/simple-storage.html">simple-storage</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/tabs.html">tabs</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/timers.html">timers</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/widget.html">widget</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/addon-kit/docs/windows.html">windows</a>
+</li>
+</ul>
+</div>
+</li>
+            <li><h4><a href="../../../dev-guide/addon-development/console.html">console</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/cfx-tool.html">cfx</a></h4></li>
+            <li><h4><a href="../../../dev-guide/addon-development/package-spec.html">Package Specification</a></h4></li>
+          </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="sidebar-section" id="module-development">
+      <h2 class="sidebar-section-header"><a href="../../../dev-guide/module-development/about.html">Internals Guide</a></h2>
+      <div class="sidebar-section-contents">
+
+        <div class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/module-development/guides.html">Programming Guides</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li><h4><a href="../../../dev-guide/module-development/best-practices.html">Low-Level Module Best Practices</a></h4>
+            <li><h4><a href="../../../dev-guide/module-development/chrome.html">Chrome Authority</a></h4>
+            <li><h4><a href="../../../dev-guide/module-development/xpi.html">XPI Generation</a></h4>
+          </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-subsection">
+          <div class="divider"></div>
+          <h3 class="sidebar-subsection-header"><a href="../../../dev-guide/module-development/reference.html">Reference</a></h3>
+          <div class="sidebar-subsection-contents">
+          <ul>
+            <li id="low-level-package-summaries">
+<div style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/api-utils/api-utils.html">api-utils</a>
+</h4>
+
+<ul class="modules">
+<li class="module">
+<a href="../../../packages/api-utils/docs/api-utils.html">api-utils</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/app-strings.html">app-strings</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/base.html">base</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/byte-streams.html">byte-streams</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/collection.html">collection</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/content.html">content</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/content/loader.html">content/loader</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/content/worker.html">content/worker</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/cortex.html">cortex</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/cuddlefish.html">cuddlefish</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/environment.html">environment</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/errors.html">errors</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/events.html">events</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/file.html">file</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/hidden-frame.html">hidden-frame</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/httpd.html">httpd</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/light-traits.html">light-traits</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/list.html">list</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/match-pattern.html">match-pattern</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/memory.html">memory</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/message-manager.html">message-manager</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/namespace.html">namespace</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/observer-service.html">observer-service</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/plain-text-console.html">plain-text-console</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/preferences-service.html">preferences-service</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/runtime.html">runtime</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/sandbox.html">sandbox</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/tab-browser.html">tab-browser</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/text-streams.html">text-streams</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/traceback.html">traceback</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/traits.html">traits</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/unit-test.html">unit-test</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/unload.html">unload</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/url.html">url</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/window-utils.html">window-utils</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/xhr.html">xhr</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/xpcom.html">xpcom</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/api-utils/docs/xul-app.html">xul-app</a>
+</li>
+</ul>
+</div>
+
+<div style="display: block;" class="package-summary">
+<h4>
+<a href="../../../packages/test-harness/test-harness.html">test-harness</a>
+</h4>
+
+<ul class="modules">
+<li class="module">
+<a href="../../../packages/test-harness/docs/harness.html">harness</a>
+</li>
+
+<li class="module">
+<a href="../../../packages/test-harness/docs/run-tests.html">run-tests</a>
+</li>
+</ul>
+</div>
+</li>
+            <li><h4><a href="../../../dev-guide/module-development/globals.html">Globals</a></h4></li>
+          </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section" id="appendices">
+        <h3><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes">Release Notes</a></h3>
+          <div class="divider"></div>
+        <h3><a href="https://wiki.mozilla.org/Labs/Jetpack">Jetpack Wiki</a></h3>
+          <div class="divider"></div>
+        <h3><a href="../../../dev-guide/appendices/glossary.html">Glossary</a></h3>
+          <div class="divider"></div>
+        <h3><a href="../../../dev-guide/appendices/credits.html">Credits</a></h3>
+
+    </div>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div role="contentinfo" id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> |
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> |
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    |<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>
