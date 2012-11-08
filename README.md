@@ -41,7 +41,9 @@ Each line in the mappings file defines a mapping, and consists of the file's loc
     sdk/1.11/packages/addon-kit/page-mod.html sdk/1.12/modules/sdk/page-mod.html
     sdk/1.10/packages/addon-kit/page-mod.html sdk/1.12/modules/sdk/page-mod.html
 
-As you see, you can specify mapping for both obsolete releases in the same mappings file. However, you can't use wildcards.
+As you see, you can specify mapping for both obsolete releases in the same mappings file. You can also use wildcards, only for the release version. So the file above could be rewritten like:
+
+    sdk/*/packages/addon-kit/page-mod.html sdk/1.12/modules/sdk/page-mod.html
 
 ### Operation of `make_webdocs.sh` ###
 
