@@ -41,6 +41,12 @@ def create_link_from_replacement_path(path_and_filename, replacement_path_and_fi
     prefix = "../" * depth
     return prefix + replacement_path_and_filename
 
+def get_wildcarded(path):
+   # only the version may be wildcarded, and we assume it's at pos number 2
+   pieces = path.split(os.sep)
+   pieces[1] = "*"
+   return os.sep.join(pieces)
+
 def obsolete(obsoleted, latest, mappings):
     missing_files = []
     for (dirpath, dirnames, filenames) in os.walk(os.sep.join(["sdk", obsoleted])):
@@ -48,8 +54,13 @@ def obsolete(obsoleted, latest, mappings):
             if not filename.endswith(".html"):
                 continue
             path_and_filename = os.sep.join([dirpath, filename])
-            # first, look for a replacement in mappings
+            # first, look for an exact replacement in mappings
             replacement_path_and_filename = mappings.get(path_and_filename, "")
+            if replacement_path_and_filename:
+                insert_notice(path_and_filename, replacement_path_and_filename, OBSOLETE_NOTICE_POSTAMBLE)
+                continue
+            # next, look for a wildcard replacement in mappings
+            replacement_path_and_filename = mappings.get(get_wildcarded(path_and_filename), "")
             if replacement_path_and_filename:
                 insert_notice(path_and_filename, replacement_path_and_filename, OBSOLETE_NOTICE_POSTAMBLE)
                 continue
