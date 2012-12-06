@@ -90,7 +90,10 @@ def read_mappings(mappings_file):
 if __name__ == "__main__":
     if len(sys.argv) == 4:
         mappings = read_mappings(sys.argv[3])
-    else:
+        obsolete(sys.argv[1], sys.argv[2], mappings)
+    if len(sys.argv) ==3:
         mappings = {}
-    obsolete(sys.argv[1], sys.argv[2], mappings)
+        obsolete(sys.argv[1], sys.argv[2], mappings)
+    else:
+        print "Usage: obsolete.py obsoleted_release latest_release mappings"
 
