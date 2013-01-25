@@ -1,0 +1,591 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Package Specification - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+	<!-- Google CSE Search Box Begins  -->
+	<!-- Use of this code assumes agreement with the Google Custom Search Terms of Service. -->
+	<!-- The terms of service are available at http://www.google.com/cse/docs/tos.html -->
+      <form action="../dev-guide/search.html" id="cse-search-box">
+        <div>
+          <input type="hidden" name="cx" value="017013284162333743052:rvlazd1zehe"/>
+          <input type="hidden" name="cof" value="FORID:10"/>
+          <input type="hidden" name="ie" value="UTF-8"/>
+          <input size="31" type="text" id="search-box" name="q"/>
+          <input type="submit" name="sa" value="Search"/>
+        </div>
+      </form>
+      <script src="https://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+    <!-- Google CSE Search Box Ends -->
+    </div>
+  </div>
+</div>
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Version 1.13</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="search-results"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Package Specification</h1>
+<p>A <em>package</em> is a directory that, at minimum, contains a JSON file
+called <code>package.json</code>. This file is also referred to as the
+<em>package manifest</em>.</p>
+<h2>The Package Manifest</h2>
+<p><code>package.json</code> may contain the following keys:</p>
+<ul>
+<li>
+<p><code>name</code> - the name of the package. The package system will only load
+  one package with a given name. This name cannot contain spaces or periods.
+  The name defaults to the name of the parent directory. If the package is
+  ever built as an XPI and the <code>fullName</code> key is not present, this is
+  used as the add-on's <code>em:name</code> element in its <code>install.rdf</code>.</p>
+</li>
+<li>
+<p><code>fullName</code> - the full name of the package. It can contain spaces. If
+  the package is ever built as an XPI, this is used as the add-on's
+  <code>em:name</code> element in its <code>install.rdf</code>.</p>
+</li>
+<li>
+<p><code>description</code> - a String describing the package. If the package is
+  ever built as an XPI, this is used as the add-on's
+  <code>em:description</code> element in its <code>install.rdf</code>.</p>
+</li>
+<li>
+<p><code>author</code> - the original author of the package. The author may be a
+  String including an optional URL in parentheses and optional email
+  address in angle brackets. If the package is ever built as an XPI,
+  this is used as the add-on's <code>em:creator</code> element in its
+  <code>install.rdf</code>.</p>
+</li>
+<li>
+<p><code>translators</code> - an Array of Strings consisted of translators of the package.</p>
+</li>
+<li>
+<p><code>contributors</code> - may be an Array of additional author Strings.</p>
+</li>
+<li>
+<p><code>homepage</code> - the URL of the package's website.</p>
+</li>
+<li>
+<p><code>icon</code> - the relative path from the root of the package to a
+  PNG file containing the icon for the package. By default, this
+  is <code>icon.png</code>. If the package is built as an XPI, this is used
+  as the add-on's icon to display in the Add-on Manager's add-ons list.
+  This key maps on to the
+  <a href="https://developer.mozilla.org/en/install_manifests#iconURL"><code>iconURL</code> entry in the Install Manifest</a>,
+  so the icon may be up to 48x48 pixels in size.</p>
+</li>
+<li>
+<p><code>icon64</code> - the relative path from the root of the package to a
+  PNG file containing the icon64 for the package. By default, this
+  is <code>icon64.png</code>. If the package is built as an XPI, this is used
+  as the add-on's icon to display in the Addon Manager's add-on details view.
+  This key maps on to the
+  <a href="https://developer.mozilla.org/en/install_manifests#icon64URL"><code>icon64URL</code> entry in the Install Manifest</a>,
+  so the icon should be 64x64 pixels in size.</p>
+</li>
+<li>
+<p><code>preferences</code> - <em>experimental</em>
+  An array of JSON objects that use the following keys <code>name</code>, <code>type</code>, <code>value</code>,
+  <code>title</code>, and <code>description</code>.  These JSON objects will be used to automatically
+  create a preferences interface for the addon in the Add-ons Manager.
+  For more information see the documentation of <a href="../modules/sdk/simple-prefs.html">simple-prefs</a>.</p>
+</li>
+<li>
+<p><code>license</code> - the name of the license as a String, with an optional
+  URL in parentheses.</p>
+</li>
+<li>
+<p><code>id</code> - a globally unique identifier for the package. When the package is
+   built as an XPI, this is used as the add-on's <code>em:id</code> element in its
+  <code>install.rdf</code>. See the
+  <a href="../dev-guide/guides/program-id.html">Program ID page</a>.</p>
+</li>
+<li>
+<p><code>version</code> - a String representing the version of the package. If the
+  package is ever built as an XPI, this is used as the add-on's
+  <code>em:version</code> element in its <code>install.rdf</code>.</p>
+</li>
+<li>
+<p><code>dependencies</code> - a String or Array of Strings representing package
+  names that this package requires in order to function properly.</p>
+</li>
+<li>
+<p><code>lib</code> - a String representing the top-level module directory provided in
+  this package. Defaults to <code>"lib"</code>.</p>
+</li>
+<li>
+<p><code>tests</code> - a String representing the top-level module directory containing
+  test suites for this package. Defaults to <code>"tests"</code>.</p>
+</li>
+<li>
+<p><code>packages</code> - a String or Array of Strings representing paths to
+  directories containing additional packages, defaults to
+  <code>"packages"</code>.</p>
+</li>
+<li>
+<p><code>main</code> - a String representing the name of a program module that is
+  located in one of the top-level module directories specified by
+  <code>lib</code>. Defaults to <code>"main"</code>.</p>
+</li>
+<li>
+<p><code>harnessClassID</code> - a String in the GUID format:
+  <code>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>, where <code>x</code> represents a single
+  hexadecimal digit. It is used as a <code>classID</code> (CID) of the "harness service"
+  XPCOM component. Defaults to a random GUID generated by <code>cfx</code>.</p>
+</li>
+</ul>
+<h2>Documentation</h2>
+<p>A package may optionally contain a
+<a href="http://daringfireball.net/projects/markdown/">Markdown</a>-formatted file
+called <code>README.md</code> in its root directory. Package-browsing tools may display
+this file to developers.</p>
+<p>Additionally, Markdown files can be placed in an optional <code>docs</code>
+directory. When package-browsing tools are asked to show the
+documentation for a module, they will look in this directory for a
+<code>.md</code> file with the module's name. Thus, for instance, if a user
+browses to a module at <code>lib/foo/bar.js</code>, the package-browsing tool
+will look for a file at <code>docs/foo/bar.js</code> to represent the module's
+API documentation.</p>
+<h2>Data Resources</h2>
+<p>Packages may optionally contain a directory called <code>data</code> into which
+arbitrary files may be placed, such as images or text files. The
+URL for these resources may be reached using the
+<a href="../modules/sdk/self.html">self</a> module.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-module-subsection">
+          <a href="../modules/third-party-modules.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-module-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../modules/high-level-modules.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-module-summaries">
+<li>
+<a href="../modules/sdk/addon-page.html">addon-page</a>
+</li>
+
+<li>
+<a href="../modules/sdk/base64.html">base64</a>
+</li>
+
+<li>
+<a href="../modules/sdk/clipboard.html">clipboard</a>
+</li>
+
+<li>
+<a href="../modules/sdk/context-menu.html">context-menu</a>
+</li>
+
+<li>
+<a href="../modules/sdk/hotkeys.html">hotkeys</a>
+</li>
+
+<li>
+<a href="../modules/sdk/l10n.html">l10n</a>
+</li>
+
+<li>
+<a href="../modules/sdk/notifications.html">notifications</a>
+</li>
+
+<li>
+<a href="../modules/sdk/page-mod.html">page-mod</a>
+</li>
+
+<li>
+<a href="../modules/sdk/page-worker.html">page-worker</a>
+</li>
+
+<li>
+<a href="../modules/sdk/panel.html">panel</a>
+</li>
+
+<li>
+<a href="../modules/sdk/passwords.html">passwords</a>
+</li>
+
+<li>
+<a href="../modules/sdk/private-browsing.html">private-browsing</a>
+</li>
+
+<li>
+<a href="../modules/sdk/querystring.html">querystring</a>
+</li>
+
+<li>
+<a href="../modules/sdk/request.html">request</a>
+</li>
+
+<li>
+<a href="../modules/sdk/selection.html">selection</a>
+</li>
+
+<li>
+<a href="../modules/sdk/self.html">self</a>
+</li>
+
+<li>
+<a href="../modules/sdk/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li>
+<a href="../modules/sdk/simple-storage.html">simple-storage</a>
+</li>
+
+<li>
+<a href="../modules/sdk/system.html">system</a>
+</li>
+
+<li>
+<a href="../modules/sdk/tabs.html">tabs</a>
+</li>
+
+<li>
+<a href="../modules/sdk/timers.html">timers</a>
+</li>
+
+<li>
+<a href="../modules/sdk/url.html">url</a>
+</li>
+
+<li>
+<a href="../modules/sdk/widget.html">widget</a>
+</li>
+
+<li>
+<a href="../modules/sdk/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../modules/low-level-modules.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-module-summaries">
+<li>
+<a href="../modules/toolkit/loader.html">/loader</a>
+</li>
+
+<li>
+<a href="../modules/sdk/console/plain-text.html">console/plain-text</a>
+</li>
+
+<li>
+<a href="../modules/sdk/console/traceback.html">console/traceback</a>
+</li>
+
+<li>
+<a href="../modules/sdk/content/content.html">content/content</a>
+</li>
+
+<li>
+<a href="../modules/sdk/content/loader.html">content/loader</a>
+</li>
+
+<li>
+<a href="../modules/sdk/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li>
+<a href="../modules/sdk/content/worker.html">content/worker</a>
+</li>
+
+<li>
+<a href="../modules/sdk/core/heritage.html">core/heritage</a>
+</li>
+
+<li>
+<a href="../modules/sdk/core/namespace.html">core/namespace</a>
+</li>
+
+<li>
+<a href="../modules/sdk/core/promise.html">core/promise</a>
+</li>
+
+<li>
+<a href="../modules/sdk/deprecated/api-utils.html">deprecated/api-utils</a>
+</li>
+
+<li>
+<a href="../modules/sdk/deprecated/app-strings.html">deprecated/app-strings</a>
+</li>
+
+<li>
+<a href="../modules/sdk/deprecated/cortex.html">deprecated/cortex</a>
+</li>
+
+<li>
+<a href="../modules/sdk/deprecated/errors.html">deprecated/errors</a>
+</li>
+
+<li>
+<a href="../modules/sdk/deprecated/events.html">deprecated/events</a>
+</li>
+
+<li>
+<a href="../modules/sdk/deprecated/light-traits.html">deprecated/light-traits</a>
+</li>
+
+<li>
+<a href="../modules/sdk/deprecated/observer-service.html">deprecated/observer-service</a>
+</li>
+
+<li>
+<a href="../modules/sdk/deprecated/tab-browser.html">deprecated/tab-browser</a>
+</li>
+
+<li>
+<a href="../modules/sdk/deprecated/traits.html">deprecated/traits</a>
+</li>
+
+<li>
+<a href="../modules/sdk/deprecated/window-utils.html">deprecated/window-utils</a>
+</li>
+
+<li>
+<a href="../modules/sdk/event/core.html">event/core</a>
+</li>
+
+<li>
+<a href="../modules/sdk/event/target.html">event/target</a>
+</li>
+
+<li>
+<a href="../modules/sdk/frame/hidden-frame.html">frame/hidden-frame</a>
+</li>
+
+<li>
+<a href="../modules/sdk/frame/utils.html">frame/utils</a>
+</li>
+
+<li>
+<a href="../modules/sdk/io/byte-streams.html">io/byte-streams</a>
+</li>
+
+<li>
+<a href="../modules/sdk/io/file.html">io/file</a>
+</li>
+
+<li>
+<a href="../modules/sdk/io/text-streams.html">io/text-streams</a>
+</li>
+
+<li>
+<a href="../modules/sdk/loader/cuddlefish.html">loader/cuddlefish</a>
+</li>
+
+<li>
+<a href="../modules/sdk/loader/sandbox.html">loader/sandbox</a>
+</li>
+
+<li>
+<a href="../modules/sdk/net/url.html">net/url</a>
+</li>
+
+<li>
+<a href="../modules/sdk/net/xhr.html">net/xhr</a>
+</li>
+
+<li>
+<a href="../modules/sdk/page-mod/match-pattern.html">page-mod/match-pattern</a>
+</li>
+
+<li>
+<a href="../modules/sdk/platform/xpcom.html">platform/xpcom</a>
+</li>
+
+<li>
+<a href="../modules/sdk/preferences/service.html">preferences/service</a>
+</li>
+
+<li>
+<a href="../modules/sdk/system/environment.html">system/environment</a>
+</li>
+
+<li>
+<a href="../modules/sdk/system/events.html">system/events</a>
+</li>
+
+<li>
+<a href="../modules/sdk/system/runtime.html">system/runtime</a>
+</li>
+
+<li>
+<a href="../modules/sdk/system/unload.html">system/unload</a>
+</li>
+
+<li>
+<a href="../modules/sdk/system/xul-app.html">system/xul-app</a>
+</li>
+
+<li>
+<a href="../modules/sdk/tabs/utils.html">tabs/utils</a>
+</li>
+
+<li>
+<a href="../modules/sdk/test/assert.html">test/assert</a>
+</li>
+
+<li>
+<a href="../modules/sdk/test/harness.html">test/harness</a>
+</li>
+
+<li>
+<a href="../modules/sdk/test/httpd.html">test/httpd</a>
+</li>
+
+<li>
+<a href="../modules/sdk/test/runner.html">test/runner</a>
+</li>
+
+<li>
+<a href="../modules/sdk/util/collection.html">util/collection</a>
+</li>
+
+<li>
+<a href="../modules/sdk/util/deprecate.html">util/deprecate</a>
+</li>
+
+<li>
+<a href="../modules/sdk/util/list.html">util/list</a>
+</li>
+
+<li>
+<a href="../modules/sdk/util/uuid.html">util/uuid</a>
+</li>
+
+<li>
+<a href="../modules/sdk/window/utils.html">window/utils</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../dev-guide/console.html">console</a>
+            <a href="../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../static-files/js/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>
