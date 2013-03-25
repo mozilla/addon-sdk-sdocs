@@ -4,7 +4,7 @@ This repository contains:
 
 ## SDK documentation sets ##
 
-There are three sets of SDK docs: one for the current release, and one for each of the two previous releases. The old releases contain "obsolete" notices at the top of each page that point to the corresponding page in the current release (or to the top-level page if there isn't a corresponding page).
+We keep documentation for every release from 1.6 onwards. The old releases contain "obsolete" notices at the top of each page that point to the corresponding page in the current release (or to the top-level page if there isn't a corresponding page).
 
 The doc sets are stored underneath the "sdk" directory, in a directory whose name is the version number for the release. Like this:
 
@@ -22,17 +22,72 @@ When we release a new version of the SDK, the contents of the `sdk` directory mu
 
 ## Building the docs for a release ##
 
-To build the docs for a release use the top-level script `make_webdocs.sh`:
+### clean sdk directory ###
 
-    bash make_webdocs.sh 1.11rc1 1.10 1.9 mappings
+    git rm -rf sdk/1.6
+....
+keeping only "latest" symlink
 
-`make_webdocs.sh` takes three mandatory parameters and one optional parameter:
+### Get the old docs ###
 
-* the first parameter is the Git tag identifying the release destined to become the new release. It's expected to consist of number and a period, like a normal release identifier, followed by one or more alpha characters, followed by anything. For example, `"1.11rc1"` or `"1.9b2"`.
-* the second and third parameters are the version numbers for the two previous releases. They are expected to identify a particular build under `https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/` when prefixed with `addon-sdk-`.
-* the fourth, optional, parameter names a file which contains a set of mappings, each of which maps a file in an obsoleted release to the corresponding file in the latest release. This is to enable the "obsoleted" notice to point users at the right file in `latest` even when the file in `latest` is in a different location.
+get sdocs for each release using get_release.sh:
 
-### Mappings file purpose and structure ###
+    bash get_release.sh 1.6.1
+    bash get_release.sh 1.7
+    bash get_release.sh 1.8.2
+    bash get_release.sh 1.9
+    bash get_release.sh 1.10
+    bash get_release.sh 1.11
+    bash get_release.sh 1.12
+    bash get_release.sh 1.13.2
+
+rename directories under "sdk" to remove the minor "hotfix" version, for hotfixed releases:
+
+    sdk/1.6.1 -> sdk/1.6
+
+### Build the new docs ###
+
+clone the addon-sdk:
+
+    git clone https://github.com/mozilla/addon-sdk.git
+
+check out the RC to generate the docs from:
+
+    git checkout 1.14rc1
+
+copy "404.md" under addon-sdk/doc/dev-guide-source
+
+build the sdocs for latest, using --override-version to write the final version tag in:
+
+    cd addon-sdk
+    source bin/activate
+    cfx sdocs --override-version 1.14
+
+create latest  under sdk, and extract addon-sdk-docs.tgz under it.
+
+## update "mappings.txt"  ###
+
+See "Mappings file purpose and structure" below).
+- minimally, update the target version to point to the latest version
+- add mappings for any files that have moved
+
+### Obsolete each old release ###
+
+    python obsolete.py 1.6 1.14 mappings.txt
+    python obsolete.py 1.7 1.14 mappings.txt
+...
+
+Check that the output of obsolete.py is what you expect (files that the tool complains about should be ones that really don't exist in the new release, and not ones that have moved but that you have forgotten to map).
+
+### Finish up ###
+
+update "latest" symlink to point to the new release
+
+test by browsing around in sdk/
+
+git add updated mappings.txt and everything under sdk/
+
+## Mappings file purpose and structure ##
 
 You don't need to define mappings for files which haven't moved relative to the docs root (for example, if `"sdk/1.9/packages/addon-kit/page-mod.html"` exists, and so does `"sdk/1.11/packages/addon-kit/page-mod.html"`), or if files have been removed in the `latest` version. You'll typically define mappings when you've reorganized the doc tree in `latest`, so the same file is now found at a different location relative to the root.
 
@@ -44,26 +99,3 @@ Each line in the mappings file defines a mapping, and consists of the file's loc
 As you see, you can specify mapping for both obsolete releases in the same mappings file. You can also use wildcards, only for the release version. So the file above could be rewritten like:
 
     sdk/*/packages/addon-kit/page-mod.html sdk/1.12/modules/sdk/page-mod.html
-
-### Operation of `make_webdocs.sh` ###
-
-`make_webdocs.sh` does the following:
-
-1. prepares to make a new commit of the docs, by deleting everything under `sdk/`
-2. fetches the latest docs from GitHub, and the two obsolete releases from `https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/`
-3. generates and extracts the static docs, for all three releases and copies them all under `sdk/`
-4. inserts the obsolete notice in every HTML file in the obsolete releases. The logic of this is as follows: for each file in the obsolete release:
-    * if a mapping exists in the mappings file, make the obsolete notice point at the file identified in the mapping.
-    * otherwise, if a file with the same name exists in the `latest` release tree, at the same relative path from the root, make the obsolete notice point at that file. For example, `"sdk/1.9/packages/addon-kit/page-mod.html"` -> `"sdk/1.11/packages/addon-kit/page-mod.html"`.
-    * otherwise, make the obsolete notice point at the root file in `latest`, for example: `"sdk/1.9/packages/api-utils/message-manager.html"` -> `"sdk/1.11/"`. In this case, different wording is used to indicate that the file is missing in `latest`, and the file is listed in the console output: this is intended to help you realise if you forgot to include a mapping for a file that was moved.
-5. add everything under `sdk/` to Git's staging area, commit it, and tag the commit with the Git tag identifying the latest release suffixed with "-amo": for example, `"1.11rc1-amo"`
-
-### What to do next ###
-
-After running `make_webdocs.sh` check that the contents of `sdk/` is what you expect, in particular that the obsolete docs contain obsolete notices, and that the links these notices contain are good.
-
-If everything looks all right, push the changes to GitHub:
-
-    git push --tags origin master
-
-Then ask IT to copy the content of `sdk/` at the relevant tag to `addons.mozilla.org`.
