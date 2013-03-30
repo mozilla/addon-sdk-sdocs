@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
@@ -103,7 +103,7 @@ Dog.prototype.bark = function bark() {
 
 // Subclassing a `Dog`
 function Pet(name, breed) {
-  // Once again we do our little dance 
+  // Once again we do our little dance
   if (!(this instanceof Pet)) return new Pet(name, breed);
 
   Dog.call(this, name);

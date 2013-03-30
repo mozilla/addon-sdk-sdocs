@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
@@ -71,7 +71,7 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<p>Provides an HTTP server written in JavaScript for the Mozilla platform, which 
+<p>Provides an HTTP server written in JavaScript for the Mozilla platform, which
 can be used in unit tests.</p>
 <p>The most basic usage is:</p>
 <pre><code>var {startServerAsync} = require("httpd");
@@ -81,17 +81,17 @@ require("unload").when(function cleanup() {
   })
 });
 </code></pre>
-<p>This starts a server in background (assuming you're running this code in an 
-application that has an event loop, such as Firefox). The server listens at 
-http://localhost:port/ and serves files from the specified directory. You 
-can serve static content or use SJS scripts, as described in documentation 
+<p>This starts a server in background (assuming you're running this code in an
+application that has an event loop, such as Firefox). The server listens at
+http://localhost:port/ and serves files from the specified directory. You
+can serve static content or use SJS scripts, as described in documentation
 on developer.mozilla.org.</p>
 <p>You can also use <code>nsHttpServer</code> to start the server manually:</p>
 <pre><code>var {nsHttpServer} = require("httpd");
 var srv = new nsHttpServer();
 // further documentation on developer.mozilla.org
 </code></pre>
-<p>See 
+<p>See
 <a href="https://developer.mozilla.org/En/HTTP_server_for_unit_tests">HTTP server for unit tests</a>
 for general information.</p>
 </div>
