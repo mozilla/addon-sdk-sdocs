@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W</div3C//DTD HTML 4.01//EN"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
@@ -232,7 +232,7 @@ in the value handler, it will not be be caught by the error handler.</p>
 });
 </code></pre>
 <p>To see why this is, consider the parallel between promises and <code>try</code>/<code>catch</code>.
-We are <code>try</code>-ing to execute <code>readAsync()</code>: the error handler represents a 
+We are <code>try</code>-ing to execute <code>readAsync()</code>: the error handler represents a
 <code>catch</code> for <code>readAsync()</code>, while the value handler represents code that happens
 <em>after</em> the <code>try</code>/<code>catch</code> block. That code then needs its own <code>try</code>/<code>catch</code>
 block to handle errors there.</p>
