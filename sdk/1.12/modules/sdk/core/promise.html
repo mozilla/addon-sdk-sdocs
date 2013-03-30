@@ -50,7 +50,7 @@
           <input type="submit" name="sa" value="Search"/>
         </div>
       </form>
-      <script src="http://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+      <script src="https://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
     <!-- Google CSE Search Box Ends -->
       <p>
         <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
@@ -236,7 +236,7 @@ in the value handler, it will not be be caught by the error handler.</p>
 });
 </code></pre>
 <p>To see why this is, consider the parallel between promises and <code>try</code>/<code>catch</code>.
-We are <code>try</code>-ing to execute <code>readAsync()</code>: the error handler represents a 
+We are <code>try</code>-ing to execute <code>readAsync()</code>: the error handler represents a
 <code>catch</code> for <code>readAsync()</code>, while the value handler represents code that happens
 <em>after</em> the <code>try</code>/<code>catch</code> block. That code then needs its own <code>try</code>/<code>catch</code>
 block to handle errors there.</p>

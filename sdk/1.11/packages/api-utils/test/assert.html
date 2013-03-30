@@ -50,7 +50,7 @@
           <input type="submit" name="sa" value="Search"/>
         </div>
       </form>
-      <script src="http://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+      <script src="https://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
     <!-- Google CSE Search Box Ends -->
       <p>
         <a href="https://builder.addons.mozilla.org/">Add-on Builder</a>
@@ -367,21 +367,21 @@ exports["test strict equality"] = function(assert) {
 <!--terminate Markdown list-->
 
 <p>For example, suppose we define two different custom exceptions:</p>
-<pre><code>function MyError(message) {  
-  this.name = "MyError";  
-  this.message = message || "Default Message";  
+<pre><code>function MyError(message) {
+  this.name = "MyError";
+  this.message = message || "Default Message";
 }
 
-MyError.prototype = new Error();  
+MyError.prototype = new Error();
 MyError.prototype.constructor = MyError;
 
 function AnotherError(message) {
-  this.name = "AnotherError";  
-  this.message = message || "Default Message"; 
-    console.log(this.message); 
+  this.name = "AnotherError";
+  this.message = message || "Default Message";
+    console.log(this.message);
 }
 
-AnotherError.prototype = new Error();  
+AnotherError.prototype = new Error();
 AnotherError.prototype.constructor = AnotherError;
 </code></pre>
 <p>We can check the type of exception by passing a function as the <code>Error</code>
