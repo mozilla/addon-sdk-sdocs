@@ -1,0 +1,875 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>lang/functional - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+	<!-- Google CSE Search Box Begins  -->
+	<!-- Use of this code assumes agreement with the Google Custom Search Terms of Service. -->
+	<!-- The terms of service are available at http://www.google.com/cse/docs/tos.html -->
+      <form action="../../../dev-guide/search.html" id="cse-search-box">
+        <div>
+          <input type="hidden" name="cx" value="017013284162333743052:rvlazd1zehe"/>
+          <input type="hidden" name="cof" value="FORID:10"/>
+          <input type="hidden" name="ie" value="UTF-8"/>
+          <input size="31" type="text" id="search-box" name="q"/>
+        </div>
+      </form>
+    <!-- Google CSE Search Box Ends -->
+    </div>
+  </div>
+</div>
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Firefox 23</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="search-results"></div>
+    <div id="main-content">
+<a href="../../../dev-guide/guides/stability.html" class="stability-note stability-unstable">unstable</a>
+
+<div id="lang/functional_module_api_docs" class="module_api_docs">
+<h1>lang/functional</h1>
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<p>The <code>lang/functional</code> module provides functional helper methods. A lot of these
+functions implement APIs from Jeremy Ashkenas's <a href="http://underscorejs.org">underscore.js</a>
+and all credits go to him and his contributors.</p>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">method(lambda)</h4>
+<p>Takes a function and returns a method associated with an object.
+When the method is invoked on an instance of the object, the original
+function is called. It is passed the object instance (i.e. <code>this</code>) as
+the first parameter, followed by any parameters passed into the method.</p>
+<pre><code>let { method } = require("sdk/lang/functional");
+let myNumber = {
+  times: method(times),
+  add: method(add),
+  number: 0
+};
+
+function times (target, x) { return target.number *= x; }
+function add (target, x) { return target.number += x; }
+
+console.log(myNumber.number); // 0
+myNumber.add(10);      // 10
+myNumber.times(2);     // 20
+myNumber.add(3);       // 23
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">lambda : <span class="datatype">function</span></div>
+<p>The function to be wrapped and returned.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">function</span><p>The wrapped <code>lambda</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">defer(fn)</h4>
+<p>Takes a function and returns a wrapped version of the function. Calling the
+wrapped version will call the original function during the next event loop.
+This is similar to calling <a href="../../../modules/sdk/timers.html#setTimeout(callback%2C ms)">setTimeout</a> with no
+wait (i.e. <code>setTimeout(function () { ... }, 0)</code>), except that the wrapped function
+may be reused and does not need to be repeated each time. This also enables you
+to use these functions as event listeners.</p>
+<pre><code>let { defer } = require("sdk/lang/functional");
+let fn = defer(function myEvent (event, value) {
+  console.log(event + " : " + value);
+});
+
+fn("click", "#home");
+console.log("done");
+
+// This will print 'done' before 'click : #home' since
+// we deferred the execution of the wrapped `myEvent`
+// function, making it non-blocking and executing on the
+// next event loop
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">fn : <span class="datatype">function</span></div>
+<p>The function to be deferred.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">function</span><p>The new, deferred function.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">remit()</h4>
+<p>An alias for <a href="../../../modules/sdk/lang/functional.html#defer(fn)">defer</a>.</p>
+</div>
+
+<div class="api_component">
+<h4 class="api_name">invoke(callee, params, self)</h4>
+<p>Invokes <code>callee</code>, passing <code>params</code> as an argument and <code>self</code> as <code>this</code>.
+Returns the value that is returned by <code>callee</code>.</p>
+<pre><code>let { invoke } = require("sdk/lang/functional");
+
+invoke(sum, [1,2,3,4,5], null); // 15
+
+function sum () {
+  return Array.slice(arguments).reduce(function (a, b) {
+    return a + b;
+  });
+}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">callee : <span class="datatype">function</span></div>
+<p>Function to invoke.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">params : <span class="datatype">Array</span></div>
+<p>Parameters to be passed into <code>callee</code>.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">self : <span class="datatype">mixed</span></div>
+<p>Object to be passed as the <code>this</code> context to <code>callee</code>.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">mixed</span><p>Returns the return value of <code>callee</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">partial(fn, arguments...)</h4>
+<p>Takes a function and bind values to one or more arguments, returning a new function of smaller arity.</p>
+<pre><code>let { partial } = require("sdk/lang/functional");
+let add = function add (x, y) { return x + y; }
+let addOne = partial(add, 1);
+
+addOne(5); // 6
+addOne(10); // 11
+partial(add, addOne(20))(2); // 23
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">fn : <span class="datatype">function</span></div>
+<p>Function on which partial application is to be performed.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">arguments... : <span class="datatype">mixed</span></div>
+<p>Additional arguments</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">function</span><p>The partial function.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">compose(fn...)</h4>
+<p>Returns the <a href="http://en.wikipedia.org/wiki/Function_composition_(computer_science)">composition</a> of a list of functions, where each function consumes the
+return value of the function that follows. In math terms, composing the functions
+<code>f()</code>, <code>g()</code>, and <code>h()</code> produces <code>f(g(h()))</code>.</p>
+<pre><code>let { compose } = require("sdk/lang/functional");
+
+let welcome = compose(exclaim, greet);
+
+welcome('moe'); // "hi: moe!";
+
+function greet (name) { return "hi: " + name; }
+function exclaim (statement) { return statement + "!"; }
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">fn... : <span class="datatype">function</span></div>
+<p>Takes a variable number of functions as arguments and composes them from right to left.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">function</span><p>The composed function.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">wrap(fn, wrapper)</h4>
+<p>Returns the first function passed as an argument to the second,
+allowing you to adjust arguments, run code before and after, and
+conditionally execute the original function.</p>
+<pre><code>let { wrap } = require("sdk/lang/functional");
+
+let wrappedHello = wrap(hello, function (fn, name) {
+  return "before, " + fn(name) + "after";
+});
+
+wrappedHello("moe"); // "before, hello: moe, after"
+
+function hello (name) { return "hello: " + name; }
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">fn : <span class="datatype">function</span></div>
+<p>The function to be passed into the <code>wrapper</code> function.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">wrapper : <span class="datatype">function</span></div>
+<p>The function that is called when the return function is executed,
+taking the wrapped <code>fn</code> as the first parameter.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">function</span><p>A function which, when called, executes <code>wrapper</code> with <code>fn</code> as the first parameter,
+and passes in any additional parameters to the <code>wrapper</code> function.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">identity(value)</h4>
+<p>Returns the same value that is used as the argument. In math: f(x) = x.</p>
+<pre><code>let { identity } = require("sdk/lang/functional");
+let x = 5;
+identity(x); // 5
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The value to be returned.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">mixed</span><p>The value that was originally passed in.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">memoize(fn, hasher)</h4>
+<p><a href="http://en.wikipedia.org/wiki/Memoization">Memoizes</a> a given function by caching
+the computed result. Useful for speeding up slow-running computations. If
+passed an optional <code>hashFunction</code>, it will be used to compute the hash key for
+storing the result, based on the arguments to the original function. The
+default <code>hashFunction</code> just uses the first argument to the memoized function as
+the key.</p>
+<pre><code>let { memoize } = require("sdk/lang/functional");
+
+let memoizedFn = memoize(primeFactorization);
+
+memoizedFn(50); // Returns [2, 5, 5], had to compute
+memoizedFn(100); // Returns [2, 2, 5, 5], had to compute
+memoizedFn(50); // Returns [2, 5, 5] again, but pulled from cache
+
+function primeFactorization (x) {
+  // Some tricky stuff
+}
+
+// We can also use a hash function to compute a different
+// hash value. In this example, we'll fabricate a function
+// that takes a string of first and last names that
+// somehow computes the lineage of that name. Our hash
+// function will just parse the last name, as our naive
+// implementation assumes that they will share the same lineage
+
+let getLineage = memoize(function (name) {
+  // computes lineage
+  return data;
+}, hasher);
+
+// Hashing function takes a string of first and last name
+// and returns the last name.
+function hasher (input) {
+  return input.split(" ")[1];
+}
+
+getLineage("homer simpson"); // Computes and returns information for "simpson"
+getLineage("lisa simpson"); // Returns cached for "simpson"
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">fn : <span class="datatype">function</span></div>
+<p>The function that becomes memoized.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">hasher : <span class="datatype">function</span></div>
+<p>An optional function that takes the memoized function's parameter and returns
+a hash key for storing the result.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">function</span><p>The memoized version of <code>fn</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">delay(fn, ms, arguments)</h4>
+<p>Much like <code>setTimeout</code>, <code>delay</code> invokes a function after waiting a set number of
+milliseconds. If you pass additional, optional, arguments, they will be forwarded
+on to the function when it is invoked.</p>
+<pre><code>let { delay } = require("sdk/lang/functional");
+
+delay(printAdd, 2000, 5, 10);
+
+// Prints "5+10=15" in two seconds (2000ms)
+function printAdd (a, b) { console.log(a + "+" + b + "=" + (a+b)); }
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">fn : <span class="datatype">function</span></div>
+<p>A function to be delayed.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">ms : <span class="datatype">number</span></div>
+<p>Number of milliseconds to delay the execution of <code>fn</code>.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">arguments : <span class="datatype">mixed</span></div>
+<p>Additional arguments to pass to <code>fn</code> upon execution</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">once(fn)</h4>
+<p>Creates a version of the input function that can only be called one time.
+Repeated calls to the modified function will have no effect, returning
+the value from the original call. Useful for initialization functions, instead
+of having to set a boolean flag and checking it later.</p>
+<pre><code>let { once } = require("sdk/lang/functional");
+let setup = once(function (env) {
+  // initializing important things
+  console.log("successfully initialized " + env);
+  return 1; // Assume success and return 1
+});
+
+setup('dev'); // returns 1
+// prints "successfully initialized dev"
+
+// Future attempts to call this function just return the cached
+// value that was returned previously
+setup('production'); // Returns 1
+// No print message is displayed since the function isn't executed
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">fn : <span class="datatype">function</span></div>
+<p>The function that will be executed only once inside the once wrapper.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">function</span><p>The wrapped <code>fn</code> that can only be executed once.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">cache()</h4>
+<p>An alias for <a href="../../../modules/sdk/lang/functional.html#once(fn)">once</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-module-subsection">
+          <a href="../../../modules/third-party-modules.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-module-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/high-level-modules.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-module-summaries">
+<li>
+<a href="../../../modules/sdk/addon-page.html">addon-page</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/base64.html">base64</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/clipboard.html">clipboard</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/context-menu.html">context-menu</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/hotkeys.html">hotkeys</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/indexed-db.html">indexed-db</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/l10n.html">l10n</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/notifications.html">notifications</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-mod.html">page-mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-worker.html">page-worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/panel.html">panel</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/passwords.html">passwords</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/private-browsing.html">private-browsing</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/querystring.html">querystring</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/request.html">request</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/selection.html">selection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/self.html">self</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-storage.html">simple-storage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system.html">system</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs.html">tabs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/timers.html">timers</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/url.html">url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/widget.html">widget</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/low-level-modules.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-module-summaries">
+<li>
+<a href="../../../modules/toolkit/loader.html">/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/plain-text.html">console/plain-text</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/traceback.html">console/traceback</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/content.html">content/content</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/loader.html">content/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/mod.html">content/mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/worker.html">content/worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/heritage.html">core/heritage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/namespace.html">core/namespace</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/promise.html">core/promise</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/api-utils.html">deprecated/api-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/app-strings.html">deprecated/app-strings</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/cortex.html">deprecated/cortex</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/errors.html">deprecated/errors</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/events.html">deprecated/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/light-traits.html">deprecated/light-traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/observer-service.html">deprecated/observer-service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/tab-browser.html">deprecated/tab-browser</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/traits.html">deprecated/traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/window-utils.html">deprecated/window-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/core.html">event/core</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/target.html">event/target</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/hidden-frame.html">frame/hidden-frame</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/utils.html">frame/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/byte-streams.html">io/byte-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/file.html">io/file</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/text-streams.html">io/text-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/functional.html">lang/functional</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/type.html">lang/type</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/cuddlefish.html">loader/cuddlefish</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/sandbox.html">loader/sandbox</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/url.html">net/url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/xhr.html">net/xhr</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-mod/match-pattern.html">page-mod/match-pattern</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/favicon.html">places/favicon</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/platform/xpcom.html">platform/xpcom</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/preferences/service.html">preferences/service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/style.html">stylesheet/style</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/utils.html">stylesheet/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/environment.html">system/environment</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/events.html">system/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/runtime.html">system/runtime</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/unload.html">system/unload</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/xul-app.html">system/xul-app</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs/utils.html">tabs/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/assert.html">test/assert</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/harness.html">test/harness</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/httpd.html">test/httpd</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/runner.html">test/runner</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/array.html">util/array</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/collection.html">util/collection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/deprecate.html">util/deprecate</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/list.html">util/list</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/object.html">util/object</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/uuid.html">util/uuid</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/window/utils.html">window/utils</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+<!-- load the google JS last, in case we're offline ( bug 836955 ) -->
+<script src="https://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+
+</body>
+
+</html>

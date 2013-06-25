@@ -181,7 +181,7 @@ if the document cannot be processed by `JSON.parse`.
 </api>
 
 <api name="status">
-@property {integer}
+@property {string}
 The HTTP response status code (e.g. *200*).
 </api>
 
