@@ -1,0 +1,960 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>lang/type - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+	<!-- Google CSE Search Box Begins  -->
+	<!-- Use of this code assumes agreement with the Google Custom Search Terms of Service. -->
+	<!-- The terms of service are available at http://www.google.com/cse/docs/tos.html -->
+      <form action="../../../dev-guide/search.html" id="cse-search-box">
+        <div>
+          <input type="hidden" name="cx" value="017013284162333743052:rvlazd1zehe"/>
+          <input type="hidden" name="cof" value="FORID:10"/>
+          <input type="hidden" name="ie" value="UTF-8"/>
+          <input size="31" type="text" id="search-box" name="q"/>
+        </div>
+      </form>
+    <!-- Google CSE Search Box Ends -->
+    </div>
+  </div>
+</div>
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Firefox 25</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="search-results"></div>
+    <div id="main-content">
+<a href="../../../dev-guide/guides/stability.html" class="stability-note stability-unstable">unstable</a>
+
+<div id="lang/type_module_api_docs" class="module_api_docs">
+<h1>lang/type</h1>
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<p>The <code>lang/type</code> module provides simple helper functions for working with type
+detection.</p>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">isUndefined(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/undefined"><code>undefined</code></a>, <code>false</code> otherwise.</p>
+<pre><code>let { isUndefined } = require('sdk/lang/type');
+
+var foo;
+isUndefined(foo); // true
+isUndefined(0); // false
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is <code>undefined</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isNull(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/null"><code>null</code></a>, <code>false</code> otherwise.</p>
+<pre><code>let { isNull } = require('sdk/lang/type');
+
+isNull(null); // true
+isNull(false); // false
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is <code>null</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isString(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is a <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String"><code>String</code></a>,
+<code>false</code> otherwise. Uses <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Operators/typeof"><code>typeof</code></a>
+operator to check type, and will only properly detect string primitives:
+for example, a string created with <code>new String()</code> will always return false.</p>
+<pre><code>let { isString } = require('sdk/lang/type');
+
+isString('my string'); // true
+isString(100); // false
+isString('100'); // true
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is a <code>String</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isNumber(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is a <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number"><code>Number</code></a>,
+<code>false</code> otherwise. Uses <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Operators/typeof"><code>typeof</code></a>
+operator to check type, and will only properly detect number primitives:
+for example, a number created with <code>new Number()</code> will always return false.</p>
+<pre><code>let { isNumber } = require('sdk/lang/type');
+
+isNumber(3.1415); // true
+isNumber(100); // true
+isNumber('100'); // false
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is a <code>Number</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isRegExp(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is a <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/RegExp"><code>RegExp</code></a>, <code>false</code> otherwise.</p>
+<pre><code>let { isRegExp } = require('sdk/lang/type');
+
+isRegExp(/[^\.]*\.js$/); // true
+isRegExp(new RegExp('substring')); // true
+isRegExp(1000); // false
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is a <code>RegExp</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isDate(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is a <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date"><code>Date</code></a>, <code>false</code> otherwise.</p>
+<pre><code>let { isDate } = require('sdk/lang/type');
+
+isDate(new Date()); // true
+isDate('3/1/2013'); // false
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is a <code>Date</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isFunction(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is a <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function"><code>Function</code></a>, <code>false</code> otherwise.</p>
+<pre><code>let { isFunction } = require('sdk/lang/type');
+
+let fn = function () {};
+isFunction(fn); // true;
+isFunction(otherFn); // true;
+isFunction(function () {}); // true;
+
+function otherFn () {}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is a <code>Function</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isObject(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is an <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object"><code>Object</code></a> and not null, <code>false</code> otherwise.</p>
+<pre><code>let { isObject } = require('sdk/lang/type');
+
+isObject({}); // true
+isObject(new Class()); // true
+isObject(null); // false
+isObject(5); // false
+
+function Class () {}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is an <code>Object</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isArray(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is an <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a>, <code>false</code> otherwise. Uses native
+<a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/isArray"><code>Array.isArray</code></a>.</p>
+<pre><code>let { isArray } = require('sdk/lang/type');
+
+isArray([]); // true
+isArray({}); // false
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is an <code>Array</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isArguments(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is an array-like <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Functions_and_function_scope/arguments"><code>arguments</code></a> object,
+<code>false</code> otherwise.</p>
+<pre><code>let { isArguments } = require('sdk/lang/type');
+
+function run () {
+  isArguments(arguments); // true
+  isArguments([]); // false
+  isArguments(Array.slice(arguments)); // false
+}
+run(1, 2, 3);
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is an <code>arguments</code> object.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isPrimitive(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is a primitive value: that is, any of <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/null"><code>null</code></a>, <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/undefined"><code>undefined</code></a>, <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/number"><code>number</code></a>,
+<a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/boolean"><code>boolean</code></a>, or <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/string"><code>string</code></a>. Returns <code>false</code> if <code>value</code> is not a primitive value.</p>
+<pre><code>let { isPrimitive } = require('sdk/lang/type');
+
+isPrimitive(3); // true
+isPrimitive('foo'); // true
+isPrimitive({}); // false
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is a primitive.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isFlat(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is a direct descendant of <code>Object.prototype</code> or <code>null</code>.
+Similar to jQuery's <a href="http://api.jquery.com/jQuery.isPlainObject/"><code>isPlainObject</code></a>.</p>
+<pre><code>let { isFlat } = require('sdk/lang/type');
+
+isFlat({}); // true
+isFlat(new Type()); // false
+
+function Type () {}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is a direct descendant of <code>Object.prototype</code> or <code>null</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isEmpty(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is an <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object"><code>Object</code></a> with no properties and <code>false</code> otherwise.</p>
+<pre><code>let { isEmpty } = require('sdk/lang/type');
+
+isEmpty({}); // true
+isEmpty({ init: false }); // false
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">object</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is an <code>Object</code> with no properties.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">isJSON(value)</h4>
+<p>Returns <code>true</code> if <code>value</code> is a string, number, boolean, null, array of JSON-serializable values, or an object whose property values are themselves JSON-serializable. Returns <code>false</code> otherwise.</p>
+<pre><code>let { isJSON } = require('sdk/lang/type');
+
+isJSON({ value: 42 }); // true
+isJSON({ fn: function () {} ); // false
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The variable to check.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is an <code>Array</code>/flat <code>Object</code> containing only
+atomic values and other flat objects.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">instanceOf(value, Type)</h4>
+<p>Returns <code>true</code> if <code>value</code> is an instance of a given <code>Type</code>. This is similar to the <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Operators/instanceof"><code>instanceof</code></a> operator.
+The difference is that the <code>Type</code> constructor can be from a scope that has
+a different top level object: for example, it could be from a different iframe,
+module or sandbox.</p>
+<pre><code>let { instanceOf } = require('sdk/lang/type');
+
+instanceOf(new Class(), Class); // true
+function Class() {}
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">object</span></div>
+<p>The variable to check.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">Type : <span class="datatype">object</span></div>
+<p>The constructor to compare to <code>value</code></p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>Boolean indicating if <code>value</code> is an instance of <code>Type</code>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">source(value, indent, limit)</h4>
+<p>Returns the textual representation of <code>value</code>, containing property descriptors and types
+of properties contained within the object.</p>
+<pre><code>let { source } = require('sdk/lang/type');
+
+var obj = {
+  name: undefined,
+  twitter: '@horse_js',
+  tweets: [
+    { id: 100, text: 'What happens to you if you break the monad laws?' },
+    { id: 101, text: 'JAVASCRIPT DUBSTEP GENERATOR' }
+  ]
+};
+
+console.log(source(obj));
+// Prints the below
+/*
+{ // [object Object]
+    // writable configurable enumerable
+    name: undefined,
+    // writable configurable enumerable
+    twitter: "@horse_js",
+    // writable configurable enumerable
+    tweets: [
+        { // [object Object]
+            // writable configurable enumerable
+            id: 100,
+            // writable configurable enumerable
+            text: "What happens to you if you break the monad laws?",
+            "__proto__": { // [object Object]
+
+            }
+        },
+        { // [object Object]
+            // writable configurable enumerable
+            id: 101,
+            // writable configurable enumerable
+            text: "JAVASCRIPT DUBSTEP GENERATOR",
+            "__proto__": { // [object Object]
+
+            }
+        }
+    ],
+    "__proto__": { // [object Object]
+
+    }
+}
+*/
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">value : <span class="datatype">mixed</span></div>
+<p>The source object to create a textual representation of.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">indent : <span class="datatype">string</span></div>
+<p>Optional. <code>String</code> to be used as indentation in output. 4 spaces by default.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">limit : <span class="datatype">number</span></div>
+<p>Optional. Number of properties to display per object.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">string</span><p>The textual representation of <code>value</code>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-module-subsection">
+          <a href="../../../modules/third-party-modules.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-module-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/high-level-modules.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-module-summaries">
+<li>
+<a href="../../../modules/sdk/addon-page.html">addon-page</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/base64.html">base64</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/clipboard.html">clipboard</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/context-menu.html">context-menu</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/hotkeys.html">hotkeys</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/indexed-db.html">indexed-db</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/l10n.html">l10n</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/notifications.html">notifications</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-mod.html">page-mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-worker.html">page-worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/panel.html">panel</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/passwords.html">passwords</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/private-browsing.html">private-browsing</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/querystring.html">querystring</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/request.html">request</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/selection.html">selection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/self.html">self</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-storage.html">simple-storage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system.html">system</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs.html">tabs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/timers.html">timers</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/url.html">url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/widget.html">widget</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/low-level-modules.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-module-summaries">
+<li>
+<a href="../../../modules/toolkit/loader.html">/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/plain-text.html">console/plain-text</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/traceback.html">console/traceback</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/content.html">content/content</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/loader.html">content/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/mod.html">content/mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/worker.html">content/worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/heritage.html">core/heritage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/namespace.html">core/namespace</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/promise.html">core/promise</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/api-utils.html">deprecated/api-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/app-strings.html">deprecated/app-strings</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/cortex.html">deprecated/cortex</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/errors.html">deprecated/errors</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/events.html">deprecated/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/light-traits.html">deprecated/light-traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/observer-service.html">deprecated/observer-service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/tab-browser.html">deprecated/tab-browser</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/traits.html">deprecated/traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/window-utils.html">deprecated/window-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/core.html">event/core</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/target.html">event/target</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/hidden-frame.html">frame/hidden-frame</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/utils.html">frame/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/byte-streams.html">io/byte-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/file.html">io/file</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/text-streams.html">io/text-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/functional.html">lang/functional</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/type.html">lang/type</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/cuddlefish.html">loader/cuddlefish</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/sandbox.html">loader/sandbox</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/url.html">net/url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/xhr.html">net/xhr</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/bookmarks.html">places/bookmarks</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/favicon.html">places/favicon</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/history.html">places/history</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/platform/xpcom.html">platform/xpcom</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/preferences/service.html">preferences/service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/style.html">stylesheet/style</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/utils.html">stylesheet/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/environment.html">system/environment</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/events.html">system/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/runtime.html">system/runtime</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/unload.html">system/unload</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/xul-app.html">system/xul-app</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs/utils.html">tabs/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/assert.html">test/assert</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/harness.html">test/harness</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/httpd.html">test/httpd</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/runner.html">test/runner</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/utils.html">test/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/array.html">util/array</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/collection.html">util/collection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/deprecate.html">util/deprecate</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/list.html">util/list</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/match-pattern.html">util/match-pattern</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/object.html">util/object</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/uuid.html">util/uuid</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/window/utils.html">window/utils</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+<!-- load the google JS last, in case we're offline ( bug 836955 ) -->
+<script src="https://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+
+</body>
+
+</html>

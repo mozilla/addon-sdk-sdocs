@@ -1,0 +1,805 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Modules - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+	<!-- Google CSE Search Box Begins  -->
+	<!-- Use of this code assumes agreement with the Google Custom Search Terms of Service. -->
+	<!-- The terms of service are available at http://www.google.com/cse/docs/tos.html -->
+      <form action="../../../dev-guide/search.html" id="cse-search-box">
+        <div>
+          <input type="hidden" name="cx" value="017013284162333743052:rvlazd1zehe"/>
+          <input type="hidden" name="cof" value="FORID:10"/>
+          <input type="hidden" name="ie" value="UTF-8"/>
+          <input size="31" type="text" id="search-box" name="q"/>
+        </div>
+      </form>
+    <!-- Google CSE Search Box Ends -->
+    </div>
+  </div>
+</div>
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Firefox 25</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="search-results"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Modules</h1>
+<p>A module is a self-contained unit of code, which is usually stored in a file,
+and has a well defined interface. The use of modules greatly improves the
+maintainability of code, by splitting it up into independent components, and
+enforcing logical boundaries between them. Unfortunately, JavaScript does not
+yet have native support for modules: it has to rely on the host application to
+provide it with functionality such as loading subscripts, and exporting/
+importing names. We will show how to do each of these things using the built-in
+Components object provided by Xulrunner application such as Firefox and
+Thunderbird.</p>
+<p>To improve encapsulation, each module should be defined in the scope of its own
+global object. This is made possible by the use of sandboxes. Each sandbox lives
+in its own compartment. A compartment is a separate memory space. Each
+compartment has a set of privileges that determines what scripts running in that
+compartment can and cannot do. We will show how sandboxes and compartments can
+be used to improve security in our module system.</p>
+<p>The module system used by the SDK is based on the CommonJS specification: it is
+implemented using a loader object, which handles all the bookkeeping related to
+module loading, such as resolving and caching URLs. We show how to create your
+own custom loaders, using the <code>Loader</code> constructor provided by the SDK. The SDK
+uses its own internal loader, known as Cuddlefish. All modules within the SDK
+are loaded using Cuddlefish by default. Like any other custom loader, Cuddlefish
+is created using the <code>Loader</code> constructor. In the final section, we will take a
+look at some of the options passed by the SDK to the <code>Loader</code> constructor to
+create the Cuddlefish loader.</p>
+<h2>Loading Subscripts</h2>
+<p>When a JavaScript project reaches a certain size, it becomes necessary to split
+it up into multiple files. Unfortunately, JavaScript does not provide any means
+to load scripts from other locations: we have to rely on the host application to
+provide us with this functionality. Applications such as Firefox and Thunderbird
+are based on Xulrunner. Xulrunner adds a built-in object, known as <code>Components</code>,
+to the global scope. This object forms the central access point for all
+functionality provided by the host application. A complete explanation of how to
+use <code>Components</code> is out of scope for this document. However, the following
+example shows how it can be used to load scripts from other locations: </p>
+<pre><code>const {
+    classes: Cc
+    interfaces: Ci
+} = Components;
+
+var instance = Cc["@mozilla.org/moz/jssubscript-loader;1"];
+var loader = instance.getService(Ci.mozIJSSubScriptLoader);
+
+function loadScript(url) {
+    loader.loadSubScript(url);
+}
+</code></pre>
+<p>When a script is loaded, it is evaluated in the scope of the global object of
+the script that loaded it. Any property defined on the global object will be
+accessible from both scripts:</p>
+<pre><code>index.js:
+loadScript("www.foo.com/a.js");
+foo; // =&gt; 3
+
+a.js:
+foo = 3;
+</code></pre>
+<h2>Exporting Names</h2>
+<p>The script loader we obtained from the <code>Components</code> object allows us load
+scripts from other locations, but its API is rather limited. For instance, it
+does not know how to handle relative URLs, which is cumbersome if you want to
+organize your project hierarchically. A more serious problem with the
+<code>loadScript</code> function, however, is that it evaluates all scripts in the scope of
+the same global object. This becomes a problem when two scripts try to define
+the same property:</p>
+<pre><code>index.js:
+loadScript("www.foo.com/a.js");
+loadScript("www.foo.com/b.js");
+foo; // =&gt; 5
+
+a.js:
+foo = 3;
+
+b.js:
+foo = 5;
+</code></pre>
+<p>In the above example, the value of <code>foo</code> depends on the order in which the
+subscripts are loaded: there is no way to access the property foo defined by
+"a.js", since it is overwritten by "b.js". To prevent scripts from interfering
+with each other, <code>loadScript</code> should evaluate each script to be loaded in the
+scope of their own global object, and then return the global object as its
+result. In effect, any properties defined by the script being loaded on its
+global object are exported to the loading script. The script loader we obtained
+from <code>Components</code> allows us to do just that:</p>
+<pre><code>function loadScript(url) {
+    let global = {};
+    loader.loadSubScript(url, global);
+    return global;
+}
+</code></pre>
+<p>If present, the <code>loadSubScript</code> function evaluates the script to be loaded in
+the scope of the second argument. Using this new version of <code>loadScript</code>, we can
+now rewrite our earlier example as follows</p>
+<pre><code>index.js:
+let a = loadScript("www.foo.com/a.js");
+let b = loadScript("www.foo.com/b.js");
+
+a.foo // =&gt; 3
+b.foo; // =&gt; 5
+
+a.js:
+foo = 3;
+
+b.js:
+foo = 5;:
+</code></pre>
+<h2>Importing Names</h2>
+<p>In addition to exporting properties from the script being loaded to the loading
+script, we can also import properties from the loading script to the script
+being loaded:</p>
+<pre><code>function loadScript(url, imports) {
+    let global = {
+        imports: imports,
+        exports: {}
+    };
+    loader.loadSubScript(url, global);
+    return global.exports;
+}
+</code></pre>
+<p>Among other things, this allows us to import <code>loadScript</code> to scripts being
+loaded, allowing them to load further scripts:</p>
+<pre><code>index.js:
+loadScript("www.foo.com/a.js", {
+    loadScript: loadScript
+}).foo; =&gt; 5
+
+a.js:
+exports.foo = imports.loadScript("www.foo.com/b.js").bar;
+
+b.js:
+exports.bar = 5;
+</code></pre>
+<h2>Sandboxes and Compartments</h2>
+<p>The <code>loadScript</code> function as defined int the previous section still has some
+serious shortcomings. The object it passed to the <code>loadSubScript</code> function is an
+ordinary object, which has the global object of the loading script as its
+prototype. This breaks encapsulation, as it allows the script being loaded to
+access the built-in constructors of the loading script, which are defined on its
+global object. The problem with breaking encapsulation like this is that
+malicious scripts can use it to get the loading script to execute arbitrary
+code, by overriding one of the methods on the built-in constructors. If the
+loading script has chrome privileges, then so will any methods called by the
+loading script, even if that method was installed by a malicious script.</p>
+<p>To avoid problems like this, the object passed to <code>loadSubScript</code> should be a
+true global object, having its own instances of the built-in constructors. This
+is exactly what sandboxes are for. A sandbox is a global object that lives in a
+separate compartment. Compartments are a fairly recent addition to SpiderMonkey,
+and can be seen as a separate memory space. Objects living in one compartment
+cannot be accessed directly from another compartment: they need to be accessed
+through an intermediate object, known as a wrapper. Compartments are very
+useful from a security point of view: each compartment has a set of privileges
+that determines what a script running in that compartment can and cannot do.
+Compartments with chrome privileges have access to the <code>Components</code> object,
+giving them full access to the host platform. In contrast, compartments with
+content privileges can only use those features available to ordinary websites.</p>
+<p>The <code>Sandbox</code> constructor takes a <code>URL</code> parameter, which is used to determine
+the set of privileges for the compartment in which the sandbox will be created.
+Passing an XUL URL will result in a compartment with chrome privileges (note,
+however, that if you ever actually do this in any of your code, Gabor will be
+forced to hunt you down and kill you). Otherwise, the compartment will have
+content privileges by default. Rewriting the <code>loadScript</code> function using
+sandboxes, we end up with:</p>
+<pre><code>function loadScript(url, imports) {
+    let global = Components.utils.Sandbox(url);
+    global.imports = imports;
+    global.exports = {};
+    loader.loadSubScript(url, global);
+    return global.exports;
+}
+</code></pre>
+<p>Note that the object returned by <code>Sandbox</code> is a wrapper to the sandbox, not the
+sandbox itself. A wrapper behaves exactly like the wrapped object, with one
+difference: for each property access/function it performs an access check to
+make sure that the calling script is actually allowed to access/call that
+property/function. If the script being loaded is less privileged than the
+loading script, the access is prevented, as the following example shows:</p>
+<pre><code>index.js:
+let a = loadScript("www.foo.com/a.js", {
+    Components: Components
+});
+
+// index.js has chrome privileges
+Components.utils; // =&gt; [object nsXPCComponents_Utils]
+
+a.js:
+// a.js has content privileges
+imports.Components.utils; // =&gt; undefined
+</code></pre>
+<h2>Modules in the Add-on SDK</h2>
+<p>The module system used by the SDK is based on what we learned so far: it follows
+the CommonJS specification, which attempts to define a standardized module API.
+A CommonJS module defines three global variables: <code>require</code>, which is a function
+that behaves like <code>loadScript</code> in our examples, <code>exports</code>, which behaves
+like the <code>exports</code> object, and <code>module</code>, which is an object representing
+the module itself. The <code>require</code> function has some extra features not provided
+by <code>loadScript</code>: it solves the problem of resolving relative URLs (which we have
+left unresolved), and provides a caching mechanism, so that when the same module
+is loaded twice, it returns the cached module object rather than triggering
+another download. The module system is implemented using a loader object, which
+is actually provided as a module itself. It is defined in the module
+“toolkit/loader”:</p>
+<pre><code>const { Loader } = require('toolkit/loader')
+</code></pre>
+<p>The <code>Loader</code> constructor allows you to create your own custom loader objects. It
+takes a single argument, which is a named options object. For instance, the
+option <code>paths</code> is used to specify a list of paths to be used by the loader to
+resolve relative URLs:</p>
+<pre><code>let loader = Loader({
+    paths: ["./": http://www.foo.com/"]
+});
+</code></pre>
+<p>CommonJS also defines the notion of a main module. The main module is always the
+first to be loaded, and differs from ordinary modules in two respects. Firstly,
+since they do not have a requiring module. Instead, the main module is loaded
+using a special function, called <code>main</code>:</p>
+<pre><code>const { Loader, main } = require('toolkit/loader');
+
+let loader = Loader({
+    paths: ["./": http://www.foo.com/"]
+});
+
+main(loader, "./main.js");
+</code></pre>
+<p>Secondly, the main module is defined as a property on <code>require</code>. This allows
+modules to check if it they have been loaded as the main module:</p>
+<pre><code>function main() {
+    ...
+}
+
+if (require.main === module)
+    main();
+</code></pre>
+<h2>The Cuddlefish Loader</h2>
+<p>The SDK uses its own internal loader, known as Cuddlefish (because we like crazy
+names). Like any other custom loader, Cuddlefish is created using the <code>Loader</code>
+constructor: Let's take a look at some of the options used by Cuddlefish to
+customize its behavior. The way module ids are resolved can be customized by
+passing a custom <code>resolve</code> function as an option. This function takes the id to
+be resolved and the requiring module as an argument, and returns the resolved id
+as its result. The resolved id is then further resolved using the paths array:</p>
+<pre><code>const { Loader, main } = require('toolkit/loader');
+
+let loader = Loader({
+    paths: ["./": "http://www.foo.com/"],
+    resolve: function (id, requirer) {
+        // Your code here
+        return id;
+    }
+});
+main(loader, "./main.js");
+</code></pre>
+<p>Cuddlefish uses a custom <code>resolve</code> function to implement a form of access
+control: modules can only require modules for which they have been explicitly
+granted access. A whitelist of modules is generated statically when the add-on
+is linked. It is possible to pass a list of predefined modules as an option to
+the <code>Loader</code> constructor. This is useful if the API to be exposed does not have
+a corresponding JS file, or is written in an incompatible format. Cuddlefish
+uses this option to expose the <code>Components</code> object as a module called <code>chrome</code>,
+in a way similar to the code here below:</p>
+<pre><code>const {
+    classes: Cc,
+    Constructor: CC,
+    interfaces: Ci,
+    utils: Cu,
+    results: Cr,
+    manager: Cm
+} = Components;
+
+let loader = Loader({
+    paths: ["./": "http://www.foo.com/"],
+    resolve: function (id, requirer) {
+        // Your logic here
+        return id;
+    },
+    modules: {
+        'chrome': {
+            components: Components,
+            Cc: Cc,
+            CC: bind(CC, Components),
+            Ci: Ci,
+            Cu: Cu,
+            Cr: Cr,
+            Cm: Cm
+        }
+    }
+});
+</code></pre>
+<p>All accesses to the <code>chrome</code> module go through this one point. As a result, we
+don't have to give modules chrome privileges on a case by case basis. More
+importantly, however, any module that wants access to <code>Components</code> has to
+explicitly express its intent via a call to <code>require("chrome")</code>. This makes it
+possible to reason about which modules have chrome capabilities and which don't.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-module-subsection">
+          <a href="../../../modules/third-party-modules.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-module-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/high-level-modules.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-module-summaries">
+<li>
+<a href="../../../modules/sdk/addon-page.html">addon-page</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/base64.html">base64</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/clipboard.html">clipboard</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/context-menu.html">context-menu</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/hotkeys.html">hotkeys</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/indexed-db.html">indexed-db</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/l10n.html">l10n</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/notifications.html">notifications</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-mod.html">page-mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-worker.html">page-worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/panel.html">panel</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/passwords.html">passwords</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/private-browsing.html">private-browsing</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/querystring.html">querystring</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/request.html">request</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/selection.html">selection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/self.html">self</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-storage.html">simple-storage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system.html">system</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs.html">tabs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/timers.html">timers</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/url.html">url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/widget.html">widget</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/low-level-modules.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-module-summaries">
+<li>
+<a href="../../../modules/toolkit/loader.html">/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/plain-text.html">console/plain-text</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/traceback.html">console/traceback</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/content.html">content/content</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/loader.html">content/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/mod.html">content/mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/worker.html">content/worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/heritage.html">core/heritage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/namespace.html">core/namespace</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/promise.html">core/promise</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/api-utils.html">deprecated/api-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/app-strings.html">deprecated/app-strings</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/cortex.html">deprecated/cortex</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/errors.html">deprecated/errors</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/events.html">deprecated/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/light-traits.html">deprecated/light-traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/observer-service.html">deprecated/observer-service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/tab-browser.html">deprecated/tab-browser</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/traits.html">deprecated/traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/window-utils.html">deprecated/window-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/core.html">event/core</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/target.html">event/target</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/hidden-frame.html">frame/hidden-frame</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/utils.html">frame/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/byte-streams.html">io/byte-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/file.html">io/file</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/text-streams.html">io/text-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/functional.html">lang/functional</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/type.html">lang/type</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/cuddlefish.html">loader/cuddlefish</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/sandbox.html">loader/sandbox</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/url.html">net/url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/xhr.html">net/xhr</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/bookmarks.html">places/bookmarks</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/favicon.html">places/favicon</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/history.html">places/history</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/platform/xpcom.html">platform/xpcom</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/preferences/service.html">preferences/service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/style.html">stylesheet/style</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/utils.html">stylesheet/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/environment.html">system/environment</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/events.html">system/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/runtime.html">system/runtime</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/unload.html">system/unload</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/xul-app.html">system/xul-app</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs/utils.html">tabs/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/assert.html">test/assert</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/harness.html">test/harness</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/httpd.html">test/httpd</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/runner.html">test/runner</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/utils.html">test/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/array.html">util/array</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/collection.html">util/collection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/deprecate.html">util/deprecate</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/list.html">util/list</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/match-pattern.html">util/match-pattern</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/object.html">util/object</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/uuid.html">util/uuid</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/window/utils.html">window/utils</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+<!-- load the google JS last, in case we're offline ( bug 836955 ) -->
+<script src="https://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+
+</body>
+
+</html>

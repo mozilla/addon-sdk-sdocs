@@ -1,0 +1,753 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>util/array - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+	<!-- Google CSE Search Box Begins  -->
+	<!-- Use of this code assumes agreement with the Google Custom Search Terms of Service. -->
+	<!-- The terms of service are available at http://www.google.com/cse/docs/tos.html -->
+      <form action="../../../dev-guide/search.html" id="cse-search-box">
+        <div>
+          <input type="hidden" name="cx" value="017013284162333743052:rvlazd1zehe"/>
+          <input type="hidden" name="cof" value="FORID:10"/>
+          <input type="hidden" name="ie" value="UTF-8"/>
+          <input size="31" type="text" id="search-box" name="q"/>
+        </div>
+      </form>
+    <!-- Google CSE Search Box Ends -->
+    </div>
+  </div>
+</div>
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Firefox 25</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="search-results"></div>
+    <div id="main-content">
+<a href="../../../dev-guide/guides/stability.html" class="stability-note stability-experimental">experimental</a>
+
+<div id="util/array_module_api_docs" class="module_api_docs">
+<h1>util/array</h1>
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<p>The <code>util/array</code> module provides simple helper functions for working with
+arrays.</p>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">has(array, element)</h4>
+<p>Returns <code>true</code> if the given <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a> contains the element or <code>false</code> otherwise.
+A simplified version of <code>array.indexOf(element) &gt;= 0</code>.</p>
+<pre><code>let { has } = require('sdk/util/array');
+let a = ['rock', 'roll', 100];
+
+has(a, 'rock'); // true
+has(a, 'rush'); // false
+has(a, 100); // true
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">array : <span class="datatype">array</span></div>
+<p>The array to search.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">element : <span class="datatype">*</span></div>
+<p>The element to search for in the array.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>A boolean indicating whether or not the element was found in the array.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">hasAny(array, elements)</h4>
+<p>Returns <code>true</code> if the given <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a> contains any of the elements in the
+<code>elements</code> array, or <code>false</code> otherwise.</p>
+<pre><code>let { hasAny } = require('sdk/util/array');
+let a = ['rock', 'roll', 100];
+
+hasAny(a, ['rock', 'bright', 'light']); // true
+hasAny(a, ['rush', 'coil', 'jet']); // false
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">array : <span class="datatype">array</span></div>
+<p>The array to search for elements.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">elements : <span class="datatype">array</span></div>
+<p>An array of elements to search for in <code>array</code>.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>A boolean indicating whether or not any of the elements were found
+in the array.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">add(array, element)</h4>
+<p>If the given <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array">array</a> does not already contain the given element, this function
+adds the element to the array and returns <code>true</code>. Otherwise, this function
+does not add the element and returns <code>false</code>.</p>
+<pre><code>let { add } = require('sdk/util/array');
+let a = ['alice', 'bob', 'carol'];
+
+add(a, 'dave'); // true
+add(a, 'dave'); // false
+add(a, 'alice'); // false
+
+console.log(a); // ['alice', 'bob', 'carol', 'dave']
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">array : <span class="datatype">array</span></div>
+<p>The array to add the element to.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">element : <span class="datatype">*</span></div>
+<p>The element to add</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>A boolean indicating whether or not the element was added to the array.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">remove(array, element)</h4>
+<p>If the given <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array">array</a> contains the given element, this function
+removes the element from the array and returns <code>true</code>. Otherwise, this function
+does not alter the array and returns <code>false</code>.</p>
+<pre><code>let { remove } = require('sdk/util/array');
+let a = ['alice', 'bob', 'carol'];
+
+remove(a, 'dave'); // false
+remove(a, 'bob'); // true
+remove(a, 'bob'); // false
+
+console.log(a); // ['alice', 'carol']
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">array : <span class="datatype">array</span></div>
+<p>The array to remove the element from.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">element : <span class="datatype">*</span></div>
+<p>The element to remove from the array if it contains it.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">boolean</span><p>A boolean indicating whether or not the element was removed from the array.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">unique(array)</h4>
+<p>Produces a duplicate-free version of the given <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array">array</a>.</p>
+<pre><code>let { unique } = require('sdk/util/array');
+let a = [1, 1, 1, 1, 3, 4, 7, 7, 10, 10, 10, 10];
+let b = unique(a);
+
+console.log(a); // [1, 1, 1, 1, 3, 4, 7, 7, 10, 10, 10, 10];
+console.log(b); // [1, 3, 4, 7, 10];
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">array : <span class="datatype">array</span></div>
+<p>Source array.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">array</span><p>The new, duplicate-free array.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">flatten(array)</h4>
+<p>Flattens a nested <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array">array</a> of any depth.</p>
+<pre><code>let { flatten } = require('sdk/util/array');
+let a = ['cut', ['ice', ['fire']], 'elec'];
+let b = flatten(a);
+
+console.log(a); // ['cut', ['ice', ['fire']], 'elec']
+console.log(b); // ['cut', 'ice', 'fire', 'elec'];
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">array : <span class="datatype">array</span></div>
+<p>The array to flatten.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">array</span><p>The new, flattened array.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">fromIterator(iterator)</h4>
+<p>Iterates over an <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Iterators_and_Generators#Iterators">iterator</a> and returns the results as an <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array">array</a>.</p>
+<pre><code>let { fromIterator } = require('sdk/util/array');
+let i = new Set();
+i.add('otoro');
+i.add('unagi');
+i.add('keon');
+
+fromIterator(i) // ['otoro', 'unagi', 'keon']
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">iterator : <span class="datatype">iterator</span></div>
+<p>The <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Iterators_and_Generators#Iterators"><code>Iterator</code></a> object over which to iterate and place results into an array.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">array</span><p>The iterator's results in an array.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">find(iterator)</h4>
+<p>Iterates over given <code>array</code> and applies given <code>predicate</code> function until
+<code>predicate(element)</code> is <code>true</code>. If such element is found it's retured back
+otherwise third optional <code>fallback</code> argument is returned back. If fallback
+is not provided returns <code>undefined</code>.</p>
+<pre><code>let { find } = require('sdk/util/array');
+let isOdd = (x) =&gt; x % 2;
+find([2, 4, 5, 7, 8, 9], isOdd);   // =&gt; 5
+find([2, 4, 6, 8], isOdd);         // =&gt; undefiend
+find([2, 4, 6, 8], isOdd, null);   // =&gt; null
+
+fromIterator(i) // ['otoro', 'unagi', 'keon']
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">iterator : <span class="datatype">iterator</span></div>
+<p>The <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Iterators_and_Generators#Iterators"><code>Iterator</code></a> object over which to iterate and place results into an array.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">array</span><p>The iterator's results in an array.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-module-subsection">
+          <a href="../../../modules/third-party-modules.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-module-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/high-level-modules.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-module-summaries">
+<li>
+<a href="../../../modules/sdk/addon-page.html">addon-page</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/base64.html">base64</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/clipboard.html">clipboard</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/context-menu.html">context-menu</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/hotkeys.html">hotkeys</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/indexed-db.html">indexed-db</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/l10n.html">l10n</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/notifications.html">notifications</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-mod.html">page-mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-worker.html">page-worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/panel.html">panel</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/passwords.html">passwords</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/private-browsing.html">private-browsing</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/querystring.html">querystring</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/request.html">request</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/selection.html">selection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/self.html">self</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-storage.html">simple-storage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system.html">system</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs.html">tabs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/timers.html">timers</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/url.html">url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/widget.html">widget</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/low-level-modules.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-module-summaries">
+<li>
+<a href="../../../modules/toolkit/loader.html">/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/plain-text.html">console/plain-text</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/traceback.html">console/traceback</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/content.html">content/content</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/loader.html">content/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/mod.html">content/mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/worker.html">content/worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/heritage.html">core/heritage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/namespace.html">core/namespace</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/promise.html">core/promise</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/api-utils.html">deprecated/api-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/app-strings.html">deprecated/app-strings</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/cortex.html">deprecated/cortex</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/errors.html">deprecated/errors</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/events.html">deprecated/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/light-traits.html">deprecated/light-traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/observer-service.html">deprecated/observer-service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/tab-browser.html">deprecated/tab-browser</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/traits.html">deprecated/traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/window-utils.html">deprecated/window-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/core.html">event/core</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/target.html">event/target</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/hidden-frame.html">frame/hidden-frame</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/utils.html">frame/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/byte-streams.html">io/byte-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/file.html">io/file</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/text-streams.html">io/text-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/functional.html">lang/functional</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/type.html">lang/type</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/cuddlefish.html">loader/cuddlefish</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/sandbox.html">loader/sandbox</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/url.html">net/url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/xhr.html">net/xhr</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/bookmarks.html">places/bookmarks</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/favicon.html">places/favicon</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/history.html">places/history</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/platform/xpcom.html">platform/xpcom</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/preferences/service.html">preferences/service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/style.html">stylesheet/style</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/utils.html">stylesheet/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/environment.html">system/environment</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/events.html">system/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/runtime.html">system/runtime</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/unload.html">system/unload</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/xul-app.html">system/xul-app</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs/utils.html">tabs/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/assert.html">test/assert</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/harness.html">test/harness</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/httpd.html">test/httpd</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/runner.html">test/runner</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/utils.html">test/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/array.html">util/array</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/collection.html">util/collection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/deprecate.html">util/deprecate</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/list.html">util/list</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/match-pattern.html">util/match-pattern</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/object.html">util/object</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/uuid.html">util/uuid</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/window/utils.html">window/utils</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+<!-- load the google JS last, in case we're offline ( bug 836955 ) -->
+<script src="https://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+
+</body>
+
+</html>
