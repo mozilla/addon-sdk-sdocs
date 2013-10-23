@@ -1,0 +1,756 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Private Properties - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+	<!-- Google CSE Search Box Begins  -->
+	<!-- Use of this code assumes agreement with the Google Custom Search Terms of Service. -->
+	<!-- The terms of service are available at http://www.google.com/cse/docs/tos.html -->
+      <form action="../../../dev-guide/search.html" id="cse-search-box">
+        <div>
+          <input type="hidden" name="cx" value="017013284162333743052:rvlazd1zehe"/>
+          <input type="hidden" name="cof" value="FORID:10"/>
+          <input type="hidden" name="ie" value="UTF-8"/>
+          <input size="31" type="text" id="search-box" name="q"/>
+        </div>
+      </form>
+    <!-- Google CSE Search Box Ends -->
+    </div>
+  </div>
+</div>
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Firefox 26</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="search-results"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Private Properties</h1>
+<p>A private property is a property that is only accessible to member
+functions of instances of the same class. Unlike other languages, JavaScript
+does not have native support for private properties. However, people have come
+up with several ways to emulate private properties using existing language
+features. We will take a look at two different techniques, using prefixes, and
+closures, respectively.</p>
+<p>Prefixes and closures both have drawbacks in that they are either not
+restrictive enough or too restrictive, respectively. We will therefore introduce
+a third technique, based on the use of WeakMaps, that solves both these
+problems. Note, however, that WeakMaps might not be supported by all
+implementations yet. Next, we generalize the idea of using WeakMaps from
+associating one or more private properties with an object to associating one or
+more namespaces with each object. A namespace is simply an object on which one
+or more private properties are defined.</p>
+<p>The SDK uses namespaces internally to implement private properties. The last
+section explains how to work with the particular namespace implementation used
+by the SDK. It is possible to read this section on its own, but to fully
+appreciate how namespaces work, and the problem they are supposed to solve, it
+is recommended that you read the entire article.</p>
+<h2>Using Prefixes</h2>
+<p>A common technique to implement private properties is to prefix each private
+property name with an underscore. Consider the following example:</p>
+<pre><code>function Point(x, y) {
+    this._x = x;
+    this._y = y;
+}
+</code></pre>
+<p>The properties <code>_x</code> and <code>_y</code> are private, and should only be accessed by member
+functions.</p>
+<p>To make a private property readable/writable from any function, it is common to
+define a getter/setter function for the property, respectively:</p>
+<pre><code>Point.prototype.getX = function () {
+    return this._x;
+};
+
+Point.prototype.setX = function (x) {
+    this._x = x;
+};
+
+Point.prototype.getY = function () {
+    return this._y;
+};
+
+Point.prototype.setY = function (y) {
+    this._y = y;
+};
+</code></pre>
+<p>The above technique is simple, and clearly expresses our intent. However, the
+use of an underscore prefix is just a coding convention, and is not enforced by
+the language: there is nothing to prevent a user from directly accessing a
+property that is supposed to be private.</p>
+<h2>Using Closures</h2>
+<p>Another common technique is to define private properties as variables, and their
+getter and/or setter function as a closure over these variables:</p>
+<pre><code>function Point(_x, _y) {
+    this.getX = function () {
+        return _x;
+    };
+
+    this.setX = function (x) {
+        _x = x;
+    };
+
+    this.getY = function () {
+        return _y;
+    };
+
+    this.setY = function (y) {
+        _y = y;
+    };
+}
+</code></pre>
+<p>Note that this technique requires member functions that need access to private
+properties to be defined on the object itself, instead of its prototype. This is
+slightly less efficient, but this is probably acceptable.</p>
+<p>The advantage of this technique is that it offers more protection: there is no
+way for the user to access a private property except by using its getter and/or
+setter function. However, the use of closures makes private properties too
+restrictive: since there is no way to access variables in one closure from
+within another closure, there is no way for objects of the same class to access
+each other's private properties.</p>
+<h2>Using WeakMaps</h2>
+<p>The techniques we've seen so far ar either not restrictive enough (prefixes) or
+too restrictive (closures). Until recently, a technique that solves both these
+problems didn't exist. That changed with the introduction of WeakMaps. WeakMaps
+were introduced to JavaScript in ES6, and have recently been implemented in
+SpiderMonkey. Before we explain how WeakMaps work, let's take a look at how
+ordinary objects can be used as hash maps, by creating a simple image cache:</p>
+<pre><code>let images = {};
+
+function getImage(name) {
+    let image = images[name];
+    if (!image) {
+        image = loadImage(name);
+        images[name] = image;
+    }
+    return image;
+}
+</code></pre>
+<p>Now suppose we want to associate a thumbnail with each image. Moreover, we want
+to create each thumbnail lazily, when it is first required:</p>
+<pre><code>function getThumbnail(image) {
+    let thumbnail = image._thumbnail;
+    if (!thumbnail) {
+        thumbnail = createThumbnail(image);
+        image._thumbnail = thumbnail;
+    }
+    return thumbnail;
+}
+</code></pre>
+<p>This approach is straightforward, but relies on the use of prefixes. A better
+approach would be to store thumbnails in their own, separate hash map:</p>
+<pre><code>let thumbnails = {};
+
+function getThumbnail(image) {
+    let thumbnail = thumbnails[image];
+    if (!thumbnail) {
+        thumbnail = createThumbnail(image);
+        thumbnails[image] = thumbnail;
+    }
+    return thumbnail;
+}
+</code></pre>
+<p>There are two problems with the above approach. First, it's not possible to use
+objects as keys. When an object is used as a key, it is converted to a string
+using its toString method. To make the above code work, we'd have to associate a
+unique identifier with each image, and override its <code>toString</code> method. The
+second problem is more severe: the thumbnail cache maintains a strong reference
+to each thumbnail object, so they will never be freed, even when their
+corresponding image has gone out of scope. This is a memory leak waiting to
+happen.</p>
+<p>The above two problems are exactly what WeakMaps were designed to solve. A
+WeakMap is very similar to an ordinary hash map, but differs from it in two
+crucial ways:</p>
+<ol>
+<li>It can use ordinary objects as keys</li>
+<li>It does not maintain a strong reference to its values</li>
+</ol>
+<p>To understand how WeakMaps are used in practice, let's rewrite the thumbnail
+cache using WeakMaps:</p>
+<pre><code>let thumbnails = new WeakMap();
+
+function getThumbnail(image) {
+    let thumbnail = thumbnails.get(image);
+    if (!thumbnail) {
+        thumbnail = createThumbnail(image);
+        thumbnails.set(image, thumbnail);
+    }
+    return thumbnail;
+}
+</code></pre>
+<p>This version suffers of none of the problems we mentioned earlier. When a
+thumbnail's image goes out of scope, the WeakMap ensures that its entry in the
+thumbnail cache will eventually be garbage collected. As a final caveat: the
+image cache we created earlier suffers from the same problem, so for the above
+code to work properly, we'd have to rewrite the image cache using WeakMaps, too.</p>
+<h1>From WeakMaps to Namespaces</h1>
+<p>In the previous section we used a WeakMap to associate a private property with
+each object. Note that we need a separate WeakMap for each private property.
+This is cumbersome if the number of private properties becomes large. A better
+solution would be to store all private properties on a single object, called a
+namespace, and then store the namespace as a private property on the original
+object. Using namespaces, our earlier example can be rewritten as follows:</p>
+<pre><code>let map = new WeakMap();
+
+let internal = function (object) {
+    if (!map.has(object))
+        map.set(object, {});
+    return map.get(object);
+}
+
+function Point(x, y) {
+    internal(this).x = x;
+    internal(this).y = y;
+}
+
+Point.prototype.getX = function () {
+    return internal(shape).x;
+};
+
+Point.prototype.setX = function (x) {
+    internal(shape).x = x;
+};
+
+Point.prototype.getY = function () {
+    return internal(shape).y;
+};
+
+Point.prototype.setY = function () {
+    internal(shape).y = y;
+};
+</code></pre>
+<p>The only way for a function to access the properties <code>x</code> and <code>y</code> is if it has a
+reference to an instance of <code>Point</code> and its <code>internal</code> namespace. By keeping the
+namespace hidden from all functions except members of <code>Point</code>, we have
+effectively implemented private properties. Moreover, because members of <code>Point</code>
+have a reference to the <code>internal</code> namespace, they can access private properties
+on other instances of <code>Point</code>.</p>
+<h2>Namespaces in the Add-on SDK</h2>
+<p>The Add-on SDK is built on top of XPCOM, the interface between JavaScript and
+C++ code. Since XPCOM allows the user to do virtually anything, security is very
+important. Among other things, we don't want add-ons to be able to access
+variables that are supposed to be private. The SDK uses namespaces internally to
+ensure this. As always with code that is heavily reused, the SDK defines a
+helper function to create namespaces. It is defined in the module
+"core/namespace", and it's usage is straightforward. To illustrate this, let's
+reimplement the class <code>Point</code> using namespaces:</p>
+<pre><code>const { ns } = require("./core/namespace");
+
+var internal = ns();
+
+function Point(x, y) {
+    internal(this).x = x;
+    internal(this).y = y;
+}
+
+Point.prototype.getX = function () {
+    return internal(shape).x;
+};
+
+Point.prototype.setX = function (x) {
+    internal(shape).x = x;
+};
+
+Point.prototype.getY = function () {
+    return internal(shape).y;
+};
+
+Point.prototype.setY = function () {
+    internal(shape).y = y;
+};
+</code></pre>
+<p>As a final note, the function <code>ns</code> returns a namespace that uses the namespace
+associated with the prototype of the object as its prototype.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-module-subsection">
+          <a href="../../../modules/third-party-modules.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-module-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/high-level-modules.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-module-summaries">
+<li>
+<a href="../../../modules/sdk/addon-page.html">addon-page</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/base64.html">base64</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/clipboard.html">clipboard</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/context-menu.html">context-menu</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/hotkeys.html">hotkeys</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/indexed-db.html">indexed-db</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/l10n.html">l10n</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/notifications.html">notifications</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-mod.html">page-mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-worker.html">page-worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/panel.html">panel</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/passwords.html">passwords</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/private-browsing.html">private-browsing</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/querystring.html">querystring</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/request.html">request</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/selection.html">selection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/self.html">self</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-storage.html">simple-storage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system.html">system</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs.html">tabs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/timers.html">timers</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/url.html">url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/widget.html">widget</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/low-level-modules.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-module-summaries">
+<li>
+<a href="../../../modules/toolkit/loader.html">/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/plain-text.html">console/plain-text</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/traceback.html">console/traceback</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/content.html">content/content</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/loader.html">content/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/mod.html">content/mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/worker.html">content/worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/heritage.html">core/heritage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/namespace.html">core/namespace</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/promise.html">core/promise</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/api-utils.html">deprecated/api-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/app-strings.html">deprecated/app-strings</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/cortex.html">deprecated/cortex</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/errors.html">deprecated/errors</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/events.html">deprecated/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/light-traits.html">deprecated/light-traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/observer-service.html">deprecated/observer-service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/tab-browser.html">deprecated/tab-browser</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/traits.html">deprecated/traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/window-utils.html">deprecated/window-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/core.html">event/core</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/target.html">event/target</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/hidden-frame.html">frame/hidden-frame</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/utils.html">frame/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/byte-streams.html">io/byte-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/file.html">io/file</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/text-streams.html">io/text-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/functional.html">lang/functional</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/type.html">lang/type</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/cuddlefish.html">loader/cuddlefish</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/sandbox.html">loader/sandbox</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/url.html">net/url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/xhr.html">net/xhr</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/bookmarks.html">places/bookmarks</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/favicon.html">places/favicon</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/history.html">places/history</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/platform/xpcom.html">platform/xpcom</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/preferences/service.html">preferences/service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/style.html">stylesheet/style</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/utils.html">stylesheet/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/environment.html">system/environment</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/events.html">system/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/runtime.html">system/runtime</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/unload.html">system/unload</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/xul-app.html">system/xul-app</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs/utils.html">tabs/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/assert.html">test/assert</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/harness.html">test/harness</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/httpd.html">test/httpd</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/runner.html">test/runner</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/utils.html">test/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/ui/id.html">ui/id</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/ui/sidebar.html">ui/sidebar</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/array.html">util/array</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/collection.html">util/collection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/deprecate.html">util/deprecate</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/list.html">util/list</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/match-pattern.html">util/match-pattern</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/object.html">util/object</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/uuid.html">util/uuid</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/window/utils.html">window/utils</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+<!-- load the google JS last, in case we're offline ( bug 836955 ) -->
+<script src="https://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+
+</body>
+
+</html>

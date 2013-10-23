@@ -1,0 +1,765 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>Classes and Inheritance - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+	<!-- Google CSE Search Box Begins  -->
+	<!-- Use of this code assumes agreement with the Google Custom Search Terms of Service. -->
+	<!-- The terms of service are available at http://www.google.com/cse/docs/tos.html -->
+      <form action="../../../dev-guide/search.html" id="cse-search-box">
+        <div>
+          <input type="hidden" name="cx" value="017013284162333743052:rvlazd1zehe"/>
+          <input type="hidden" name="cof" value="FORID:10"/>
+          <input type="hidden" name="ie" value="UTF-8"/>
+          <input size="31" type="text" id="search-box" name="q"/>
+        </div>
+      </form>
+    <!-- Google CSE Search Box Ends -->
+    </div>
+  </div>
+</div>
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Firefox 26</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="search-results"></div>
+    <div id="main-content"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<h1>Classes and Inheritance</h1>
+<p>A class is a blueprint from which individual objects are created. These
+individual objects are the instances of the class. Each class defines one or
+more members, which are initialized to a given value when the class is
+instantiated. Data members are properties that allow each instance to have
+their own state, whereas member functions are properties that allow instances to
+have behavior. Inheritance allows classes to inherit state and behavior from an
+existing classes, known as the base class. Unlike languages like C++ and Java,
+JavaScript does not have native support for classical inheritance. Instead, it
+uses something called prototypal inheritance. As it turns out, it is possible to
+emulate classical inheritance using prototypal inheritance, but not without
+writing a significant amount of boilerplate code.</p>
+<p>Classes in JavaScript are defined using constructor functions. Each constructor
+function has an associated object, known as its prototype, which is shared
+between all instances of that class. We will show how to define classes using
+constructors, and how to use prototypes to efficiently define member functions
+on each instance. Classical inheritance can be implemented in JavaScript using
+constructors and prototypes. We will show how to make inheritance work correctly
+with respect to constructors, prototypes, and the instanceof operator, and how
+to override methods in subclasses. The SDK uses a special constructor internally,
+known as <code>Class</code>, to create constructors that behave properly with respect to
+inheritance. The last section shows how to work with the <code>Class</code> constructor. It
+is possible to read this section on its own. However, to fully appreciate how
+<code>Class</code> works, and the problem it is supposed to solve, it is recommended that
+you read the entire article.</p>
+<h2>Constructors</h2>
+<p>In JavaScript, a class is defined by defining a constructor function for that
+class. To illustrate this, let's define a simple constructor for a class
+<code>Shape</code>:</p>
+<pre><code>function Shape(x, y) {
+    this.x = x;
+    this.y = y;
+}
+</code></pre>
+<p>We can now use this constructor to create instances of <code>Shape</code>:</p>
+<pre><code>let shape = new Shape(2, 3);
+shape instanceof Shape; // =&gt; true
+shape.x; // =&gt; 2
+shape.y; // =&gt; 3
+</code></pre>
+<p>The keyword new tells JavaScript that we are performing a constructor call.
+Constructor calls differ from ordinary function calls in that JavaScript
+automatically creates a new object and binds it to the keyword this for the
+duration of the call. Moreover, if the constructor does not return a value, the
+result of the call defaults to the value of this. Constructors are just ordinary
+functions, however, so it is perfectly legal to perform ordinary function calls
+on them. In fact, some people (including the Add-on SDK team) prefer to use
+constructors this way. However, since the value of this is undefined for
+ordinary function calls, we need to add some boilerplate code to convert them to
+constructor calls:</p>
+<pre><code>function Shape(x, y) {
+    if (!this)
+        return new Shape(x, y);
+    this.x = x;
+    this.y = y;
+}
+</code></pre>
+<h2>Prototypes</h2>
+<p>Every object has an implicit property, known as its prototype. When JavaScript
+looks for a property, it first looks for it in the object itself. If it cannot
+find the property there, it looks for it in the object's prototype. If the
+property is found on the prototype, the lookup succeeds, and JavaScript pretends
+that it found the property on the original object. Every function has an
+explicit property, known as <code>prototype</code>. When a function is used in a
+constructor call, JavaScript makes the value of this property the prototype of
+the newly created object:</p>
+<pre><code>let shape = Shape(2, 3);
+Object.getPrototypeOf(shape) == Shape.prototype; // =&gt; true
+</code></pre>
+<p>All instances of a class have the same prototype. This makes the prototype the
+perfect place to define properties that are shared between instances of the
+class. To illustrate this, let's add a member function to the class <code>Shape</code>:</p>
+<pre><code>Shape.prototype.draw = function () {
+    throw Error("not yet implemented");
+}
+let shape = Shape(2, 3);
+Shape.draw(); // =&gt; Error: not yet implemented
+</code></pre>
+<h2>Inheritance and Constructors</h2>
+<p>Suppose we want to create a new class, <code>Circle</code>, and inherit it from <code>Shape</code>.
+Since every <code>Circle</code> is also a <code>Shape</code>, the constructor for <code>Circle</code> must be
+called every time we call the constructor for <code>Shape</code>. Since JavaScript does
+not have native support for inheritance, it doesn't do this automatically.
+Instead, we need to call the constructor for <code>Shape</code> explicitly. The resulting
+constructor looks as follows:</p>
+<pre><code>function Circle(x, y, radius) {
+   if (!this)
+       return new Circle(x, y, radius);
+   Shape.call(this, x, y);
+   this.radius = radius;
+}
+</code></pre>
+<p>Note that the constructor for <code>Shape</code> is called as an ordinary function, and
+reuses the object created for the constructor call to <code>Circle</code>. Had we used a
+constructor call instead, the constructor for <code>Shape</code> would have been applied to
+a different object than the constructor for <code>Circle</code>. We can now use the above
+constructor to create instances of the class <code>Circle</code>:</p>
+<pre><code>let circle = Circle(2, 3, 5);
+circle instanceof Circle; // =&gt; true
+circle.x; // =&gt; 2
+circle.y; // =&gt; 3
+circle.radius; // =&gt; 5
+</code></pre>
+<h2>Inheritance and Prototypes</h2>
+<p>There is a problem with the definition of <code>Circle</code> in the previous section that
+we have glossed over thus far. Consider the following:</p>
+<pre><code>let circle = Circle(2, 3, 5);
+circle.draw(); // =&gt; TypeError: circle.draw is not a function
+</code></pre>
+<p>This is not quite right. The method <code>draw</code> is defined on instances of <code>Shape</code>,
+so we definitely want it to be defined on instances of <code>Circle</code>. The problem is
+that <code>draw</code> is defined on the prototype of <code>Shape</code>, but not on the prototype of
+<code>Circle</code>. We could of course copy every property from the prototype of <code>Shape</code>
+over to the prototype of <code>Circle</code>, but this is needlessly inefficient. Instead,
+we use a clever trick, based on the observation that prototypes are ordinary
+objects. Since prototypes are objects, they have a prototype as well. We can
+thus override the prototype of <code>Circle</code> with an object which prototype is the
+prototype of <code>Shape</code>.</p>
+<pre><code>Circle.prototype = Object.create(Shape.prototype);
+</code></pre>
+<p>Now when JavaScript looks for the method draw on an instance of Circle, it first
+looks for it on the object itself. When it cannot find the property there, it
+looks for it on the prototype of <code>Circle</code>. When it cannot find the property
+there either, it looks for it on <code>Shape</code>, at which point the lookup succeeds.
+The resulting behavior is what we were aiming for.</p>
+<h2>Inheritance and Instanceof</h2>
+<p>The single line of code we added in the previous section solved the problem with
+prototypes, but introduced a new problem with the <strong>instanceof</strong> operator.
+Consider the following:</p>
+<pre><code>let circle = Circle(2, 3, 5);
+circle instanceof Shape; // =&gt; false
+</code></pre>
+<p>Since instances of <code>Circle</code> inherit from <code>Shape</code>, we definitely want the result
+of this expression to be true. To understand why it is not, we need to
+understand how <strong>instanceof</strong> works. Every prototype has a <code>constructor</code>
+property, which is a reference to the constructor for objects with this
+prototype. In other words:</p>
+<pre><code>Circle.prototype.constructor == Circle // =&gt; true
+</code></pre>
+<p>The <strong>instanceof</strong> operator compares the <code>constructor</code> property of the prototype
+of the left hand side with that of the right hand side, and returns true if they
+are equal. Otherwise, it repeats the comparison for the prototype of the right
+hand side, and so on, until either it returns <strong>true</strong>, or the prototype becomes
+<strong>null</strong>, in which case it returns <strong>false</strong>. The problem is that when we
+overrode the prototype of <code>Circle</code> with an object whose prototype is the
+prototype of <code>Shape</code>, we didn't correctly set its <code>constructor</code> property. This
+property is set automatically for the <code>prototype</code> property of a constructor, but
+not for objects created with <code>Object.create</code>. The <code>constructor</code> property is
+supposed to be non-configurable, non-enumberable, and non-writable, so the
+correct way to define it is as follows:</p>
+<pre><code>Circle.prototype = Object.create(Shape.prototype, {
+    constructor: {
+        value: Circle
+    }
+});
+</code></pre>
+<h2>Overriding Methods</h2>
+<p>As a final example, we show how to override the stub implementation of the
+method <code>draw</code> in <code>Shape</code> with a more specialized one in <code>Circle</code>. Recall that
+JavaScript returns the first property it finds when walking the prototype chain
+of an object from the bottom up. Consequently, overriding a method is as simple
+as providing a new definition on the prototype of the subclass:</p>
+<pre><code>Circle.prototype.draw = function (ctx) {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius,
+            0, 2 * Math.PI, false);
+    ctx.fill();
+};
+</code></pre>
+<p>With this definition in place, we get:</p>
+<pre><code>let shape = Shape(2, 3);
+shape.draw(); // Error: not yet implemented 
+let circle = Circle(2, 3, 5);
+circle.draw(); // TypeError: ctx is not defined
+</code></pre>
+<p>which is the behavior we were aiming for.</p>
+<h2>Classes in the Add-on SDK</h2>
+<p>We have shown how to emulate classical inheritance in JavaScript using
+constructors and prototypes. However, as we have seen, this takes a significant
+amount of boilerplate code. The Add-on SDK team consists of highly trained
+professionals, but they are also lazy: that is why the SDK contains a helper
+function that handles this boilerplate code for us. It is defined in the module
+“core/heritage”:</p>
+<pre><code>const { Class } = require('sdk/core/heritage');
+</code></pre>
+<p>The function <code>Class</code> is a meta-constructor: it creates constructors that behave
+properly with respect to inheritance. It takes a single argument, which is an
+object which properties will be defined on the prototype of the resulting
+constructor. The semantics of <code>Class</code> are based on what we've learned earlier.
+For instance, to define a constructor for a class <code>Shape</code> in terms of <code>Class</code>,
+we can write:</p>
+<pre><code>let Shape = Class({
+    initialize: function (x, y) {
+        this.x = x;
+        this.y = y;
+    },
+    draw: function () {
+        throw new Error("not yet implemented");
+    }
+});
+</code></pre>
+<p>The property <code>initialize</code> is special. When it is present, the call to the
+constructor is forwarded to it, as are any arguments passed to it (including the
+this object). In effect, initialize specifies the body of the constructor. Note
+that the constructors created with <code>Class</code> automatically check whether they are
+called as constructors, so an explicit check is no longer necessary.</p>
+<p>Another special property is <code>extends</code>. It specifies the base class from which
+this class inherits, if any. <code>Class</code> uses this information to automatically set
+up the prototype chain of the constructor. If the extends property is omitted,
+<code>Class</code> itself is used as the base class:</p>
+<pre><code>var shape = new Shape(2, 3);
+shape instanceof Shape; // =&gt; true
+shape instanceof Class; // =&gt; true
+</code></pre>
+<p>To illustrate the use of the <code>extends</code> property, let's redefine the constructor
+for the class <code>Circle</code> in terms of <code>Class</code>:</p>
+<pre><code>var Circle = Class({
+    extends: Shape,
+    initialize: function(x, y, radius) {
+        Shape.prototype.initialize.call(this, x, y);
+        this.radius = radius;
+    },
+    draw: function () {
+        context.beginPath();
+        context.arc(this.x, this.y, this.radius,
+                    0, 2 * Math.PI, false);
+        context.fill();
+    }
+});
+</code></pre>
+<p>Unlike the definition of <code>Circle</code> in the previous section, we no longer have to
+override its prototype, or set its <code>constructor</code> property. This is all handled
+automatically. On the other hand, the call to the constructor for <code>Shape</code> still
+has to be made explicitly. This is done by forwarding to the initialize method
+of the prototype of the base class. Note that this is always safe, even if there
+is no <code>initialize</code> method defined on the base class: in that case the call is
+forwarded to a stub implementation defined on <code>Class</code> itself.</p>
+<p>The last special property we will look into is <code>implements</code>. It specifies a list
+of objects, which properties are to be copied to the prototype of the
+constructor. Note that only properties defined on the object itself are copied:
+properties defined on one of its prototypes are not. This allows objects to
+inherit from more than one class. It is not true multiple inheritance, however:
+no constructors are called for objects inherited via <code>implements</code>, and
+<strong>instanceof</strong> only works correctly for classes inherited via <code>extends</code>.</p></div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-module-subsection">
+          <a href="../../../modules/third-party-modules.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-module-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/high-level-modules.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-module-summaries">
+<li>
+<a href="../../../modules/sdk/addon-page.html">addon-page</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/base64.html">base64</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/clipboard.html">clipboard</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/context-menu.html">context-menu</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/hotkeys.html">hotkeys</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/indexed-db.html">indexed-db</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/l10n.html">l10n</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/notifications.html">notifications</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-mod.html">page-mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-worker.html">page-worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/panel.html">panel</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/passwords.html">passwords</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/private-browsing.html">private-browsing</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/querystring.html">querystring</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/request.html">request</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/selection.html">selection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/self.html">self</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-storage.html">simple-storage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system.html">system</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs.html">tabs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/timers.html">timers</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/url.html">url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/widget.html">widget</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/low-level-modules.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-module-summaries">
+<li>
+<a href="../../../modules/toolkit/loader.html">/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/plain-text.html">console/plain-text</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/traceback.html">console/traceback</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/content.html">content/content</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/loader.html">content/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/mod.html">content/mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/worker.html">content/worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/heritage.html">core/heritage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/namespace.html">core/namespace</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/promise.html">core/promise</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/api-utils.html">deprecated/api-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/app-strings.html">deprecated/app-strings</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/cortex.html">deprecated/cortex</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/errors.html">deprecated/errors</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/events.html">deprecated/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/light-traits.html">deprecated/light-traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/observer-service.html">deprecated/observer-service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/tab-browser.html">deprecated/tab-browser</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/traits.html">deprecated/traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/window-utils.html">deprecated/window-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/core.html">event/core</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/target.html">event/target</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/hidden-frame.html">frame/hidden-frame</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/utils.html">frame/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/byte-streams.html">io/byte-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/file.html">io/file</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/text-streams.html">io/text-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/functional.html">lang/functional</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/type.html">lang/type</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/cuddlefish.html">loader/cuddlefish</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/sandbox.html">loader/sandbox</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/url.html">net/url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/xhr.html">net/xhr</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/bookmarks.html">places/bookmarks</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/favicon.html">places/favicon</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/history.html">places/history</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/platform/xpcom.html">platform/xpcom</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/preferences/service.html">preferences/service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/style.html">stylesheet/style</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/utils.html">stylesheet/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/environment.html">system/environment</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/events.html">system/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/runtime.html">system/runtime</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/unload.html">system/unload</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/xul-app.html">system/xul-app</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs/utils.html">tabs/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/assert.html">test/assert</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/harness.html">test/harness</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/httpd.html">test/httpd</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/runner.html">test/runner</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/utils.html">test/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/ui/id.html">ui/id</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/ui/sidebar.html">ui/sidebar</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/array.html">util/array</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/collection.html">util/collection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/deprecate.html">util/deprecate</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/list.html">util/list</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/match-pattern.html">util/match-pattern</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/object.html">util/object</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/uuid.html">util/uuid</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/window/utils.html">window/utils</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+<!-- load the google JS last, in case we're offline ( bug 836955 ) -->
+<script src="https://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,1124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <base>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+  <script src="../../../static-files/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="../../../static-files/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+  <link media="all" href="../../../static-files/css/base.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/header.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/footer.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/sdk-docs.css" type="text/css" rel="stylesheet">
+  <link media="all" href="../../../static-files/css/api-reference.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shCore.css" type="text/css" rel="stylesheet">
+  <link href="../../../static-files/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" rel="stylesheet">
+  <!--[if IE]>
+    <style type="text/css">
+      .package-summary .module,
+      .package-entry .module,
+      .package-detail .module {
+      display: block;
+      }
+    </style>
+  <![endif]-->
+
+  <link href="../../../static-files/media/favicon.png" type="image/x-icon" rel="shortcut icon">
+  <title>places/bookmarks - Add-on SDK Documentation</title>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="funnel">
+    <a href="http://www.mozilla.org/?ref=logo" id="mozilla-tab">Mozilla</a>
+    <div class="menu">
+	<!-- Google CSE Search Box Begins  -->
+	<!-- Use of this code assumes agreement with the Google Custom Search Terms of Service. -->
+	<!-- The terms of service are available at http://www.google.com/cse/docs/tos.html -->
+      <form action="../../../dev-guide/search.html" id="cse-search-box">
+        <div>
+          <input type="hidden" name="cx" value="017013284162333743052:rvlazd1zehe"/>
+          <input type="hidden" name="cof" value="FORID:10"/>
+          <input type="hidden" name="ie" value="UTF-8"/>
+          <input size="31" type="text" id="search-box" name="q"/>
+        </div>
+      </form>
+    <!-- Google CSE Search Box Ends -->
+    </div>
+  </div>
+</div>
+
+<div id="site-header">
+  <div class="funnel">
+    <h1>
+      <a href="../../../dev-guide/index.html">Add-on SDK<span></span></a>
+    </h1>
+    <div id="version">Firefox 26</div>
+  </div>
+</div>
+
+  <div id="container">
+
+  <div id="columns">
+
+  <div id="main-content-column" class="column">
+    <div id="toc"></div>
+    <div id="search-results"></div>
+    <div id="main-content">
+<a href="../../../dev-guide/guides/stability.html" class="stability-note stability-unstable">unstable</a>
+
+<div id="places/bookmarks_module_api_docs" class="module_api_docs">
+<h1>places/bookmarks</h1>
+<div class="module_description"><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<p>The <code>places/bookmarks</code> module provides functions for creating, modifying and searching bookmark items. It exports:</p>
+<ul>
+<li>three constructors: <a href="../../../modules/sdk/places/bookmarks.html#Bookmark">Bookmark</a>, <a href="../../../modules/sdk/places/bookmarks.html#Group">Group</a>, and <a href="../../../modules/sdk/places/bookmarks.html#Separator">Separator</a>, corresponding to the types of objects, referred to as <strong>bookmark items</strong>, in the Bookmarks database in Firefox</li>
+<li>two additional functions, <a href="../../../modules/sdk/places/bookmarks.html#save(bookmarkItems%2C%20options)"><code>save()</code></a> to create, update, and remove bookmark items, and <a href="../../../modules/sdk/places/bookmarks.html#search(queries%2C%20options)"><code>search()</code></a> to retrieve the bookmark items that match a particular set of criteria.</li>
+</ul>
+<p><code>save()</code> and <code>search()</code> are both asynchronous functions: they synchronously return a <a href="../../../modules/sdk/places/bookmarks.html#PlacesEmitter"><code>PlacesEmitter</code></a> object, which then asynchronously emits events as the operation progresses and completes.</p>
+<p>Each retrieved bookmark item represents only a snapshot of state at a specific time. The module does not automatically sync up a <code>Bookmark</code> instance with ongoing changes to that item in the database from the same add-on, other add-ons, or the user.</p>
+<h2>Examples</h2>
+<h3>Creating a new bookmark</h3>
+<pre><code>let { Bookmark, save } = require("sdk/places/bookmarks");
+
+// Create a new bookmark instance, unsaved
+let bookmark = Bookmark({ title: "Mozilla", url: "http://mozila.org" });
+
+// Attempt to save the bookmark instance to the Bookmarks database
+// and store the emitter
+let emitter = save(bookmark);
+
+// Listen for events
+emitter.on("data", function (saved, inputItem) {
+  // on a "data" event, an item has been updated, passing in the
+  // latest snapshot from the server as `saved` (with properties
+  // such as `updated` and `id`), as well as the initial input
+  // item as `inputItem`
+  console.log(saved.title === inputItem.title); // true
+  console.log(saved !== inputItem); // true
+  console.log(inputItem === bookmark); // true
+}).on("end", function (savedItems, inputItems) {
+  // Similar to "data" events, except "end" is an aggregate of
+  // all progress events, with ordered arrays as `savedItems`
+  // and `inputItems`
+});
+</code></pre>
+<h3>Creating several bookmarks with a new group</h3>
+<pre><code>let { Bookmark, Group, save } = require("sdk/places/bookmarks");
+
+let group = Group({ title: "Guitars" });
+let bookmarks = [
+  Bookmark({ title: "Ran", url: "http://ranguitars.com", group: group }),
+  Bookmark({ title: "Ibanez", url: "http://ibanez.com", group: group }),
+  Bookmark({ title: "ESP", url: "http://espguitars.com", group: group })
+];
+
+// Save `bookmarks` array -- notice we don't have `group` in the array,
+// although it needs to be saved since all bookmarks are children
+// of `group`. This will be saved implicitly.
+
+save(bookmarks).on("data", function (saved, input) {
+  // A data event is called once for each item saved, as well
+  // as implicit items, like `group`
+  console.log(input === group || ~bookmarks.indexOf(input)); // true
+}).on("end", function (saves, inputs) {
+  // like the previous example, the "end" event returns an 
+  // array of all of our updated saves. Only explicitly saved 
+  // items are returned in this array -- the `group` won't be
+  // present here.
+  console.log(saves[0].title); // "Ran"
+  console.log(saves[2].group.title); // "Guitars"
+});
+</code></pre>
+<h3>Searching for bookmarks</h3>
+<p>Bookmarks can be queried with the <a href="../../../modules/sdk/places/bookmarks.html#search(queries%2C%20options)"><code>search()</code></a> function, which accepts a query object or an array of query objects, as well as a query options object. Query properties are AND'd together within a single query object, but are OR'd together across multiple query objects.</p>
+<pre><code>let { search, UNSORTED } = require("sdk/places/bookmarks");
+
+// Simple query with one object
+search(
+  { query: "firefox" },
+  { sort: "title" }
+).on(end, function (results) {
+  // results matching any bookmark that has "firefox"
+  // in its URL, title or tag, sorted by title
+});
+
+// Multiple queries are OR'd together
+search(
+  [{ query: "firefox" }, { group: UNSORTED, tags: ["mozilla"] }],
+  { sort: "title" }
+).on("end", function (results) {
+  // Our first query is the same as the simple query above;
+  // all of those results are also returned here. Since multiple
+  // queries are OR'd together, we also get bookmarks that
+  // match the second query. The second query's properties
+  // are AND'd together, so results that are in the platform's unsorted
+  // bookmarks folder, AND are also tagged with 'mozilla', get returned
+  // as well in this query
+});
+</code></pre>
+</div>
+
+<div class="api_reference">
+<h2 class="api_header">API Reference</h2>
+
+<div class="api_component_group">
+<h3 class="api_header">Classes</h3>
+
+<div class="api_component">
+<h4 class="api_name">Bookmark</h4>
+
+<div class="api_component_group">
+<h5 class="api_header">Constructors</h5>
+
+<div class="api_component">
+<h6 class="api_name">Bookmark(options)</h6>
+<p>Creates an unsaved bookmark instance.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">options : <span class="datatype">object</span></div>
+<p>Options for the bookmark, with the following parameters:</p>
+<div class="api_component">
+<div class="api_name">title : <span class="datatype">string</span></div>
+<p>The title for the bookmark. Required.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">url : <span class="datatype">string</span></div>
+<p>The URL for the bookmark. Required.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ group : <span class="datatype">Group</span> ]</div>
+<p>The parent group that the bookmark lives under. Defaults to the <a href="../../../modules/sdk/places/bookmarks.html#UNSORTED">Bookmarks.UNSORTED</a> group.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ index : <span class="datatype">number</span> ]</div>
+<p>The index of the bookmark within its group. Last item within the group by default.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ tags : <span class="datatype">set</span> ]</div>
+<p>A set of tags to be applied to the bookmark.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Properties</h5>
+
+<div class="api_component">
+<h6 class="api_name">title : <span class="datatype">string</span></h6>
+<p>The bookmark's title.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">url : <span class="datatype">string</span></h6>
+<p>The bookmark's URL.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">group : <span class="datatype">Group</span></h6>
+<p>The group instance that the bookmark lives under.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">index : <span class="datatype">number</span></h6>
+<p>The index of the bookmark within its group.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">updated : <span class="datatype">number</span></h6>
+<p>A Unix timestamp indicating when the bookmark was last updated on the platform.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">tags : <span class="datatype">set</span></h6>
+<p>A <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set">Set</a> of tags that the bookmark is tagged with.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">Group</h4>
+
+<div class="api_component_group">
+<h5 class="api_header">Constructors</h5>
+
+<div class="api_component">
+<h6 class="api_name">Group(options)</h6>
+<p>Creates an unsaved bookmark group instance.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">options : <span class="datatype">object</span></div>
+<p>Options for the bookmark group, with the following parameters:</p>
+<div class="api_component">
+<div class="api_name">title : <span class="datatype">string</span></div>
+<p>The title for the group. Required.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ group : <span class="datatype">Group</span> ]</div>
+<p>The parent group that the bookmark group lives under. Defaults to the <a href="../../../modules/sdk/places/bookmarks.html#UNSORTED">Bookmarks.UNSORTED</a> group.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ index : <span class="datatype">number</span> ]</div>
+<p>The index of the bookmark group within its parent group. Last item within the group by default.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Properties</h5>
+
+<div class="api_component">
+<h6 class="api_name">title : <span class="datatype">string</span></h6>
+<p>The bookmark group's title.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">group : <span class="datatype">Group</span></h6>
+<p>The group instance that the bookmark group lives under.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">index : <span class="datatype">number</span></h6>
+<p>The index of the bookmark group within its group.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">updated : <span class="datatype">number</span></h6>
+<p>A Unix timestamp indicating when the bookmark was last updated on the platform.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">Separator</h4>
+
+<div class="api_component_group">
+<h5 class="api_header">Constructors</h5>
+
+<div class="api_component">
+<h6 class="api_name">Separator(options)</h6>
+<p>Creates an unsaved bookmark separator instance.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">options : <span class="datatype">object</span></div>
+<p>Options for the bookmark group, with the following parameters:</p>
+<div class="api_component">
+<div class="api_name">[ group : <span class="datatype">Group</span> ]</div>
+<p>The parent group that the bookmark group lives under. Defaults to the <a href="../../../modules/sdk/places/bookmarks.html#UNSORTED">Bookmarks.UNSORTED</a> group.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ index : <span class="datatype">number</span> ]</div>
+<p>The index of the bookmark group within its parent group. Last item within the group by default.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h5 class="api_header">Properties</h5>
+
+<div class="api_component">
+<h6 class="api_name">group : <span class="datatype">Group</span></h6>
+<p>The group instance that the bookmark group lives under.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">index : <span class="datatype">number</span></h6>
+<p>The index of the bookmark group within its group.</p>
+</div>
+
+<div class="api_component">
+<h6 class="api_name">updated : <span class="datatype">number</span></h6>
+<p>A Unix timestamp indicating when the bookmark was last updated on the platform.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">PlacesEmitter</h4>
+<p>The <code>PlacesEmitter</code> is not exported from the module, but returned from the <code>save</code> and <code>search</code> functions. The <code>PlacesEmitter</code> inherits from <a href="../../../modules/sdk/event/target.html"><code>event/target</code></a>, and emits <code>data</code>, <code>error</code>, and <code>end</code>.</p>
+<p><code>data</code> events are emitted for every individual operation (such as: each item saved, or each item found by a search query), whereas <code>end</code> events are emitted as the aggregate of an operation, passing an array of objects into the handler.</p>
+<div class="api_component_group">
+<h5 class="api_header">Events</h5>
+
+<div class="api_component">
+<h6 class="api_name">data</h6>
+<p>The <code>data</code> event is emitted when a bookmark item that was passed into the <code>save</code> method has been saved to the platform. This includes implicit saves that are dependencies of the explicit items saved. For example, when creating a new bookmark group with two bookmark items as its children, and explicitly saving the two bookmark children, the unsaved parent group will also emit a <code>data</code> event.</p>
+<pre><code>let { Bookmark, Group, save } = require("sdk/places/bookmarks");
+
+let group = Group({ title: "my group" });
+let bookmarks = [
+  Bookmark({ title: "mozilla", url: "http://mozilla.com", group: group }),
+  Bookmark({ title: "w3", url: "http://w3.org", group: group })
+];
+
+save(bookmarks).on("data", function (item) {
+  // This function will be called three times:
+  // once for each bookmark saved
+  // once for the new group specified implicitly
+  // as the parent of the two items
+});
+</code></pre>
+<p>The <code>data</code> event is also called for <code>search</code> requests, with each result being passed individually into its own <code>data</code> event.</p>
+<pre><code>let { search } = require("sdk/places/bookmarks");
+
+search({ query: "firefox" }).on("data", function (item) {
+  // each bookmark item that matches the query will 
+  // be called in this function
+});
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name"><span class="datatype">Bookmark|Group|Separator</span></div>
+<p>For the <code>save</code> function, this is the saved, latest snapshot of the bookmark item. For <code>search</code>, this is a snapshot of a bookmark returned from the search query.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name"><span class="datatype">Bookmark|Group|Separator|object</span></div>
+<p>Only in <code>save</code> data events. The initial instance of the item that was used for the save request.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">error</h6>
+<p>The <code>error</code> event is emitted whenever a bookmark item's save could not be completed.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name"><span class="datatype">string</span></div>
+<p>A string indicating the error that occurred.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name"><span class="datatype">Bookmark|Group|Separator|object</span></div>
+<p>Only in <code>save</code> error events. The initial instance of the item that was used for the save request.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component">
+<h6 class="api_name">end</h6>
+<p>The <code>end</code> event is called when all bookmark items and dependencies
+have been saved, or an aggregate of all items returned from a search query.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name"><span class="datatype">array</span></div>
+<p>The array is an ordered list of the input bookmark items, replaced
+with their updated, latest snapshot instances (the first argument
+in the <code>data</code> handler), or in the case of an error, the initial instance
+of the item that was used for the save request
+(the second argument in the <code>data</code> or <code>error</code> handler).</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h3 class="api_header">Functions</h3>
+
+<div class="api_component">
+<h4 class="api_name">save(bookmarkItems, options)</h4>
+<p>Creating, saving, and deleting bookmarks are all done with the <code>save()</code> function. This function takes in any of:</p>
+<ul>
+<li>a bookmark item (Bookmark, Group, Separator)</li>
+<li>a duck-typed object (the relative properties for a bookmark item, in addition to a <code>type</code> property of <code>'bookmark'</code>, <code>'group'</code>, or <code>'separator'</code>)</li>
+<li>an array of bookmark items.</li>
+</ul>
+<p>All of the items passed in are pushed to the platform and are either created, updated or deleted.</p>
+<ul>
+<li>adding items: if passing in freshly instantiated bookmark items or a duck-typed object, the item is created on the platform.</li>
+<li>updating items: for an item referenced from a previous <code>save()</code> or from the result of a <code>search()</code> query, changing the properties and calling <code>save()</code> will update the item on the server.</li>
+<li>deleting items: to delete a bookmark item, pass in a bookmark item with a property <code>remove</code> set to <code>true</code>.</li>
+</ul>
+<p>The function returns a <a href="../../../modules/sdk/places/bookmarks.html#PlacesEmitter"><code>PlacesEmitter</code></a> that emits a <code>data</code> event for each item as it is saved, and an <code>end</code> event when all items have been saved.</p>
+<pre><code>let { Bookmark, Group } = require("sdk/places/bookmarks");
+
+let myGroup = Group({ title: "My Group" });
+let myBookmark = Bookmark({
+  title: "Moz",
+  url: "http://mozilla.com",
+  group: myGroup
+});
+
+save(myBookmark).on("data", function (item, inputItem) {
+  // The `data` event returns the latest snapshot from the
+  // host, so this is a new instance of the bookmark item,
+  // where `item !== myBookmark`. To match it with the input item,
+  // use the second argument, so `inputItem === myBookmark`
+
+  // All explicitly saved items have data events called, as
+  // well as implicitly saved items. In this case,
+  // `myGroup` has to be saved before `myBookmark`, since
+  // `myBookmark` is a child of `myGroup`. `myGroup` will
+  // also have a `data` event called for it.
+}).on("end", function (items, inputItems) {
+  // The `end` event returns all items that are explicitly
+  // saved. So `myGroup` will not be in this array,
+  // but `myBookmark` will be.
+  // `inputItems` matches the initial input as an array,
+  // so `inputItems[0] === myBookmark`
+});
+
+// Saving multiple bookmarks, as duck-types in this case
+
+let bookmarks = [
+  { title: "mozilla", url: "http://mozilla.org", type: "bookmark" },
+  { title: "firefox", url: "http://firefox.com", type: "bookmark" },
+  { title: "twitter", url: "http://twitter.com", type: "bookmark" }
+];
+
+save(bookmarks).on("data", function (item, inputItem) {
+  // Each item in `bookmarks` has its own `data` event
+}).on("end", function (results, inputResults) {
+  // `results` is an array of items saved in the same order
+  // as they were passed in.
+});
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">bookmarkItems : <span class="datatype">bookmark|group|separator|array</span></div>
+<p>A bookmark item (<a href="../../../modules/sdk/places/bookmarks.html#Bookmark">Bookmark</a>, <a href="../../../modules/sdk/places/bookmarks.html#Group">Group</a>, <a href="../../../modules/sdk/places/bookmarks.html#Separator">Separator</a>), or an array of bookmark items to be saved.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ options : <span class="datatype">object</span> ]</div>
+<p>An optional options object that takes the following properties:</p>
+<div class="api_component">
+<div class="api_name">[ resolve : <span class="datatype">function</span> ]</div>
+<p>A resolution function that is invoked during an attempt to save
+a bookmark item that is not derived from the latest state from
+the platform. Invoked with two arguments, <code>mine</code> and <code>platform</code>, where
+<code>mine</code> is the item that is being saved, and <code>platform</code> is the
+current state of the item on the item. The object returned from
+this function is what is saved on the platform. By default, all changes
+on an outdated bookmark item overwrite the platform's bookmark item.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">PlacesEmitter</span><p>Returns a <a href="../../../modules/sdk/places/bookmarks.html#PlacesEmitter">PlacesEmitter</a>.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">remove(items)</h4>
+<p>A helper function that takes in a bookmark item, or an <code>Array</code> of several bookmark items, and sets each item's <code>remove</code> property to true. This does not remove the bookmark item from the database: it must be subsequently saved.</p>
+<pre><code>let { search, save, remove } = require("sdk/places/bookmarks");
+
+search({ tags: ["php"] }).on("end", function (results) {
+  // The search returns us all bookmark items that are
+  // tagged with `"php"`.
+
+  // We then pass `results` into the remove function to mark
+  // all items to be removed, which returns the new modified `Array`
+  // of items, which is passed into save.
+  save(remove(results)).on("end", function (results) {
+    // items tagged with `"php"` are now removed!
+  });
+})
+</code></pre>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">items : <span class="datatype">Bookmark|Group|Separator|array</span></div>
+<p>A bookmark item, or <code>Array</code> of bookmark items to be transformed to set their <code>remove</code> property to <code>true</code>.</p>
+</div>
+
+</div>
+
+<div class="returns">Returns: <span class="datatype">array</span><p>An array of the transformed bookmark items.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<h4 class="api_name">search(queries, options)</h4>
+<p>Queries can be performed on bookmark items by passing in one or more query objects, each of which is given one or more properties.</p>
+<p>Within each query object, the properties are AND'd together: so only objects matching all properties are retrieved. Across query objects, the results are OR'd together, meaning that if an item matches any of the query objects, it will be retrieved.</p>
+<p>For example, suppose we called <code>search()</code> with two query objects:</p>
+<pre>[{ url: "mozilla.org", tags: ["mobile"]},
+ { tags: ["firefox-os"]}]</pre>
+
+<p>This will return:</p>
+<ul>
+<li>all bookmark items from mozilla.org that are also tagged "mobile"</li>
+<li>all bookmark items that are tagged "firefox-os"</li>
+</ul>
+<p>An <code>options</code> object may be used to determine overall settings such as sort order and how many objects should be returned.</p>
+<div class="parameter_set">
+<div class="api_component">
+<div class="api_name">queries : <span class="datatype">object|array</span></div>
+<p>An <code>Object</code> representing a query, or an <code>Array</code> of <code>Objects</code> representing queries. Each query object can take several properties, which are queried against the bookmarks database. Each property is AND'd together, meaning that bookmarks must match each property within a query object. Multiple query objects are then OR'd together.</p>
+<div class="api_component">
+<div class="api_name">[ group : <span class="datatype">Group</span> ]</div>
+<p>Group instance that should be owners of the returned children bookmarks. If no <code>group</code> specified, all bookmarks are under the search space.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ tags : <span class="datatype">set|array</span> ]</div>
+<p>Bookmarks with corresponding tags. These are AND'd together.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ url : <span class="datatype">string</span> ]</div>
+<p>A string that matches bookmarks' URL. The following patterns are accepted:</p>
+<p><code>'*.mozilla.com'</code>: matches any URL with 'mozilla.com' as the host, accepting any subhost.</p>
+<p><code>'mozilla.com'</code>: matches any URL with 'mozilla.com' as the host.</p>
+<p><code>'http://mozilla.com'</code>: matches 'http://mozilla.com' exactly.</p>
+<p><code>'http://mozilla.com/*'</code>: matches any URL that starts with 'http://mozilla.com/'.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ query : <span class="datatype">string</span> ]</div>
+<p>A string that matches bookmarks' URL, title and tags.</p>
+</div>
+
+</div>
+
+<div class="api_component">
+<div class="api_name">[ options : <span class="datatype">object</span> ]</div>
+<p>An <code>Object</code> with options for the search query.</p>
+<div class="api_component">
+<div class="api_name">[ count : <span class="datatype">number</span> ]</div>
+<p>The number of bookmark items to return. If left undefined, no limit is set.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ sort : <span class="datatype">string</span> ]</div>
+<p>A string specifying how the results should be sorted. Possible options are <code>'title'</code>, <code>'date'</code>, <code>'url'</code>, <code>'visitCount'</code>, <code>'dateAdded'</code> and <code>'lastModified'</code>.</p>
+</div>
+
+<div class="api_component">
+<div class="api_name">[ descending : <span class="datatype">boolean</span> ]</div>
+<p>A boolean specifying whether the results should be in descending order. By default, results are in ascending order.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="api_component_group">
+<h3 class="api_header">Properties</h3>
+
+<div class="api_component">
+<h4 class="api_name">MENU : <span class="datatype">group</span></h4>
+<p>This is a constant, default <a href="../../../modules/sdk/places/bookmarks.html#Group"><code>Group</code></a> on the Firefox platform, the <strong>Bookmarks Menu</strong>. It can be used in queries or specifying the parent of a bookmark item, but it cannot be modified.</p>
+</div>
+
+<div class="api_component">
+<h4 class="api_name">TOOLBAR : <span class="datatype">group</span></h4>
+<p>This is a constant, default <a href="../../../modules/sdk/places/bookmarks.html#Group"><code>Group</code></a> on the Firefox platform, the <strong>Bookmarks Toolbar</strong>. It can be used in queries or specifying the parent of a bookmark item, but it cannot be modified.</p>
+</div>
+
+<div class="api_component">
+<h4 class="api_name">UNSORTED : <span class="datatype">group</span></h4>
+<p>This is a constant, default <a href="../../../modules/sdk/places/bookmarks.html#Group"><code>Group</code></a> on the Firefox platform, the <strong>Unsorted Bookmarks</strong> group. It can be used in queries or specifying the parent of a bookmark item, but it cannot be modified.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+  </div>
+
+  <div id="sidebar" class="column">
+    <div class="sidebar-section" id="addon-development">
+      <a href="../../../dev-guide/index.html"><h2 class="sidebar-section-header">Developer Guide</h2></a>
+      <ul class="sidebar-section-contents" id="default-section-contents">
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/installation.html"><h3>Installation</h3></a>
+        </li>
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/tutorials/index.html"><h3 class="sidebar-subsection-header">Tutorials</h3></a>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../dev-guide/guides/index.html"><h3 class="sidebar-subsection-header">Guides</h3></a>
+        </li>
+
+        <li class="sidebar-subsection" id="third-party-module-subsection">
+          <a href="../../../modules/third-party-modules.html"><h3 class="sidebar-subsection-header">Third-Party APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="third-party-module-summaries"></ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/high-level-modules.html"><h3 class="sidebar-subsection-header">High-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="high-level-module-summaries">
+<li>
+<a href="../../../modules/sdk/addon-page.html">addon-page</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/base64.html">base64</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/clipboard.html">clipboard</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/context-menu.html">context-menu</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/hotkeys.html">hotkeys</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/indexed-db.html">indexed-db</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/l10n.html">l10n</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/notifications.html">notifications</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-mod.html">page-mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/page-worker.html">page-worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/panel.html">panel</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/passwords.html">passwords</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/private-browsing.html">private-browsing</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/querystring.html">querystring</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/request.html">request</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/selection.html">selection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/self.html">self</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-prefs.html">simple-prefs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/simple-storage.html">simple-storage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system.html">system</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs.html">tabs</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/timers.html">timers</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/url.html">url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/widget.html">widget</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/windows.html">windows</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <a href="../../../modules/low-level-modules.html"><h3 class="sidebar-subsection-header">Low-Level APIs</h3></a>
+          <div class="sidebar-subsection-contents">
+            <ul id="low-level-module-summaries">
+<li>
+<a href="../../../modules/toolkit/loader.html">/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/plain-text.html">console/plain-text</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/console/traceback.html">console/traceback</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/content.html">content/content</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/loader.html">content/loader</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/mod.html">content/mod</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/symbiont.html">content/symbiont</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/content/worker.html">content/worker</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/heritage.html">core/heritage</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/namespace.html">core/namespace</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/core/promise.html">core/promise</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/api-utils.html">deprecated/api-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/app-strings.html">deprecated/app-strings</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/cortex.html">deprecated/cortex</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/errors.html">deprecated/errors</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/events.html">deprecated/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/light-traits.html">deprecated/light-traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/observer-service.html">deprecated/observer-service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/tab-browser.html">deprecated/tab-browser</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/traits.html">deprecated/traits</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/deprecated/window-utils.html">deprecated/window-utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/core.html">event/core</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/event/target.html">event/target</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/hidden-frame.html">frame/hidden-frame</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/frame/utils.html">frame/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/byte-streams.html">io/byte-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/file.html">io/file</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/io/text-streams.html">io/text-streams</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/functional.html">lang/functional</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/lang/type.html">lang/type</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/cuddlefish.html">loader/cuddlefish</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/loader/sandbox.html">loader/sandbox</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/url.html">net/url</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/net/xhr.html">net/xhr</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/bookmarks.html">places/bookmarks</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/favicon.html">places/favicon</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/places/history.html">places/history</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/platform/xpcom.html">platform/xpcom</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/preferences/service.html">preferences/service</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/style.html">stylesheet/style</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/stylesheet/utils.html">stylesheet/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/environment.html">system/environment</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/events.html">system/events</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/runtime.html">system/runtime</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/unload.html">system/unload</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/system/xul-app.html">system/xul-app</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/tabs/utils.html">tabs/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/assert.html">test/assert</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/harness.html">test/harness</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/httpd.html">test/httpd</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/runner.html">test/runner</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/test/utils.html">test/utils</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/ui/id.html">ui/id</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/ui/sidebar.html">ui/sidebar</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/array.html">util/array</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/collection.html">util/collection</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/deprecate.html">util/deprecate</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/list.html">util/list</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/match-pattern.html">util/match-pattern</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/object.html">util/object</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/util/uuid.html">util/uuid</a>
+</li>
+
+<li>
+<a href="../../../modules/sdk/window/utils.html">window/utils</a>
+</li>
+</ul>
+          </div>
+        </li>
+
+        <li class="sidebar-subsection">
+          <h3 class="sidebar-subsection-header">Tools Reference</h3>
+          <div class="sidebar-subsection-contents">
+            <a href="../../../dev-guide/console.html">console</a>
+            <a href="../../../dev-guide/cfx-tool.html">cfx</a>
+            <a href="../../../dev-guide/package-spec.html">package.json</a>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <ul class="sidebar-section" id="appendices">
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack/Release_Notes"><h3>Release Notes</h3></a></li>
+        <li><a href="https://wiki.mozilla.org/Labs/Jetpack"><h3>Jetpack Wiki</h3></a></li>
+        <li><a href="../../../dev-guide/glossary.html"><h3>Glossary</h3></a></li>
+        <li><a href="../../../dev-guide/credits.html"><h3>Credits</h3></a></li>
+
+    </ul>
+<!--end of sidebar column-->
+  </div>
+<!--end of 'columns'-->
+<div class="clearfooter"></div>
+</div>
+</div>
+
+<div id="footer">
+  <div class="section">
+    <img src="../../../static-files/media/footer-logo-med.png" alt="" class="footerlogo">
+    <div id="social-footer">
+      <ul>
+        <li>get to know <b>add-ons</b></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/about">About</a></li>
+        <li><a href="http://blog.mozilla.com/addons">Blog</a></li>
+        <li class="footer-devhub-link"><a href="https://addons.mozilla.org/en-US/developers/">Developer Hub</a></li>
+        <li><a href="https://addons.mozilla.org/en-US/firefox/faq">FAQ</a></li>
+        <li><a href="https://forums.addons.mozilla.org">Forum</a></li>
+      </ul>
+    </div>
+
+    <div id="copyright">
+      <p id="footer-links">
+        <a href="http://mozilla.com/privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/about/legal.html">Legal Notices</a> &nbsp;|&nbsp;
+        <a href="http://mozilla.com/legal/fraud-report/index.html">Report Trademark Abuse</a>
+    &nbsp;|&nbsp;<a href="https://addons.mozilla.org/z/en-US/developers/" class="mobile-link">View Mobile Site</a>
+      </p>
+      <p>
+      Except where otherwise <a href="http://mozilla.com/about/legal.html#site">noted</a>, content on this site is licensed under the <br> <a href="http://creativecommons.org/licenses/by-sa/3.0/"> Creative Commons Attribution Share-Alike License v3.0 </a> or any later version.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="../../../static-files/js/jquery.js" type="text/javascript"></script>
+<script src="../../../static-files/js/main.js" type="text/javascript"></script>
+<!-- load the google JS last, in case we're offline ( bug 836955 ) -->
+<script src="https://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
+
+</body>
+
+</html>
